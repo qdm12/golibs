@@ -1,0 +1,19 @@
+{
+    "go.useLanguageServer": true,
+    "go.autocompleteUnimportedPackages": true,
+    "[go]": {
+        "editor.snippetSuggestions": "none",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "gopls": {
+        "completeUnimported": true,
+        "watchChangedFiles": true,
+        "deepCompletion": true,
+        "usePlaceholders": false
+    },
+    "files.eol": "\n",
+    "go.inferGopath": false
+}
