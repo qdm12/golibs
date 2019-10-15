@@ -21,10 +21,10 @@ func getEnv(key, defaultValue string) (value string) {
 }
 
 // GetListeningPort obtains and checks the listening port
-func GetListeningPort() (listeningPort, err error) {
+func GetListeningPort() (listeningPort string, err error) {
 	listeningPort = getEnv("LISTENINGPORT", "8000")
 	uid := os.Geteuid()
-	warning, err = verifyListeningPort(listeningPort, uid)
+	warning, err := verifyListeningPort(listeningPort, uid)
 	zap.L().Warn(warning)
 	return listeningPort, err
 }
