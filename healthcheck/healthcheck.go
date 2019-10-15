@@ -36,7 +36,7 @@ func Query() error {
 }
 
 // Serve runs the server locally to serve the healthcheck
-func Serve(rootURL string, isHealthy func() bool, stop <-chan struct{}) error {
+func Serve(isHealthy func() bool, stop <-chan struct{}) error {
 	router := httprouter.New()
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		if isHealthy() {
