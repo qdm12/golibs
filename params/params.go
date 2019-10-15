@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/qdm12/golibs/verification"
+	"go.uber.org/zap"
 )
 
 func getEnv(key, defaultValue string) (value string) {
@@ -19,15 +20,16 @@ func getEnv(key, defaultValue string) (value string) {
 	return value
 }
 
-// GetListeningPort obtains and checks the listening port from Viper (env variable or config file, etc.)
-func GetListeningPort() (listeningPort, warning string, err error) {
+// GetListeningPort obtains and checks the listening port
+func GetListeningPort() (listeningPort, err error) {
 	listeningPort = getEnv("LISTENINGPORT", "8000")
 	uid := os.Geteuid()
 	warning, err = verifyListeningPort(listeningPort, uid)
-	return listeningPort, warning, err
+	zap.L().Warn(warning)
+	return listeningPort, err
 }
 
-// GetRootURL obtains and checks the root URL from Viper (env variable or config file, etc.)
+// GetRootURL obtains and checks the root URL
 func GetRootURL() (rootURL string, err error) {
 	rootURL = getEnv("ROOTURL", "/")
 	if err := verifyRootURL(rootURL); err != nil {
@@ -38,7 +40,7 @@ func GetRootURL() (rootURL string, err error) {
 	return rootURL, nil
 }
 
-// GetDatabaseDetails obtains the SQL database details from Viper (env variable or config file, etc.)
+// GetDatabaseDetails obtains the SQL database details
 func GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
 	hostname = getEnv("sqlhost", "postgres")
 	if err := verifyHostname(hostname); err != nil {
@@ -53,7 +55,7 @@ func GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
 		nil
 }
 
-// GetRedisDetails obtains the Redis details from Viper (env variable or config file, etc.)
+// GetRedisDetails obtains the Redis details
 func GetRedisDetails() (hostname, port, password string, err error) {
 	hostname = getEnv("redishost", "redis")
 	if err := verifyHostname(hostname); err != nil {
@@ -80,7 +82,7 @@ func GetDir() (dir string, err error) {
 	return dir, nil
 }
 
-// GetLoggerMode obtains the logging mode from Viper (env variable or config file, etc.)
+// GetLoggerMode obtains the logging mode for Zap
 func GetLoggerMode() (production bool, err error) {
 	s := getEnv("logging", "production")
 	switch strings.ToLower(s) {
