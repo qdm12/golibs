@@ -4,7 +4,9 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"fmt"
 
@@ -12,7 +14,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func getEnv(key, defaultValue string) (value string) {
+// GetEnv returns the value stored for a named environment variable,
+// and a default if no value is found
+func GetEnv(key, defaultValue string) (value string) {
 	value = os.Getenv(key)
 	if len(value) == 0 {
 		value = defaultValue
@@ -20,9 +24,29 @@ func getEnv(key, defaultValue string) (value string) {
 	return value
 }
 
+// GetDurationMs obtains an integer for the environment variable
+// corresponding to the key given and converts it to a duration in milliseconds.
+// It returns the duration in milliseconds corresponding to the defaultValue if
+// no value is found for this particular key.
+func GetDurationMs(key, defaultValue string) (duration time.Duration, err error) {
+	s := GetEnv(key, defaultValue)
+	value, err := strconv.Atoi(s)
+	if err != nil {
+		return duration, fmt.Errorf("duration %s: %w", key, err)
+	}
+	return time.Duration(value) * time.Millisecond, nil
+}
+
+// GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
+// from the environment variable HTTPTIMEOUT
+func GetHTTPTimeout(defaultValue string) (duration time.Duration, err error) {
+	return GetDurationMs("HTTPTIMEOUT", defaultValue)
+}
+
 // GetListeningPort obtains and checks the listening port
+// from the environment variable LISTENINGPORT
 func GetListeningPort() (listeningPort string, err error) {
-	listeningPort = getEnv("LISTENINGPORT", "8000")
+	listeningPort = GetEnv("LISTENINGPORT", "8000")
 	uid := os.Geteuid()
 	warning, err := verifyListeningPort(listeningPort, uid)
 	zap.L().Warn(warning)
@@ -30,8 +54,9 @@ func GetListeningPort() (listeningPort string, err error) {
 }
 
 // GetRootURL obtains and checks the root URL
+// from the environment variable ROOTURL
 func GetRootURL() (rootURL string, err error) {
-	rootURL = getEnv("ROOTURL", "/")
+	rootURL = GetEnv("ROOTURL", "/")
 	if err := verifyRootURL(rootURL); err != nil {
 		return rootURL, err
 	}
@@ -40,40 +65,42 @@ func GetRootURL() (rootURL string, err error) {
 	return rootURL, nil
 }
 
-// GetDatabaseDetails obtains the SQL database details
+// GetDatabaseDetails obtains the SQL database details from the
+// environment variables SQLUSER, SQLPASSWORD and SQLDBNAME
 func GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
-	hostname = getEnv("sqlhost", "postgres")
+	hostname = GetEnv("sqlhost", "postgres")
 	if err := verifyHostname(hostname); err != nil {
 		return hostname, user, password, dbName,
 			fmt.Errorf("Postgres parameters: %w", err)
 	}
 	// TODO port
 	return hostname,
-		getEnv("sqluser", "postgres"),
-		getEnv("sqlpassword", "postgres"),
-		getEnv("sqldbname", "postgres"),
+		GetEnv("SQLUSER", "postgres"),
+		GetEnv("SQLPASSWORD", "postgres"),
+		GetEnv("SQLDBNAME", "postgres"),
 		nil
 }
 
-// GetRedisDetails obtains the Redis details
+// GetRedisDetails obtains the Redis details from the
+// environment variables REDISHOST, REDISPORT and REDISPASSWORD
 func GetRedisDetails() (hostname, port, password string, err error) {
-	hostname = getEnv("redishost", "redis")
+	hostname = GetEnv("REDISHOST", "redis")
 	if err := verifyHostname(hostname); err != nil {
 		return hostname, port, password,
 			fmt.Errorf("Redis parameters: %w", err)
 	}
-	port = getEnv("redisport", "6379")
+	port = GetEnv("redisport", "6379")
 	if err := verification.VerifyPort(port); err != nil {
 		return hostname, port, password,
 			fmt.Errorf("Redis parameters: %w", err)
 	}
 	return hostname, port,
-		getEnv("redispassword", ""),
+		GetEnv("redispassword", ""),
 		nil
 }
 
-// GetDir obtains the executable directory
-func GetDir() (dir string, err error) {
+// GetExeDir obtains the executable directory
+func GetExeDir() (dir string, err error) {
 	ex, err := os.Executable()
 	if err != nil {
 		return dir, err
@@ -82,9 +109,18 @@ func GetDir() (dir string, err error) {
 	return dir, nil
 }
 
+// GetPath obtains a path from the environment variable corresponding
+// to key, and verifies it is valid. It uses defaultValue if no value is
+// found
+func GetPath(key, defaultValue string) (path string, err error) {
+	s := GetEnv(key, defaultValue)
+	return filepath.Abs(s)
+}
+
 // GetLoggerMode obtains the logging mode for Zap
+// from the environment variable LOGGING
 func GetLoggerMode() (production bool, err error) {
-	s := getEnv("logging", "production")
+	s := GetEnv("LOGGING", "production")
 	switch strings.ToLower(s) {
 	case "production":
 		return true, nil
@@ -94,18 +130,28 @@ func GetLoggerMode() (production bool, err error) {
 	return false, fmt.Errorf("logging mode %s unrecognized", s)
 }
 
-// GetGotifyURL obtains the URL to the Gotify server
-func GetGotifyURL() (*url.URL, error) {
-	URL := getEnv("gotifyurl", "")
+// GetURL obtains the URL for the environment variable for the key given.
+// It returns the URL of defaultValue if defaultValue is not empty.
+// If no defaultValue is given, it returns nil.
+func GetURL(key, defaultValue string) (*url.URL, error) {
+	URL := GetEnv(key, defaultValue)
 	if URL == "" {
 		return nil, nil
 	}
 	return url.Parse(URL)
 }
 
+// GetGotifyURL obtains the URL for Gotify server
+// from the environment variable GOTIFYURL.
+// It returns a nil URL if no value is found.
+func GetGotifyURL() (*url.URL, error) {
+	return GetURL("GOTIFYURL", "")
+}
+
 // GetGotifyToken obtains the token for the app on the Gotify server
+// from the environment variable GOTIFYTOKEN.
 func GetGotifyToken() (token string, err error) {
-	token = getEnv("gotifytoken", "")
+	token = GetEnv("GOTIFYTOKEN", "")
 	if token == "" {
 		return "", fmt.Errorf("Gotify token not provided")
 	}
