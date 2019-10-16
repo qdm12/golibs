@@ -7,7 +7,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/qdm12/golibs/network"
-	"github.com/qdm12/golibs/server"
 )
 
 // Mode checks if the program is launched to run the
@@ -35,8 +34,9 @@ func Query() error {
 	return nil
 }
 
-// Serve runs the server locally to serve the healthcheck
-func Serve(isHealthy func() bool, stop <-chan struct{}) error {
+// CreateRouter creates a HTTP router with the route and configuration
+// to run a healthcheck server locally
+func CreateRouter(isHealthy func() bool) *httprouter.Router {
 	router := httprouter.New()
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		if isHealthy() {
@@ -45,5 +45,5 @@ func Serve(isHealthy func() bool, stop <-chan struct{}) error {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 	})
-	return server.Serve("127.0.0.1:9999", router, stop)
+	return router
 }
