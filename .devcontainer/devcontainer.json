@@ -1,7 +1,6 @@
 {
     "name": "golibs Dev",
     "dockerFile": "Dockerfile",
-    "appPort": 8000,
     "extensions": [
         "ms-vscode.go",
         "davidanson.vscode-markdownlint",
