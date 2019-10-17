@@ -24,23 +24,37 @@ func GetEnv(key, defaultValue string) (value string) {
 	return value
 }
 
-// GetDurationMs obtains an integer for the environment variable
-// corresponding to the key given and converts it to a duration in milliseconds.
-// It returns the duration in milliseconds corresponding to the defaultValue if
-// no value is found for this particular key.
-func GetDurationMs(key, defaultValue string) (duration time.Duration, err error) {
-	s := GetEnv(key, defaultValue)
-	value, err := strconv.Atoi(s)
+// defaultValue returns the value stored for a named environment variable,
+// and a default if no value is found. If the value is not a valid
+// integer, an error is returned.
+func GetEnvInt(key string, defaultValue int) (n int, err error) {
+	s := GetEnv(key, "")
+	if s == "" {
+		return defaultValue, nil
+	}
+	return strconv.Atoi(s)
+}
+
+func GetDuration(key string, defaultValue time.Duration) (duration time.Duration, err error) {
+	value, err := GetEnvInt(key, -1)
 	if err != nil {
 		return duration, fmt.Errorf("duration %s: %w", key, err)
+	} else if value == 0 {
+		return duration, fmt.Errorf("duration %s cannot be 0", key)
+	} else if value < 0 {
+		return defaultValue, nil
 	}
 	return time.Duration(value) * time.Millisecond, nil
 }
 
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
 // from the environment variable HTTPTIMEOUT
-func GetHTTPTimeout(defaultValue string) (duration time.Duration, err error) {
-	return GetDurationMs("HTTPTIMEOUT", defaultValue)
+func GetHTTPTimeout(defaultValue time.Duration) (duration time.Duration, err error) {
+	duration, err = GetDuration("HTTPTIMEOUT", defaultValue)
+	if err != nil {
+		return duration, err
+	}
+	return duration * time.Millisecond, nil
 }
 
 // GetListeningPort obtains and checks the listening port
