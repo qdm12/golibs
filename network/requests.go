@@ -19,7 +19,7 @@ var userAgents = []string{
 // GetContentParamsType contains the optional parameters to use
 // to get content with an HTTP get
 type GetContentParamsType struct {
-	disguisedUserAgent bool
+	DisguisedUserAgent bool
 }
 
 // DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
@@ -44,7 +44,7 @@ func GetContent(httpClient *http.Client, URL string, params GetContentParamsType
 	if err != nil {
 		return nil, fmt.Errorf("cannot GET content of URL %s: %w", URL, err)
 	}
-	if params.disguisedUserAgent {
+	if params.DisguisedUserAgent {
 		req.Header.Set("User-Agent", userAgents[security.GenerateRandomInt(len(userAgents))])
 	}
 	status, content, err := DoHTTPRequest(httpClient, req)
