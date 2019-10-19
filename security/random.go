@@ -1,11 +1,9 @@
 package security
 
 import (
-	mathrand "math/rand"
-	"time"
+	"crypto/rand"
+	"encoding/binary"
 )
-
-var randomSource = mathrand.NewSource(time.Now().UnixNano())
 
 const lowercase = "abcdefghijklmnopqrstuvwxyz"
 const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -18,31 +16,48 @@ const (
 	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
 )
 
-// GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length
-func GenerateRandomAlphaNum(length uint64) string {
-	return generateRandomAlphaNum(length, randomSource)
+func GenerateRandomBytes(n int) ([]byte, error) {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
-// GenerateRandomNum returns a string of random numeric characters of a specified length
-func GenerateRandomNum(length uint64) string {
-	return generateRandomAlphaNum(length, randomSource)
+// GenerateRandomInt63 returns a random 63 bit positive integer
+func GenerateRandomInt63() int64 {
+	b, _ := GenerateRandomBytes(32) // 256 bits
+	v := int64(binary.BigEndian.Uint64(b))
+	if v < 0 {
+		v = -v
+	}
+	return v
 }
 
 // GenerateRandomInt returns a random integer between 0 and n
 func GenerateRandomInt(n int) int {
-	return generateRandomInt(n, randomSource)
+	if n == 0 {
+		return 0
+	}
+	r := int(GenerateRandomInt63())
+	if r < 0 {
+		r = -r
+	}
+	return int(r % n)
 }
 
-func generateRandomAlphaNum(length uint64, source mathrand.Source) string {
+// GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length
+func GenerateRandomAlphaNum(length uint64) string {
 	if length >= 9223372036854775807 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
 	n := int64(length)
 	b := make([]byte, n)
-	// A source.Int63() generates 63 random bits, enough for letterIdxMax characters!
-	for i, cache, remain := n-1, source.Int63(), letterIdxMax; i >= 0; {
+	// GenerateRandomInt63() generates 63 random bits, enough for letterIdxMax characters!
+	for i, cache, remain := n-1, GenerateRandomInt63(), letterIdxMax; i >= 0; {
 		if remain == 0 {
-			cache, remain = source.Int63(), letterIdxMax
+			cache, remain = GenerateRandomInt63(), letterIdxMax
 		}
 		if idx := int(cache & letterIdxMask); idx < len(alphaNum) {
 			b[i] = alphaNum[idx]
@@ -54,20 +69,14 @@ func generateRandomAlphaNum(length uint64, source mathrand.Source) string {
 	return string(b)
 }
 
-func generateRandomNum(n uint64, source mathrand.Source) string {
+// GenerateRandomNum returns a string of random numeric characters of a specified length
+func GenerateRandomNum(n uint64) string {
 	if n >= 9223372036854775807 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
 	b := make([]byte, n)
 	for i := range b {
-		b[i] = num[int(source.Int63())%len(num)]
+		b[i] = num[int(GenerateRandomInt63())%len(num)]
 	}
 	return string(b)
-}
-
-func generateRandomInt(n int, source mathrand.Source) int {
-	if n == 0 {
-		return 0
-	}
-	return int(source.Int63() % int64(n))
 }
