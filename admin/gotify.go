@@ -10,6 +10,7 @@ import (
 	"github.com/gotify/go-api-client/v2/client/message"
 	"github.com/gotify/go-api-client/v2/gotify"
 	"github.com/gotify/go-api-client/v2/models"
+	"go.uber.org/zap"
 )
 
 // Gotify contains the Gotify API client and the token for the application
@@ -34,7 +35,13 @@ func NewGotify(URL *url.URL, token string, httpClient *http.Client) (g *Gotify, 
 }
 
 // Notify sends a notification to the Gotify server
-func (g *Gotify) Notify(title string, priority int, content string, args ...interface{}) error {
+func (g *Gotify) Notify(title string, priority int, content string, args ...interface{}) {
+	if err := g.notify(title, priority, content, args...); err != nil {
+		zap.L().Error("Gotify error", zap.Error(err))
+	}
+}
+
+func (g *Gotify) notify(title string, priority int, content string, args ...interface{}) error {
 	if g.client == nil {
 		return nil
 	}
