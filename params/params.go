@@ -12,6 +12,7 @@ import (
 
 	"github.com/qdm12/golibs/verification"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 // GetEnv returns the value stored for a named environment variable,
@@ -24,7 +25,7 @@ func GetEnv(key, defaultValue string) (value string) {
 	return value
 }
 
-// defaultValue returns the value stored for a named environment variable,
+// GetEnvInt returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer, an error is returned.
 func GetEnvInt(key string, defaultValue int) (n int, err error) {
@@ -35,6 +36,8 @@ func GetEnvInt(key string, defaultValue int) (n int, err error) {
 	return strconv.Atoi(s)
 }
 
+// GetDuration gets the duration from the environment variable corresponding to the key provided.
+// If none is set, it returns defaultValue.
 func GetDuration(key string, defaultValue time.Duration) (duration time.Duration, err error) {
 	value, err := GetEnvInt(key, -1)
 	if err != nil {
@@ -131,17 +134,44 @@ func GetPath(key, defaultValue string) (path string, err error) {
 	return filepath.Abs(s)
 }
 
-// GetLoggerMode obtains the logging mode for Zap
-// from the environment variable LOGGING
-func GetLoggerMode() (production bool, err error) {
-	s := GetEnv("LOGGING", "production")
-	switch strings.ToLower(s) {
-	case "production":
-		return true, nil
-	case "development":
-		return false, nil
+// GetLoggerEncoding obtains the logging encoding for Zap
+// from the environment variable LOGENCODING
+func GetLoggerEncoding() (encoding string, err error) {
+	s := GetEnv("LOGENCODING", "json")
+	s = strings.ToLower(s)
+	if s != "json" && s != "console" {
+		return "", fmt.Errorf("logger encoding \"%s\" unrecognized", s)
 	}
-	return false, fmt.Errorf("logging mode %s unrecognized", s)
+	return s, nil
+}
+
+// GetLoggerLevel obtains the logging level for Zap
+// from the environment variable LOGLEVEL
+func GetLoggerLevel() (level zapcore.Level, err error) {
+	s := GetEnv("LOGLEVEL", "info")
+	switch strings.ToLower(s) {
+	case "info":
+		return zap.InfoLevel, nil
+	case "warning":
+		return zap.WarnLevel, nil
+	case "error":
+		return zap.ErrorLevel, nil
+	case "":
+		return zap.InfoLevel, nil
+	default:
+		return level, fmt.Errorf("logger level \"%s\" unrecognized", s)
+	}
+}
+
+// GetNodeID obtains the node instance ID from the environment variable
+// NODEID
+func GetNodeID() (nodeID int, err error) {
+	s := GetEnv("NODEID", "0")
+	nodeID, err = strconv.Atoi(s)
+	if err != nil {
+		return 0, fmt.Errorf("Node ID \"%d\" is not a valid integer", nodeID)
+	}
+	return nodeID, nil
 }
 
 // GetURL obtains the URL for the environment variable for the key given.
