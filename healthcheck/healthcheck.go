@@ -7,6 +7,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/qdm12/golibs/network"
+	"go.uber.org/zap"
 )
 
 // Mode checks if the program is launched to run the
@@ -36,14 +37,16 @@ func Query() error {
 
 // CreateRouter creates a HTTP router with the route and configuration
 // to run a healthcheck server locally
-func CreateRouter(isHealthy func() bool) *httprouter.Router {
+func CreateRouter(isHealthy func() error) *httprouter.Router {
 	router := httprouter.New()
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		if isHealthy() {
-			w.WriteHeader(http.StatusOK)
-		} else {
+		err := isHealthy()
+		if err != nil {
+			zap.L().Warn("Unhealthy", zap.Error(err))
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
+		w.WriteHeader(http.StatusOK)
 	})
 	return router
 }
