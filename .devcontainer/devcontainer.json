@@ -1,54 +1,62 @@
 {
-    "name": "golibs Dev",
-    "dockerFile": "Dockerfile",
+    "name": "golibs-dev",
+    "dockerComposeFile": ["docker-compose.yml"],
+    "service": "vscode",
+    "runServices": ["vscode"],
+    "shutdownAction": "stopCompose",
+    "postCreateCommand": "go mod download",
+    "workspaceFolder": "/workspace",
     "extensions": [
         "ms-vscode.go",
+        "IBM.output-colorizer",
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
         "davidanson.vscode-markdownlint",
         "shardulm94.trailing-spaces",
-        "IBM.output-colorizer",
         "alefragnani.Bookmarks",
-        "CoenraadS.bracket-pair-colorizer-2",
-        "donjayamanne.githistory",
-        "eamodio.gitlens",
-        "GrapeCity.gc-excelviewer",
         "Gruntfuggly.todo-tree",
-        "jrebocho.vscode-random",
-        "mhutchie.git-graph",
         "mohsen1.prettify-json",
-        "ms-vscode.github-issues-prs",
         "quicktype.quicktype",
-        "redhat.vscode-yaml",
         "spikespaz.vscode-smoothtype",
         "stkb.rewrap",
-        "vscode-icons-team.vscode-icons",
-        "bajdzis.vscode-database"
+        "vscode-icons-team.vscode-icons"
     ],
     "settings": {
+        // General settings
+        "files.eol": "\n",
+        // Docker
+        "remote.extensionKind": {
+            "ms-azuretools.vscode-docker": "workspace"
+        },
+        // Golang general settings
         "go.useLanguageServer": true,
         "go.autocompleteUnimportedPackages": true,
+        "go.gotoSymbol.includeImports": true,
+        "go.gotoSymbol.includeGoroot": true,
+        "gopls": {
+            "completeUnimported": true,
+            "deepCompletion": true,
+            "usePlaceholders": false
+        },
+        // Golang on save
+        "go.buildOnSave": "package",
+        "go.lintOnSave": "package",
+        "go.vetOnSave": "package",
+        "editor.formatOnSave": true,
         "[go]": {
-            "editor.snippetSuggestions": "none",
-            "editor.formatOnSave": true,
             "editor.codeActionsOnSave": {
                 "source.organizeImports": true
             }
         },
-        "gopls": {
-            "completeUnimported": true,
-            "watchChangedFiles": true,
-            "deepCompletion": true,
-            "usePlaceholders": false
+        // Golang testing
+        "go.toolsEnvVars": {
+            "GOFLAGS": "-tags=integration"
         },
-        "files.eol": "\n"
-    },
-    "postCreateCommand": "go mod download",
-    "runArgs": [
-        "-u",
-        "vscode",
-        "--cap-add=SYS_PTRACE",
-        "--security-opt",
-        "seccomp=unconfined",
-        "-v",
-        "${env:HOME}/.ssh:/home/vscode/.ssh:ro"
-    ]
+        "gopls.env": {
+            "GOFLAGS": "-tags=integration"
+        },
+        "go.testEnvVars": {},
+        "go.testFlags": ["-v"],
+        "go.testTimeout": "600s"
+    }
 }
