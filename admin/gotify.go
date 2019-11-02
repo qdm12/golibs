@@ -31,15 +31,15 @@ func InitGotify(httpClient *http.Client) *Gotify {
 	}
 	gotifyURL, err := params.GetGotifyURL()
 	if err != nil {
-		logging.Error("parameter error", err)
+		logging.Err(err)
 	}
 	gotifyToken, err := params.GetGotifyToken()
 	if err != nil {
-		logging.Warn(err.Error())
+		logging.Werr(err)
 	}
 	gotify, err := NewGotify(gotifyURL, gotifyToken, httpClient)
 	if err != nil {
-		logging.Warn(err.Error())
+		logging.Werr(err)
 	}
 	return gotify
 }

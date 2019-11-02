@@ -6,34 +6,20 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func Log(message string) {
-	zap.L().Info(message)
-}
-
-func Warn(message string) {
-	zap.L().Warn(message)
-}
-
-func Error(message string, err error) {
-	zap.L().Error(message, zap.Error(err))
-}
-
-func Sync() error {
-	return zap.L().Sync()
-}
-
+// InitLogger sets up the global logger using the environment variables
+// LOGENCODING, LOGLEVEL and NODEID
 func InitLogger() {
 	encoding, err := params.GetLoggerEncoding()
 	if err != nil {
-		Error("logger initialization failed", err)
+		Errorf("logger initialization failed: %s", err)
 	}
 	level, err := params.GetLoggerLevel()
 	if err != nil {
-		Error("logger initialization failed", err)
+		Errorf("logger initialization failed: %s", err)
 	}
 	nodeID, err := params.GetNodeID()
 	if err != nil {
-		Error("logger initialization failed", err)
+		Errorf("logger initialization failed: %s", err)
 	}
 	config := zap.Config{
 		Level:    zap.NewAtomicLevelAt(level),
@@ -53,8 +39,13 @@ func InitLogger() {
 	}
 	logger, err := config.Build()
 	if err != nil {
-		Error("logger initialization failed", err)
+		Errorf("logger initialization failed: %s", err)
 	}
 	logger = logger.With(zap.Int("node_id", nodeID))
 	zap.ReplaceGlobals(logger)
+}
+
+// Sync synchronizes the buffer to ensure everything is printed out
+func Sync() error {
+	return zap.L().Sync()
 }
