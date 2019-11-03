@@ -22,9 +22,9 @@ func RespondJSON(w http.ResponseWriter, code int, payload interface{}) error {
 	return nil
 }
 
-// ServerSettings contains settings to launch an HTTP server
+// Settings contains settings to launch an HTTP server
 // Name is simply a unique identifiant used for logging purposes.
-type ServerSettings struct {
+type Settings struct {
 	Name    string
 	Addr    string
 	Handler http.Handler
@@ -38,7 +38,7 @@ type namedError struct {
 // RunServers manages multiple HTTP servers in parallel and stops
 // them all as soon as one of them fails. It returns one error per HTTP
 // server if there is any.
-func RunServers(settings ...ServerSettings) (errs map[string]error) {
+func RunServers(settings ...Settings) (errs map[string]error) {
 	errs = make(map[string]error)
 	for i := range settings {
 		for j := range settings {
