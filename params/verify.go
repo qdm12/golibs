@@ -31,7 +31,7 @@ func verifyListeningPort(listeningPort string, uid int) (warning string, err err
 
 func verifyRootURL(rootURL string) error {
 	if strings.ContainsAny(rootURL, " \t.?~#") {
-		return fmt.Errorf("root URL \"%s\" contains invalid characters", rootURL)
+		return fmt.Errorf("root URL %q contains invalid characters", rootURL)
 	}
 	return nil
 }
@@ -40,5 +40,5 @@ func verifyHostname(hostname string) error {
 	if verification.MatchHostname(hostname) {
 		return nil
 	}
-	return fmt.Errorf("hostname \"%s\" is not valid", hostname)
+	return fmt.Errorf("hostname %q is not valid", hostname)
 }

@@ -37,8 +37,8 @@ func Test_IPHeaders_String(t *testing.T) {
 		s       string
 	}{
 		"nil headers":       {nil, "remoteAddr= | xRealIP= | xForwardedFor="},
-		"empty headers":     {&IPHeaders{}, "remoteAddr= | xRealIP= | xForwardedFor="},
-		"non empty headers": {&IPHeaders{RemoteAddress: "a", XRealIP: "bvc e"}, "remoteAddr=a | xRealIP=bvc e | xForwardedFor="},
+		"empty headers":     {&IPHeaders{}, "remoteAddr=\"\" | xRealIP=\"\" | xForwardedFor=\"\""},
+		"non empty headers": {&IPHeaders{RemoteAddress: "a", XRealIP: "bvc e"}, "remoteAddr=\"a\" | xRealIP=\"bvc e\" | xForwardedFor=\"\""},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {

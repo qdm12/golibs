@@ -9,7 +9,7 @@ import (
 func VerifyPort(port string) error {
 	value, err := strconv.Atoi(port)
 	if err != nil {
-		return fmt.Errorf("port \"%s\" is not a valid integer", port)
+		return fmt.Errorf("port %q is not a valid integer", port)
 	} else if value < 1 {
 		return fmt.Errorf("port %s cannot be lower than 1", port)
 	} else if value > 65535 {

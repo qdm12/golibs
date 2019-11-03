@@ -44,7 +44,7 @@ func RunServers(settings ...ServerSettings) (errs map[string]error) {
 		for j := range settings {
 			if settings[i].Name == settings[j].Name {
 				errs[settings[i].Name] = fmt.Errorf(
-					"server settings at indexes %d and %d have the same name %s",
+					"server settings at indexes %d and %d have the same name %q",
 					i, j, settings[i].Name,
 				)
 				return errs

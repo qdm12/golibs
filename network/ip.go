@@ -40,7 +40,7 @@ func (headers *IPHeaders) String() string {
 	if headers == nil {
 		return "remoteAddr= | xRealIP= | xForwardedFor="
 	}
-	return fmt.Sprintf("remoteAddr=%s | xRealIP=%s | xForwardedFor=%s",
+	return fmt.Sprintf("remoteAddr=%q | xRealIP=%q | xForwardedFor=%q",
 		headers.RemoteAddress, headers.XRealIP, headers.XForwardedFor)
 }
 
@@ -139,12 +139,12 @@ func getRemoteIP(remoteAddr string) (IP string, err error) {
 		}
 		if len(port) > 0 {
 			if err := verification.VerifyPort(port); err != nil {
-				return "", fmt.Errorf("remote address \"%s\" is invalid: %w", remoteAddr, err)
+				return "", fmt.Errorf("remote address %q is invalid: %w", remoteAddr, err)
 			}
 		}
 	}
 	if !ipIsValid(IP) {
-		return "", fmt.Errorf("IP address \"%s\" is not valid", IP)
+		return "", fmt.Errorf("IP address %q is not valid", IP)
 	}
 	return IP, nil
 }

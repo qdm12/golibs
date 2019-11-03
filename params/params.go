@@ -41,9 +41,9 @@ func GetEnvInt(key string, defaultValue int) (n int, err error) {
 func GetDuration(key string, defaultValue time.Duration) (duration time.Duration, err error) {
 	value, err := GetEnvInt(key, -1)
 	if err != nil {
-		return duration, fmt.Errorf("duration %s: %w", key, err)
+		return duration, fmt.Errorf("duration %q: %w", key, err)
 	} else if value == 0 {
-		return duration, fmt.Errorf("duration %s cannot be 0", key)
+		return duration, fmt.Errorf("duration %q cannot be 0", key)
 	} else if value < 0 {
 		return defaultValue, nil
 	}
@@ -140,7 +140,7 @@ func GetLoggerEncoding() (encoding string, err error) {
 	s := GetEnv("LOGENCODING", "json")
 	s = strings.ToLower(s)
 	if s != "json" && s != "console" {
-		return "", fmt.Errorf("logger encoding \"%s\" unrecognized", s)
+		return "", fmt.Errorf("logger encoding %q unrecognized", s)
 	}
 	return s, nil
 }
@@ -159,7 +159,7 @@ func GetLoggerLevel() (level zapcore.Level, err error) {
 	case "":
 		return zap.InfoLevel, nil
 	default:
-		return level, fmt.Errorf("logger level \"%s\" unrecognized", s)
+		return level, fmt.Errorf("logger level %q unrecognized", s)
 	}
 }
 
@@ -169,7 +169,7 @@ func GetNodeID() (nodeID int, err error) {
 	s := GetEnv("NODEID", "0")
 	nodeID, err = strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("Node ID \"%d\" is not a valid integer", nodeID)
+		return 0, fmt.Errorf("Node ID %q is not a valid integer", nodeID)
 	}
 	return nodeID, nil
 }
