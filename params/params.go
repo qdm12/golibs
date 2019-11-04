@@ -132,10 +132,18 @@ func GetExeDir() (dir string, err error) {
 }
 
 // GetPath obtains a path from the environment variable corresponding
-// to key, and verifies it is valid. It uses defaultValue if no value is
-// found
+// to key, and verifies it is valid. If it is a relative path,
+// it prepends it with the executable path to obtain an absolute path.
+// It uses defaultValue if no value is found
 func GetPath(key, defaultValue string) (path string, err error) {
 	s := GetEnv(key, defaultValue)
+	if !filepath.IsAbs(s) {
+		exDir, err := GetExeDir()
+		if err != nil {
+			return "", err
+		}
+		s = filepath.Join(exDir, s)
+	}
 	return filepath.Abs(s)
 }
 
