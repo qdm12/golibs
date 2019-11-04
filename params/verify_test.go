@@ -40,7 +40,7 @@ func Test_verifyRootURL(t *testing.T) {
 		rootURL string
 		err     error
 	}{
-		"invalid root URL": {"/path/?test", errors.New("root URL \"/path/?test\" contains invalid characters")},
+		"invalid root URL": {"/path/?test", errors.New("root URL \"/path/?test\" is invalid")},
 		"valid root URL":   {"/path/path2", nil},
 	}
 	for name, tc := range tests {

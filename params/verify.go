@@ -28,7 +28,7 @@ func verifyListeningPort(listeningPort string, uid int) (warning string, err err
 }
 
 func verifyRootURL(rootURL string) error {
-	if verification.MatchRootURL(rootURL) {
+	if !verification.MatchRootURL(rootURL) {
 		return fmt.Errorf("root URL %q is invalid", rootURL)
 	}
 	return nil
