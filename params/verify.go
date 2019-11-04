@@ -1,8 +1,6 @@
 package params
 
 import (
-	"strings"
-
 	"github.com/qdm12/golibs/verification"
 
 	"fmt"
@@ -30,8 +28,8 @@ func verifyListeningPort(listeningPort string, uid int) (warning string, err err
 }
 
 func verifyRootURL(rootURL string) error {
-	if strings.ContainsAny(rootURL, " \t.?~#") {
-		return fmt.Errorf("root URL %q contains invalid characters", rootURL)
+	if verification.MatchRootURL(rootURL) {
+		return fmt.Errorf("root URL %q is invalid", rootURL)
 	}
 	return nil
 }

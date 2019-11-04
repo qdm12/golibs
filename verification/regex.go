@@ -11,6 +11,7 @@ const (
 	regexPhoneLocal   = `([1-9][0-9]{4,13}|0[1-9][0-9]{3,12})`
 	regexDomain       = `(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\.[a-zA-Z]{2,3})`
 	regexHostname     = `([a-zA-Z0-9]|[a-zA-Z0-9_][a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9_])(\.([a-zA-Z0-9]|[a-zA-Z0-9_][a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9]))*`
+	regexRootURL      = `\/[a-zA-Z0-9\-_/\+]+`
 	regexMD5String    = `[a-fA-F0-9]{32}`
 	regexSHA256String = `[a-fA-F0-9]{64}`
 )
@@ -43,6 +44,7 @@ var (
 	MatchDomain     = buildMatchFn(regexDomain)
 	MatchHostname   = buildMatchFn(regexHostname)
 	// TODO add tests
+	MatchRootURL      = buildMatchFn(regexRootURL)
 	MatchMD5String    = buildMatchFn(regexMD5String)
 	MatchSHA256String = buildMatchFn(regexSHA256String)
 )

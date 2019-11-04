@@ -3,6 +3,7 @@ package params
 import (
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -78,10 +79,10 @@ func GetListeningPort() (listeningPort string, err error) {
 // from the environment variable ROOT_URL
 func GetRootURL() (rootURL string, err error) {
 	rootURL = GetEnv("ROOT_URL", "/")
+	rootURL = path.Clean(rootURL)
 	if err := verifyRootURL(rootURL); err != nil {
-		return rootURL, err
+		return "", err
 	}
-	rootURL = strings.ReplaceAll(rootURL, "//", "/")
 	rootURL = strings.TrimSuffix(rootURL, "/") // already have / from paths of router
 	return rootURL, nil
 }
