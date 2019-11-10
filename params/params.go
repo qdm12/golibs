@@ -11,6 +11,7 @@ import (
 
 	"fmt"
 
+	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/verification"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -34,6 +35,13 @@ func GetEnvInt(key string, defaultValue int) (n int, err error) {
 	if s == "" {
 		return defaultValue, nil
 	}
+	n, err = strconv.Atoi(s)
+	if err != nil {
+		return 0, fmt.Errorf("environment variable %q: %w", key, s, err)
+	}
+	return n, nil
+}
+
 // GetYesNo obtains the value stored for a named environment variable and returns:
 // if the value is 'yes', it returns true
 // if the value is 'no', it returns false
@@ -69,7 +77,7 @@ func GetOnOff(key string, defaultValue bool) (yes bool, err error) {
 		return defaultValue, nil
 	default:
 		return false, fmt.Errorf("environment variable %q value is %q and can only be \"on\" or \"off\"", key, s)
-}
+	}
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.
@@ -81,11 +89,11 @@ func GetDuration(key string, defaultValue int, timeUnit time.Duration) (duration
 	}
 	value, err := strconv.Atoi(s)
 	if err != nil {
-		return duration, fmt.Errorf("duration %q: %w", key, err)
+		return duration, fmt.Errorf("environment variable %q duration: %w", key, err)
 	} else if value == 0 {
-		return duration, fmt.Errorf("duration %q cannot be 0", key)
+		return duration, fmt.Errorf("environment variable %q duration cannot be 0", key)
 	} else if value < 0 {
-		return duration, fmt.Errorf("duration %q cannot be lower than 0", key)
+		return duration, fmt.Errorf("environment variable %q duration cannot be lower than 0", key)
 	}
 	return time.Duration(value) * timeUnit, nil
 }
@@ -106,7 +114,7 @@ func GetListeningPort() (listeningPort string, err error) {
 	listeningPort = GetEnv("LISTENING_PORT", "8000")
 	uid := os.Geteuid()
 	warning, err := verifyListeningPort(listeningPort, uid)
-	zap.L().Warn(warning)
+	logging.Warn(warning)
 	return listeningPort, err
 }
 
@@ -116,7 +124,7 @@ func GetRootURL() (rootURL string, err error) {
 	rootURL = GetEnv("ROOT_URL", "/")
 	rootURL = path.Clean(rootURL)
 	if err := verifyRootURL(rootURL); err != nil {
-		return "", err
+		return "", fmt.Errorf("environment variable ROOT_URL: %w", err)
 	}
 	rootURL = strings.TrimSuffix(rootURL, "/") // already have / from paths of router
 	return rootURL, nil
@@ -144,12 +152,12 @@ func GetRedisDetails() (hostname, port, password string, err error) {
 	hostname = GetEnv("REDIS_HOST", "redis")
 	if err := verifyHostname(hostname); err != nil {
 		return hostname, port, password,
-			fmt.Errorf("Redis parameters: %w", err)
+			fmt.Errorf("environment variable REDIS_HOST: %w", err)
 	}
 	port = GetEnv("REDIS_PORT", "6379")
 	if err := verification.VerifyPort(port); err != nil {
 		return hostname, port, password,
-			fmt.Errorf("Redis parameters: %w", err)
+			fmt.Errorf("environment variable REDIS_PORT: %w", err)
 	}
 	return hostname, port,
 		GetEnv("REDIS_PASSWORD", ""),
@@ -188,7 +196,7 @@ func GetLoggerEncoding() (encoding string, err error) {
 	s := GetEnv("LOG_ENCODING", "json")
 	s = strings.ToLower(s)
 	if s != "json" && s != "console" {
-		return "", fmt.Errorf("logger encoding %q unrecognized", s)
+		return "", fmt.Errorf("environment variable LOG_ENCODING: logger encoding %q unrecognized", s)
 	}
 	return s, nil
 }
@@ -207,7 +215,7 @@ func GetLoggerLevel() (level zapcore.Level, err error) {
 	case "":
 		return zap.InfoLevel, nil
 	default:
-		return level, fmt.Errorf("logger level %q unrecognized", s)
+		return level, fmt.Errorf("environment variable LOG_LEVEL: logger level %q unrecognized", s)
 	}
 }
 
@@ -217,7 +225,7 @@ func GetNodeID() (nodeID int, err error) {
 	s := GetEnv("NODE_ID", "0")
 	nodeID, err = strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("Node ID %q is not a valid integer", nodeID)
+		return 0, fmt.Errorf("environment variable NODE_ID: %w", err)
 	}
 	return nodeID, nil
 }
@@ -225,12 +233,16 @@ func GetNodeID() (nodeID int, err error) {
 // GetURL obtains the URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
-func GetURL(key, defaultValue string) (*url.URL, error) {
-	URL := GetEnv(key, defaultValue)
-	if URL == "" {
+func GetURL(key, defaultValue string) (URL *url.URL, err error) {
+	s := GetEnv(key, defaultValue)
+	if s == "" {
 		return nil, nil
 	}
-	return url.Parse(URL)
+	URL, err = url.Parse(s)
+	if err != nil {
+		return nil, fmt.Errorf("environment variable %q URL value: %w", key, err)
+	}
+	return URL, nil
 }
 
 // GetGotifyURL obtains the URL for Gotify server
@@ -245,7 +257,7 @@ func GetGotifyURL() (*url.URL, error) {
 func GetGotifyToken() (token string, err error) {
 	token = GetEnv("GOTIFY_TOKEN", "")
 	if token == "" {
-		return "", fmt.Errorf("Gotify token not provided")
+		return "", fmt.Errorf("environment variable GOTIFY_TOKEN value not provided")
 	}
 	return token, nil
 }
