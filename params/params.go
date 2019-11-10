@@ -34,7 +34,42 @@ func GetEnvInt(key string, defaultValue int) (n int, err error) {
 	if s == "" {
 		return defaultValue, nil
 	}
-	return strconv.Atoi(s)
+// GetYesNo obtains the value stored for a named environment variable and returns:
+// if the value is 'yes', it returns true
+// if the value is 'no', it returns false
+// if it is unset, it returns the default value
+// otherwise, an error is returned.
+func GetYesNo(key string, defaultValue bool) (yes bool, err error) {
+	s := GetEnv(key, "")
+	switch s {
+	case "yes":
+		return true, nil
+	case "no":
+		return false, nil
+	case "":
+		return defaultValue, nil
+	default:
+		return false, fmt.Errorf("environment variable %q value is %q and can only be \"yes\" or \"no\"", key, s)
+	}
+}
+
+// GetOnOff obtains the value stored for a named environment variable and returns:
+// if the value is 'on', it returns true
+// if the value is 'off', it returns false
+// if it is unset, it returns the default value
+// otherwise, an error is returned.
+func GetOnOff(key string, defaultValue bool) (yes bool, err error) {
+	s := GetEnv(key, "")
+	switch s {
+	case "on":
+		return true, nil
+	case "off":
+		return false, nil
+	case "":
+		return defaultValue, nil
+	default:
+		return false, fmt.Errorf("environment variable %q value is %q and can only be \"on\" or \"off\"", key, s)
+}
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.
