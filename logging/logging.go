@@ -1,28 +1,23 @@
 package logging
 
 import (
-	"github.com/qdm12/golibs/params"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-// InitLogger sets up the global logger using the environment variables
-// LOGENCODING, LOGLEVEL and NODEID
-func InitLogger() {
-	encoding, err := params.GetLoggerEncoding()
-	if err != nil {
-		Errorf("logger initialization failed: %s", err)
-	}
-	level, err := params.GetLoggerLevel()
-	if err != nil {
-		Errorf("logger initialization failed: %s", err)
-	}
-	nodeID, err := params.GetNodeID()
-	if err != nil {
-		Errorf("logger initialization failed: %s", err)
-	}
+// Level is the level of the logger
+type Level zapcore.Level
+
+const (
+	InfoLevel = iota
+	WarnLevel
+	ErrorLevel
+)
+
+// InitLogger sets up the global logger using the parameters given
+func InitLogger(encoding string, level Level, nodeID int) {
 	config := zap.Config{
-		Level:    zap.NewAtomicLevelAt(level),
+		Level:    zap.NewAtomicLevelAt(zapcore.Level(level)),
 		Encoding: encoding,
 		EncoderConfig: zapcore.EncoderConfig{
 			TimeKey:        "ts",
