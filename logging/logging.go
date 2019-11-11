@@ -14,7 +14,8 @@ const (
 	ErrorLevel
 )
 
-// InitLogger sets up the global logger using the parameters given
+// InitLogger sets up the global logger using the parameters given.
+// If nodeID is set to -1, it is not added to the log messages.
 func InitLogger(encoding string, level Level, nodeID int) {
 	config := zap.Config{
 		Level:    zap.NewAtomicLevelAt(zapcore.Level(level)),
@@ -36,7 +37,9 @@ func InitLogger(encoding string, level Level, nodeID int) {
 	if err != nil {
 		Errorf("logger initialization failed: %s", err)
 	}
-	logger = logger.With(zap.Int("node_id", nodeID))
+	if nodeID != -1 {
+		logger = logger.With(zap.Int("node_id", nodeID))
+	}
 	zap.ReplaceGlobals(logger)
 }
 
