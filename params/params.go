@@ -191,24 +191,24 @@ func GetPath(key, defaultValue string) (path string, err error) {
 // GetLoggerConfig obtains configuration details for the logger
 // using the environment variables LOG_ENCODING, LOG_LEVEL and NODE_ID.
 func GetLoggerConfig() (encoding string, level logging.Level, nodeID int, err error) {
-	encoding, err = getLoggerEncoding()
+	encoding, err = GetLoggerEncoding()
 	if err != nil {
 		return "", 0, 0, fmt.Errorf("logger configuration error: %w", err)
 	}
-	level, err = getLoggerLevel()
+	level, err = GetLoggerLevel()
 	if err != nil {
 		return "", 0, 0, fmt.Errorf("logger configuration error: %w", err)
 	}
-	nodeID, err = getNodeID()
+	nodeID, err = GetNodeID()
 	if err != nil {
 		return "", 0, 0, fmt.Errorf("logger configuration error: %w", err)
 	}
 	return encoding, level, nodeID, nil
 }
 
-// getLoggerEncoding obtains the logging encoding
+// GetLoggerEncoding obtains the logging encoding
 // from the environment variable LOG_ENCODING
-func getLoggerEncoding() (encoding string, err error) {
+func GetLoggerEncoding() (encoding string, err error) {
 	s := GetEnv("LOG_ENCODING", "json")
 	s = strings.ToLower(s)
 	if s != "json" && s != "console" {
@@ -217,9 +217,9 @@ func getLoggerEncoding() (encoding string, err error) {
 	return s, nil
 }
 
-// getLoggerLevel obtains the logging level
+// GetLoggerLevel obtains the logging level
 // from the environment variable LOG_LEVEL
-func getLoggerLevel() (level logging.Level, err error) {
+func GetLoggerLevel() (level logging.Level, err error) {
 	s := GetEnv("LOG_LEVEL", "info")
 	switch strings.ToLower(s) {
 	case "info":
@@ -235,9 +235,9 @@ func getLoggerLevel() (level logging.Level, err error) {
 	}
 }
 
-// getNodeID obtains the node instance ID from the environment variable
+// GetNodeID obtains the node instance ID from the environment variable
 // NODE_ID
-func getNodeID() (nodeID int, err error) {
+func GetNodeID() (nodeID int, err error) {
 	s := GetEnv("NODE_ID", "0")
 	nodeID, err = strconv.Atoi(s)
 	if err != nil {
