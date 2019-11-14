@@ -40,6 +40,24 @@ func GetEnvInt(key string, defaultValue int) (n int, err error) {
 	return n, nil
 }
 
+// GetEnvIntRange returns the value stored for a named environment variable,
+// and a default if no value is found. If the value is not a valid
+// integer in the range specified, an error is returned.
+func GetEnvIntRange(key string, lower, upper, defaultValue int) (n int, err error) {
+	n = defaultValue
+	s := GetEnv(key, "")
+	if s != "" {
+		n, err = strconv.Atoi(s)
+		if err != nil {
+			return 0, fmt.Errorf("environment variable %q: %w", key, err)
+		}
+	}
+	if n < lower || n > upper {
+		return 0, fmt.Errorf("environment variable %q value %d is not between %d and %d", key, n, lower, upper)
+	}
+	return n, nil
+}
+
 // GetYesNo obtains the value stored for a named environment variable and returns:
 // if the value is 'yes', it returns true
 // if the value is 'no', it returns false
@@ -106,11 +124,21 @@ func GetHTTPTimeout(defaultMilliseconds int) (duration time.Duration, err error)
 	return duration, nil
 }
 
+// GetUserID obtains the user ID running the program
+func GetUserID() int {
+	return os.Geteuid()
+}
+
+// GetGroupID obtains the user ID running the program
+func GetGroupID() int {
+	return os.Getegid()
+}
+
 // GetListeningPort obtains and checks the listening port
 // from the environment variable LISTENING_PORT
 func GetListeningPort() (listeningPort string, err error) {
 	listeningPort = GetEnv("LISTENING_PORT", "8000")
-	uid := os.Geteuid()
+	uid := GetUserID()
 	warning, err := verifyListeningPort(listeningPort, uid)
 	logging.Warn(warning)
 	return listeningPort, err
