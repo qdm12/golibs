@@ -40,16 +40,17 @@ type namedError struct {
 // server if there is any.
 func RunServers(settings ...Settings) (errs map[string]error) {
 	errs = make(map[string]error)
+	serverNames := make(map[string][]int)
 	for i := range settings {
-		for j := range settings {
-			if settings[i].Name == settings[j].Name {
-				errs[settings[i].Name] = fmt.Errorf(
-					"server settings at indexes %d and %d have the same name %q",
-					i, j, settings[i].Name,
-				)
-				return errs
-			}
+		serverNames[settings[i].Name] = append(serverNames[settings[i].Name], i)
+	}
+	for name, indexes := range serverNames {
+		if len(indexes) > 1 {
+			errs[name] = fmt.Errorf("server settings have the same name %q at indexes: %v", name, indexes)
 		}
+	}
+	if len(errs) > 0 {
+		return errs
 	}
 	chDone := make(chan namedError, len(settings))
 	chStop := make(chan struct{})
