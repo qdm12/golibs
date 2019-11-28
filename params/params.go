@@ -140,7 +140,9 @@ func GetListeningPort() (listeningPort string, err error) {
 	listeningPort = GetEnv("LISTENING_PORT", "8000")
 	uid := GetUserID()
 	warning, err := verifyListeningPort(listeningPort, uid)
-	logging.Warn(warning)
+	if warning != "" {
+		logging.Warn(warning)
+	}
 	return listeningPort, err
 }
 
