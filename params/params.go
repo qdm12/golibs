@@ -82,7 +82,7 @@ func GetYesNo(key string, defaultValue bool) (yes bool, err error) {
 // if the value is 'off', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func GetOnOff(key string, defaultValue bool) (yes bool, err error) {
+func GetOnOff(key string, defaultValue bool) (on bool, err error) {
 	s := GetEnv(key, "")
 	switch s {
 	case "on":
@@ -94,6 +94,21 @@ func GetOnOff(key string, defaultValue bool) (yes bool, err error) {
 	default:
 		return false, fmt.Errorf("environment variable %q value is %q and can only be \"on\" or \"off\"", key, s)
 	}
+}
+
+// GetValueIfInside obtains the value stored for a named environment variable if it is part of a
+// list of possible values. You can optionally specify a defaultValue
+func GetValueIfInside(key string, possibilities []string, compulsory bool, defaultValue string) (value string, err error) {
+	s := GetEnv(key, "")
+	if !compulsory && s == "" {
+		s = defaultValue
+	}
+	for _, possibility := range possibilities {
+		if s == possibility {
+			return s, nil
+		}
+	}
+	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, strings.Join(possibilities, ", "))
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.
