@@ -16,10 +16,14 @@ var userAgents = []string{
 	"Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1",
 }
 
-// GetContentParamsType contains the optional parameters to use
-// to get content with an HTTP get
-type GetContentParamsType struct {
-	DisguisedUserAgent bool
+// GetContentSetter is a setter for options to GetContent
+type GetContentSetter func(options *getContentOptions)
+
+// GetContentWithRandomUserAgent sets a random realistic user agent to the GetContent HTTP request
+func GetContentWithRandomUserAgent() GetContentSetter {
+	return func(options *getContentOptions) {
+		options.randomUserAgent = true
+	}
 }
 
 // DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
@@ -38,13 +42,21 @@ func DoHTTPRequest(client *http.Client, request *http.Request) (status int, cont
 	return response.StatusCode, content, nil
 }
 
+type getContentOptions struct {
+	randomUserAgent bool
+}
+
 // GetContent returns the content and eventual error from an HTTP GET to a given URL
-func GetContent(httpClient *http.Client, URL string, params GetContentParamsType) ([]byte, error) {
+func GetContent(httpClient *http.Client, URL string, setters ...GetContentSetter) ([]byte, error) {
+	var options getContentOptions
+	for _, setter := range setters {
+		setter(&options)
+	}
 	req, err := http.NewRequest(http.MethodGet, URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("cannot GET content of URL %s: %w", URL, err)
 	}
-	if params.DisguisedUserAgent {
+	if options.randomUserAgent {
 		req.Header.Set("User-Agent", userAgents[security.GenerateRandomInt(len(userAgents))])
 	}
 	status, content, err := DoHTTPRequest(httpClient, req)
