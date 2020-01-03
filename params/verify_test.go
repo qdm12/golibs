@@ -24,8 +24,8 @@ func Test_verifyListeningPort(t *testing.T) {
 		"valid port":                      {"8000", 1000, "", nil},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			warning, err := verifyListeningPort(tc.listeningPort, tc.uid)
 			assert.Equal(t, tc.warning, warning)
@@ -45,8 +45,8 @@ func Test_verifyRootURL(t *testing.T) {
 		"valid single slash URL": {"/", nil},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			err := verifyRootURL(tc.rootURL)
 			helpers.AssertErrorsEqual(t, tc.err, err)
@@ -64,8 +64,8 @@ func Test_verifyHostname(t *testing.T) {
 		"valid hostname":   {"example.com", nil},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			err := verifyHostname(tc.hostname)
 			helpers.AssertErrorsEqual(t, tc.err, err)

@@ -66,8 +66,8 @@ func Test_GenerateRandomAlphaNum(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			s := GenerateRandomAlphaNum(tc.n)
 			assert.Regexp(t, tc.regex, s)
@@ -106,8 +106,8 @@ func Test_GenerateRandomNum(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			s := GenerateRandomNum(tc.n)
 			assert.Regexp(t, tc.regex, s)

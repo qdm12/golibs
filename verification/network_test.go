@@ -21,8 +21,8 @@ func Test_VerifyPort(t *testing.T) {
 		"valid port 8000":       {"8000", nil},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			err := VerifyPort(tc.port)
 			helpers.AssertErrorsEqual(t, tc.err, err)

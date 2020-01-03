@@ -37,8 +37,8 @@ func Test_EncryptAES(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			out, err := EncryptAES(tc.plaintext, tc.key)
 			helpers.AssertErrorsEqual(t, tc.err, err)
@@ -81,8 +81,8 @@ func Test_DecryptAES(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			out, err := DecryptAES(tc.ciphertext, tc.key)
 			helpers.AssertErrorsEqual(t, tc.err, err)
@@ -119,8 +119,8 @@ func Test_EncryptDecryptAES(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			ciphertext, err := EncryptAES(tc.plaintext, tc.key)
 			if !helpers.AssertErrorsEqual(t, tc.encryptErr, err) {

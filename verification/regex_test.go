@@ -25,8 +25,8 @@ func Test_buildSearchFn(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			f := buildSearchFn(tc.regex)
 			if !assert.NotNil(t, f) {
@@ -57,8 +57,8 @@ func Test_buildMatchFn(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			f := buildMatchFn(tc.regex)
 			if !assert.NotNil(t, f) {

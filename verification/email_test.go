@@ -36,8 +36,8 @@ func Test_ValidateEmail(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			err := ValidateEmail(tc.email, tc.mxLookup)
 			helpers.AssertErrorsEqual(t, tc.err, err)

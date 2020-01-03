@@ -21,8 +21,8 @@ func Test_IPHeaders_isVoid(t *testing.T) {
 		"non empty headers": {&IPHeaders{RemoteAddress: "a"}, false},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			void := tc.headers.isVoid()
 			assert.Equal(t, tc.void, void)
@@ -41,8 +41,8 @@ func Test_IPHeaders_String(t *testing.T) {
 		"non empty headers": {&IPHeaders{RemoteAddress: "a", XRealIP: "bvc e"}, "remoteAddr=\"a\" | xRealIP=\"bvc e\" | xForwardedFor=\"\""},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			s := tc.headers.String()
 			assert.Equal(t, tc.s, s)
@@ -71,8 +71,8 @@ func Test_GetClientIPHeaders(t *testing.T) {
 		}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			headers := GetClientIPHeaders(tc.request)
 			assert.Equal(t, tc.headers, headers)
@@ -125,8 +125,8 @@ func Test_GetClientIP(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			IP, err := GetClientIP(tc.request)
 			helpers.AssertErrorsEqual(t, tc.err, err)
@@ -150,8 +150,8 @@ func Test_ipIsValid(t *testing.T) {
 		"complex IPv6 address": {"fdf7:8fb3:2a0:62d:0:0:0:0", true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			valid := ipIsValid(tc.IP)
 			assert.Equal(t, tc.valid, valid)
@@ -172,8 +172,8 @@ func Test_netIPIsPrivate(t *testing.T) {
 		"Private IPv6": {net.ParseIP("fd8d:8d72:b629:0f87:0000:0000:0000:0000"), true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			private := netIPIsPrivate(tc.netIP)
 			assert.Equal(t, tc.private, private)
@@ -201,8 +201,8 @@ func Test_splitHostPort(t *testing.T) {
 		"address with [IPv6 address] and too many colons after port": {"[2001:db8::8a2e:370:7334]:8000:500", "", "", fmt.Errorf("address [2001:db8::8a2e:370:7334]:8000:500: too many colons in address")},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			IP, port, err := splitHostPort(tc.address)
 			helpers.AssertErrorsEqual(t, tc.err, err)
@@ -233,8 +233,8 @@ func Test_getRemoteIP(t *testing.T) {
 		"address with [valid IPv6 address] and valid port":              {"[2001:db8::8a2e:370:7334]:8000", "2001:db8::8a2e:370:7334", nil},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			IP, err := getRemoteIP(tc.remoteAddr)
 			helpers.AssertErrorsEqual(t, tc.err, err)
@@ -258,8 +258,8 @@ func Test_extractPublicIPs(t *testing.T) {
 		"1 private and 1 public IPv6":  {[]string{"fd8d:8d72:b629:0f87:0000:0000:0000:0000", "2001:db8::8a2e:370:7334"}, []string{"2001:db8::8a2e:370:7334"}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			publicIPs := extractPublicIPs(tc.IPs)
 			assert.ElementsMatch(t, tc.publicIPs, publicIPs)
@@ -281,8 +281,8 @@ func Test_getXForwardedIPs(t *testing.T) {
 		"1 IPv4 and 1 IPv6 with \\t":                {" 192.99.99.58, \t2001:db8::8a2e:370:7334", []string{"192.99.99.58", "2001:db8::8a2e:370:7334"}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			IPs := getXForwardedIPs(tc.XForwardedFor)
 			assert.ElementsMatch(t, tc.IPs, IPs)

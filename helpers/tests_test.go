@@ -41,8 +41,8 @@ func Test_AssertErrosEqual(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			tMock := &testing.T{}
 			out := AssertErrorsEqual(tMock, tc.expected, tc.actual)

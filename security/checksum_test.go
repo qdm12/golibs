@@ -24,8 +24,8 @@ func Test_Chechsumize(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			out := Checksumize(tc.data)
 			assert.Equal(t, tc.checksumData, out)
@@ -67,8 +67,8 @@ func Test_Dechecksumize(t *testing.T) {
 		},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
-			tc := tc
 			t.Parallel()
 			out, err := Dechecksumize(tc.checksumData)
 			helpers.AssertErrorsEqual(t, tc.err, err)
