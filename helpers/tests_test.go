@@ -5,9 +5,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-func Test_AssertErrosEqual(t *testing.T) {
+func Test_AssertErrorsEqual(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		expected error
@@ -44,7 +45,13 @@ func Test_AssertErrosEqual(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			tMock := &testing.T{}
+			tMock := &mockTestingT{}
+			if !tc.success {
+				tMock.On("Errorf", mock.AnythingOfType("string"), mock.AnythingOfType("string"))
+			}
+			if tc.expected != nil && tc.actual == nil {
+				tMock.On("FailNow")
+			}
 			out := AssertErrorsEqual(tMock, tc.expected, tc.actual)
 			assert.Equal(t, tc.success, out)
 		})

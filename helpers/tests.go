@@ -1,28 +1,24 @@
 package helpers
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
+	"github.com/stretchr/testify/require"
 )
 
-// AssertErrosEqual asserts errors match, so that they are both nil or their messages
-// are both equal
-func AssertErrorsEqual(t *testing.T, expected, actual error) (success bool) {
-	if expected == nil {
-		return assert.Nil(t, actual)
-	}
-	return assert.EqualError(t, actual, expected.Error())
+type testingT interface {
+	Errorf(format string, args ...interface{})
+	FailNow()
 }
 
-// SetDefaultLoggerToEmpty sets Zap's default logger to output to no stream
-func SetDefaultLoggerToEmpty() (restore func()) {
-	loggerConfig := zap.NewDevelopmentConfig()
-	loggerConfig.OutputPaths, loggerConfig.ErrorOutputPaths = nil, nil
-	logger, err := loggerConfig.Build()
-	if err != nil {
-		panic(err)
+// AssertErrorsEqual asserts errors match, so that they are both nil or their messages
+// are both equal
+func AssertErrorsEqual(t testingT, expected, actual error) (success bool) {
+	if expected != nil {
+		require.Error(t, actual)
+		if actual == nil {
+			return false
+		}
+		return assert.Equal(t, expected.Error(), actual.Error())
 	}
-	return zap.ReplaceGlobals(logger)
+	return assert.NoError(t, actual)
 }

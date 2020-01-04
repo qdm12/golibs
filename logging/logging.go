@@ -47,3 +47,14 @@ func InitLogger(encoding string, level Level, nodeID int) {
 func Sync() error {
 	return zap.L().Sync()
 }
+
+// SetLoggerToEmpty sets the logger stdout and stderr to nil for testing
+func SetLoggerToEmpty() (restore func(), err error) {
+	loggerConfig := zap.NewDevelopmentConfig()
+	loggerConfig.OutputPaths, loggerConfig.ErrorOutputPaths = nil, nil
+	logger, err := loggerConfig.Build()
+	if err != nil {
+		return nil, err
+	}
+	return zap.ReplaceGlobals(logger), nil
+}
