@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/verification"
-	"go.uber.org/zap"
 )
 
 var privateCIDRs []*net.IPNet
@@ -152,7 +152,7 @@ func getRemoteIP(remoteAddr string) (IP string, err error) {
 func extractPublicIPs(IPs []string) (publicIPs []string) {
 	for _, IP := range IPs {
 		if !ipIsValid(IP) {
-			zap.L().Warn("IP address is not valid", zap.String("IP", IP))
+			logging.Warnf("IP address %q is not valid", IP)
 			continue
 		}
 		netIP := net.ParseIP(IP)
@@ -173,7 +173,7 @@ func getXForwardedIPs(XForwardedFor string) (IPs []string) {
 	XForwardForIPs := strings.Split(XForwardedFor, ",")
 	for _, IP := range XForwardForIPs {
 		if !ipIsValid(IP) {
-			zap.L().Warn("IP address is not valid", zap.String("IP", IP))
+			logging.Warnf("IP address %q is not valid", IP)
 			continue
 		}
 		IPs = append(IPs, IP)

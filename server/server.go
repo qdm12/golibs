@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.uber.org/zap"
+	"github.com/qdm12/golibs/logging"
 )
 
 // RespondJSON marshals a payload into JSON and writes the JSON data
@@ -80,11 +80,11 @@ func serve(name, addr string, handler http.Handler, chDone chan namedError, chSt
 		<-chStop
 		err := server.Shutdown(context.Background())
 		if err != nil {
-			zap.L().Error("server "+name+" shutdown error", zap.Error(err))
-			zap.L().Sync()
+			logging.Errorf("server "+name+" shutdown error: %s", err)
+			logging.Sync()
 		}
 	}()
-	zap.L().Info("HTTP server listening", zap.String("name", name), zap.String("addr", addr))
+	logging.Infof("HTTP server %s listening on %s", name, addr)
 	err := server.ListenAndServe()
 	chDone <- namedError{name, err}
 }

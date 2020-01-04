@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/qdm12/golibs/logging"
+
 	"github.com/qdm12/golibs/network"
-	"go.uber.org/zap"
 )
 
 // Mode checks if the program is launched to run the
@@ -42,7 +43,7 @@ func CreateRouter(isHealthy func() error) *httprouter.Router {
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		err := isHealthy()
 		if err != nil {
-			zap.L().Warn("Unhealthy", zap.Error(err))
+			logging.Warnf("Unhealthy: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
