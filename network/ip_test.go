@@ -123,6 +123,14 @@ func Test_GetClientIP(t *testing.T) {
 			"56.56.56.56",
 			nil,
 		},
+		"request with remote address, and bad XForwardedFor": {
+			&http.Request{
+				RemoteAddr: "54.54.54.54:8888",
+				Header:     http.Header{"X-Forwarded-For": []string{"x"}},
+			},
+			"54.54.54.54",
+			nil,
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
