@@ -13,20 +13,20 @@ type MockClient struct {
 	mock.Mock
 }
 
-// DoHTTPRequest provides a mock function with given fields: client, request
-func (_m *MockClient) DoHTTPRequest(client *http.Client, request *http.Request) (int, []byte, error) {
-	ret := _m.Called(client, request)
+// DoHTTPRequest provides a mock function with given fields: request
+func (_m *MockClient) DoHTTPRequest(request *http.Request) (int, []byte, error) {
+	ret := _m.Called(request)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func(*http.Client, *http.Request) int); ok {
-		r0 = rf(client, request)
+	if rf, ok := ret.Get(0).(func(*http.Request) int); ok {
+		r0 = rf(request)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
 	var r1 []byte
-	if rf, ok := ret.Get(1).(func(*http.Client, *http.Request) []byte); ok {
-		r1 = rf(client, request)
+	if rf, ok := ret.Get(1).(func(*http.Request) []byte); ok {
+		r1 = rf(request)
 	} else {
 		if ret.Get(1) != nil {
 			r1 = ret.Get(1).([]byte)
@@ -34,8 +34,8 @@ func (_m *MockClient) DoHTTPRequest(client *http.Client, request *http.Request) 
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(*http.Client, *http.Request) error); ok {
-		r2 = rf(client, request)
+	if rf, ok := ret.Get(2).(func(*http.Request) error); ok {
+		r2 = rf(request)
 	} else {
 		r2 = ret.Error(2)
 	}

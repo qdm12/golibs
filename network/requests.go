@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -11,21 +12,31 @@ import (
 
 // Client has methods to do HTTP requests as a client
 type Client interface {
-	DoHTTPRequest(client *http.Client, request *http.Request) (status int, content []byte, err error)
+	DoHTTPRequest(request *http.Request) (status int, content []byte, err error)
 	GetContent(URL string, setters ...GetContentSetter) (content []byte, status int, err error)
+}
+
+type httpClient interface {
+	Do(r *http.Request) (*http.Response, error)
+}
+
+func newHTTPClient(timeout time.Duration) httpClient {
+	return &http.Client{Timeout: timeout}
 }
 
 // ClientImpl is the implementation for IClient
 type ClientImpl struct {
-	httpClient *http.Client
+	httpClient httpClient
+	readBody   func(r io.Reader) ([]byte, error)
 	userAgents []string
 	random     security.Random
 }
 
-// NewClient creates a new HTTP client
+// NewClient creates a new easy to use HTTP client
 func NewClient(timeout time.Duration) Client {
 	return &ClientImpl{
-		httpClient: &http.Client{Timeout: timeout},
+		httpClient: newHTTPClient(timeout),
+		readBody:   ioutil.ReadAll,
 		userAgents: []string{
 			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.146 Safari/537.36",
@@ -37,15 +48,15 @@ func NewClient(timeout time.Duration) Client {
 }
 
 // DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
-func (c *ClientImpl) DoHTTPRequest(client *http.Client, request *http.Request) (status int, content []byte, err error) {
-	response, err := client.Do(request)
+func (c *ClientImpl) DoHTTPRequest(request *http.Request) (status int, content []byte, err error) {
+	response, err := c.httpClient.Do(request)
 	if response != nil {
 		defer response.Body.Close()
 	}
 	if err != nil {
 		return status, nil, err
 	}
-	content, err = ioutil.ReadAll(response.Body)
+	content, err = c.readBody(response.Body)
 	if err != nil {
 		return status, nil, err
 	}
@@ -66,10 +77,6 @@ func UseRandomUserAgent() GetContentSetter {
 	}
 }
 
-func (c *ClientImpl) getRandomUserAgent() string {
-	return c.userAgents[c.random.GenerateRandomInt(len(c.userAgents))]
-}
-
 // GetContent returns the content and eventual error from an HTTP GET to a given URL
 func (c *ClientImpl) GetContent(URL string, setters ...GetContentSetter) (content []byte, status int, err error) {
 	var options getContentOptions
@@ -81,9 +88,9 @@ func (c *ClientImpl) GetContent(URL string, setters ...GetContentSetter) (conten
 		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", URL, err)
 	}
 	if options.randomUserAgent {
-		req.Header.Set("User-Agent", c.getRandomUserAgent())
+		req.Header.Set("User-Agent", c.userAgents[c.random.GenerateRandomInt(len(c.userAgents))])
 	}
-	status, content, err = c.DoHTTPRequest(c.httpClient, req)
+	status, content, err = c.DoHTTPRequest(req)
 	if err != nil {
 		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", URL, err)
 	}
