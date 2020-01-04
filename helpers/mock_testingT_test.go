@@ -21,3 +21,8 @@ func (_m *mockTestingT) Errorf(format string, args ...interface{}) {
 func (_m *mockTestingT) FailNow() {
 	_m.Called()
 }
+
+// Helper provides a mock function with given fields:
+func (_m *mockTestingT) Helper() {
+	_m.Called()
+}

@@ -46,14 +46,16 @@ func Test_AssertErrorsEqual(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			tMock := &mockTestingT{}
+			tMock.On("Helper")
 			if !tc.success {
-				tMock.On("Errorf", mock.AnythingOfType("string"), mock.AnythingOfType("string"))
+				tMock.On("Errorf", mock.AnythingOfType("string"), mock.AnythingOfType("string")).Once()
 			}
 			if tc.expected != nil && tc.actual == nil {
-				tMock.On("FailNow")
+				tMock.On("FailNow").Once()
 			}
 			out := AssertErrorsEqual(tMock, tc.expected, tc.actual)
 			assert.Equal(t, tc.success, out)
+			tMock.AssertExpectations(t)
 		})
 	}
 }
