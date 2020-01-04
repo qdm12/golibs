@@ -21,16 +21,11 @@ func Mode(args []string) bool {
 // Query sends an HTTP request to the other instance of
 // the program, and to its internal healthcheck server.
 func Query() error {
-	request, err := http.NewRequest(http.MethodGet, "http://127.0.0.1:9999", nil)
+	client := network.NewClient(time.Second)
+	_, status, err := client.GetContent("http://127.0.0.1:9999")
 	if err != nil {
-		return fmt.Errorf("Cannot build HTTP request: %w", err)
-	}
-	client := &http.Client{Timeout: 1 * time.Second}
-	status, _, err := network.DoHTTPRequest(client, request)
-	if err != nil {
-		return fmt.Errorf("Cannot execute HTTP request: %w", err)
-	}
-	if status != 200 {
+		return err
+	} else if status != 200 {
 		return fmt.Errorf("HTTP status code is %d", status)
 	}
 	return nil

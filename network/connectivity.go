@@ -3,73 +3,75 @@ package network
 import (
 	"fmt"
 	"net"
-	"net/http"
+	"time"
 )
 
-// ConnectivityChecks verifies the connection to the domains in terms of DNS, HTTP and HTTPS
-func ConnectivityChecks(client *http.Client, domains []string) (errs []error) {
+// Connectivity has methods to check Internet connectivity
+type Connectivity interface {
+	Checks(domains ...string) (errs []error)
+}
+
+// ConnectivityImpl implements Connectivity
+type ConnectivityImpl struct {
+	checkDNS checkDNSFunc
+	client   Client
+}
+
+// NewConnectivity returns a new connectivity object
+func NewConnectivity(timeout time.Duration) Connectivity {
+	return &ConnectivityImpl{
+		checkDNS: func(domain string) error {
+			_, err := net.LookupIP(domain)
+			return err
+		},
+		client: NewClient(timeout),
+	}
+}
+
+type checkDNSFunc func(domain string) error
+
+// Checks verifies the connection to the domains in terms of DNS, HTTP and HTTPS
+func (c *ConnectivityImpl) Checks(domains ...string) (errs []error) {
 	chErrors := make(chan []error)
 	for _, domain := range domains {
-		go connectivityCheck(client, domain, chErrors)
+		go func(domain string) {
+			chErrors <- connectivityCheck(domain, c.checkDNS, c.client)
+		}(domain)
 	}
-	N := len(domains)
-	for N > 0 {
-		select {
-		case errs := <-chErrors:
-			errs = append(errs, errs...)
-			N--
-		}
+	for range domains {
+		newErrors := <-chErrors
+		errs = append(errs, newErrors...)
 	}
 	close(chErrors)
 	return errs
 }
 
-func connectivityCheck(client *http.Client, domain string, chErrors chan []error) {
-	var errs []error
+func connectivityCheck(domain string, checkDNS checkDNSFunc, client Client) (errs []error) {
 	chError := make(chan error)
-	go domainNameResolutionCheckAsync(domain, chError)
-	go httpGetCheckAsync(client, "http://"+domain, chError)
-	go httpGetCheckAsync(client, "https://"+domain, chError)
-	N := 3
-	for N > 0 {
-		select {
-		case err := <-chError:
-			if err != nil {
-				errs = append(errs, err)
-			}
-			N--
+	go func() { chError <- domainNameResolutionCheck(domain, checkDNS) }()
+	go func() { chError <- httpGetCheck("http://"+domain, client) }()
+	go func() { chError <- httpGetCheck("https://"+domain, client) }()
+	for i := 0; i < 3; i++ {
+		if err := <-chError; err != nil {
+			errs = append(errs, err)
 		}
 	}
 	close(chError)
-	chErrors <- errs
+	return errs
 }
 
-func httpGetCheckAsync(client *http.Client, URL string, chError chan error) {
-	err := httpGetCheck(client, URL)
-	chError <- err
-}
-
-func domainNameResolutionCheckAsync(domain string, chError chan error) {
-	chError <- domainNameResolutionCheck(domain)
-}
-
-func httpGetCheck(client *http.Client, URL string) error {
-	req, err := http.NewRequest(http.MethodGet, URL, nil)
+func httpGetCheck(URL string, client Client) error {
+	_, status, err := client.GetContent(URL)
 	if err != nil {
 		return fmt.Errorf("HTTP GET failed for %s: %w", URL, err)
-	}
-	statusCode, _, err := DoHTTPRequest(client, req)
-	if err != nil {
-		return fmt.Errorf("HTTP GET failed for %s: %w", URL, err)
-	} else if statusCode != 200 {
-		return fmt.Errorf("HTTP GET failed for %s: HTTP Status %d", URL, statusCode)
+	} else if status != 200 {
+		return fmt.Errorf("HTTP GET failed for %s: HTTP Status %d", URL, status)
 	}
 	return nil
 }
 
-func domainNameResolutionCheck(domain string) error {
-	_, err := net.LookupIP(domain)
-	if err != nil {
+func domainNameResolutionCheck(domain string, checkDNS checkDNSFunc) error {
+	if err := checkDNS(domain); err != nil {
 		return fmt.Errorf("Domain name resolution is not working for %s: %w", domain, err)
 	}
 	return nil

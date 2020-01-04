@@ -1,25 +1,80 @@
 package security
 
 import (
+	"crypto/rand"
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func Test_GenerateRandomInt63(t *testing.T) {
+func Test_GenerateRandomBytes(t *testing.T) {
 	t.Parallel()
-	for i := 0; i < 20; i++ {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+	tests := map[string]struct {
+		n          int
+		randReader func(b []byte) error
+		err        error
+	}{
+		"no error": {
+			10,
+			func(b []byte) error {
+				_, err := rand.Read(b)
+				return err
+			},
+			nil,
+		},
+		"error": {
+			0,
+			func(b []byte) error {
+				return fmt.Errorf("error")
+			},
+			fmt.Errorf("error"),
+		},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := GenerateRandomInt63()
-			assert.GreaterOrEqual(t, out, int64(0))
+			r := &RandomImpl{
+				randReader: tc.randReader,
+			}
+			out, err := r.GenerateRandomBytes(tc.n)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Len(t, out, tc.n)
 		})
 	}
 }
 
+func Test_GenerateRandomInt63(t *testing.T) {
+	t.Parallel()
+	r := NewRandom()
+	var previousValue int64
+	for i := 0; i < 50; i++ {
+		out := r.GenerateRandomInt63()
+		assert.GreaterOrEqual(t, out, int64(0))
+		assert.NotEqual(t, out, previousValue)
+		previousValue = out
+	}
+	t.Run("panics from rand.Read error", func(t *testing.T) {
+		t.Parallel()
+		r := &RandomImpl{
+			randReader: func(b []byte) error {
+				return fmt.Errorf("error")
+			},
+		}
+		assert.PanicsWithValue(t, "error", func() { r.GenerateRandomInt63() })
+	})
+}
+
 func Test_GenerateRandomInt(t *testing.T) {
 	t.Parallel()
+	r := NewRandom()
 	tests := map[string]struct {
 		n int
 	}{
@@ -29,21 +84,21 @@ func Test_GenerateRandomInt(t *testing.T) {
 		"generates random int modulo 50": {50},
 	}
 	for name, tc := range tests {
-		for i := 0; i < 20; i++ {
-			t.Run(fmt.Sprintf("%s %d", name, i), func(t *testing.T) {
-				tc := tc
-				t.Parallel()
-				out := GenerateRandomInt(tc.n)
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			for i := 0; i < 50; i++ {
+				out := r.GenerateRandomInt(tc.n)
 				assert.GreaterOrEqual(t, out, 0)
 				assert.LessOrEqual(t, out, tc.n)
-			})
-		}
-
+			}
+		})
 	}
 }
 
 func Test_GenerateRandomAlphaNum(t *testing.T) {
 	t.Parallel()
+	r := NewRandom()
 	tests := map[string]struct {
 		n     uint64
 		regex string
@@ -69,17 +124,19 @@ func Test_GenerateRandomAlphaNum(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			s := GenerateRandomAlphaNum(tc.n)
+			s := r.GenerateRandomAlphaNum(tc.n)
 			assert.Regexp(t, tc.regex, s)
 		})
 	}
 	t.Run("panics with length argument too large", func(t *testing.T) {
-		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { GenerateRandomAlphaNum(9223372036854775808) })
+		t.Parallel()
+		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { r.GenerateRandomAlphaNum(9223372036854775808) })
 	})
 }
 
 func Test_GenerateRandomNum(t *testing.T) {
 	t.Parallel()
+	r := NewRandom()
 	tests := map[string]struct {
 		n     uint64
 		regex string
@@ -109,11 +166,12 @@ func Test_GenerateRandomNum(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			s := GenerateRandomNum(tc.n)
+			s := r.GenerateRandomNum(tc.n)
 			assert.Regexp(t, tc.regex, s)
 		})
 	}
 	t.Run("panics with length argument too large", func(t *testing.T) {
-		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { GenerateRandomNum(9223372036854775808) })
+		t.Parallel()
+		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { r.GenerateRandomNum(9223372036854775808) })
 	})
 }
