@@ -8,11 +8,13 @@ import (
 type testingT interface {
 	Errorf(format string, args ...interface{})
 	FailNow()
+	Helper()
 }
 
 // AssertErrorsEqual asserts errors match, so that they are both nil or their messages
 // are both equal
 func AssertErrorsEqual(t testingT, expected, actual error) (success bool) {
+	t.Helper()
 	if expected != nil {
 		require.Error(t, actual)
 		if actual == nil {
