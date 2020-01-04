@@ -1,9 +1,9 @@
 package security
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
-	"reflect"
 )
 
 // between 1 and 32
@@ -33,7 +33,7 @@ func Dechecksumize(checksumData []byte) (data []byte, err error) {
 	data = checksumData[:L-4]
 	digest := sha256.Sum256(data)
 	checksum2 := digest[:4]
-	if !reflect.DeepEqual(checksum, checksum2) {
+	if !bytes.Equal(checksum, checksum2) {
 		return nil, fmt.Errorf("checksum verification failed (%v and %v)", checksum, checksum2)
 	}
 	return data, nil
