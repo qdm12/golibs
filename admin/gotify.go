@@ -23,16 +23,16 @@ type Gotify struct {
 
 // InitGotify creates a Gotify client from environment variables
 // and logs warnings if the parameters are not valid.
-func InitGotify(httpClient *http.Client) *Gotify {
+func InitGotify(httpClient *http.Client, p params.EnvParams) *Gotify {
 	if httpClient == nil {
 		logging.Warn("Setting HTTP client to default")
 		httpClient = &http.Client{Timeout: 3 * time.Second}
 	}
-	gotifyURL, err := params.GetGotifyURL()
+	gotifyURL, err := p.GetGotifyURL()
 	if err != nil {
 		logging.Err(err)
 	}
-	gotifyToken, err := params.GetGotifyToken()
+	gotifyToken, err := p.GetGotifyToken()
 	if err != nil {
 		logging.Werr(err)
 	}
