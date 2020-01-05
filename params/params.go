@@ -96,8 +96,8 @@ func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value strin
 	for _, setter := range setters {
 		if err := setter(&options); err != nil {
 			return "", fmt.Errorf("environment variable %q: %w", key, err)
+		}
 	}
-}
 	value = e.getenv(key)
 	if len(value) == 0 {
 		if options.compulsory {
@@ -249,7 +249,7 @@ func (e *envParamsImpl) GetListeningPort(setters ...GetEnvSetter) (listeningPort
 // GetRootURL obtains and checks the root URL
 // from the environment variable ROOT_URL
 func (e *envParamsImpl) GetRootURL(setters ...GetEnvSetter) (rootURL string, err error) {
-	setters = append(setters, Default("/"))
+	setters = append([]GetEnvSetter{Default("/")}, setters...)
 	rootURL, err = e.GetEnv("ROOT_URL", setters...)
 	if err != nil {
 		return rootURL, err

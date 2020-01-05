@@ -324,3 +324,34 @@ func Test_GetListeningPort(t *testing.T) {
 		})
 	}
 }
+
+func Test_GetRootURL(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue string
+		setters  []GetEnvSetter
+		rootURL  string
+		err      error
+	}{
+		"key with valid value":             {"/a", nil, "/a", nil},
+		"key with valid value and trail /": {"/a/", nil, "/a", nil},
+		"key with invalid value":           {"/a?", nil, "", fmt.Errorf("environment variable ROOT_URL: root URL \"/a?\" is invalid")},
+		"key without value":                {"", nil, "", nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("/a")}, "/a", nil},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"ROOT_URL\": cannot make environment variable value compulsory with a default value")},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParamsImpl{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			rootURL, err := e.GetRootURL(tc.setters...)
+			helpers.AssertErrorsEqual(t, tc.err, err)
+			assert.Equal(t, tc.rootURL, rootURL)
+		})
+	}
+}
