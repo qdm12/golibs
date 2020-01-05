@@ -13,6 +13,11 @@ type mockHttpClient struct {
 	mock.Mock
 }
 
+// CloseIdleConnections provides a mock function with given fields:
+func (_m *mockHttpClient) CloseIdleConnections() {
+	_m.Called()
+}
+
 // Do provides a mock function with given fields: r
 func (_m *mockHttpClient) Do(r *http.Request) (*http.Response, error) {
 	ret := _m.Called(r)

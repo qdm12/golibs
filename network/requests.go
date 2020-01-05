@@ -14,10 +14,12 @@ import (
 type Client interface {
 	DoHTTPRequest(request *http.Request) (status int, content []byte, err error)
 	GetContent(URL string, setters ...GetContentSetter) (content []byte, status int, err error)
+	Close()
 }
 
 type httpClient interface {
 	Do(r *http.Request) (*http.Response, error)
+	CloseIdleConnections()
 }
 
 func newHTTPClient(timeout time.Duration) httpClient {
@@ -45,6 +47,11 @@ func NewClient(timeout time.Duration) Client {
 			"Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1",
 		},
 	}
+}
+
+// Close terminates idle connections of the HTTP client
+func (c *ClientImpl) Close() {
+	c.httpClient.CloseIdleConnections()
 }
 
 // DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
