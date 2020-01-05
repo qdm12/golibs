@@ -29,7 +29,7 @@ func Test_GetEnv(t *testing.T) {
 		"key with value":                   {"value", nil, "value", nil},
 		"key without value and default":    {"", []GetEnvSetter{Default("default")}, "default", nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
-		"bad options":                      {"", []GetEnvSetter{Compulsory(), Default("a")}, "", fmt.Errorf("cannot set default value for environment variable value which is compulsory")},
+		"bad options":                      {"", []GetEnvSetter{Compulsory(), Default("a")}, "", fmt.Errorf("environment variable \"any\": cannot set default value for environment variable value which is compulsory")},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -304,7 +304,7 @@ func Test_GetListeningPort(t *testing.T) {
 		"key with valid warning value":     {"60000", nil, "60000", nil},
 		"key without value":                {"", nil, "8000", nil},
 		"key without value and default":    {"", []GetEnvSetter{Default("9000")}, "9000", nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("cannot make environment variable value compulsory with a default value")},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"LISTENING_PORT\": cannot make environment variable value compulsory with a default value")},
 	}
 	for name, tc := range tests {
 		tc := tc

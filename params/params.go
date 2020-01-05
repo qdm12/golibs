@@ -89,22 +89,15 @@ func Default(defaultValue string) GetEnvSetter {
 	}
 }
 
-func setOptions(setters []GetEnvSetter) (options getEnvOptions, err error) {
-	for _, setter := range setters {
-		if err := setter(&options); err != nil {
-			return options, err
-		}
-	}
-	return options, nil
-}
-
 // GetEnv returns the value stored for a named environment variable,
 // and a default if no value is found
 func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
-	options, err := setOptions(setters)
-	if err != nil {
-		return "", err
+	options := getEnvOptions{}
+	for _, setter := range setters {
+		if err := setter(&options); err != nil {
+			return "", fmt.Errorf("environment variable %q: %w", key, err)
 	}
+}
 	value = e.getenv(key)
 	if len(value) == 0 {
 		if options.compulsory {
