@@ -292,9 +292,8 @@ func Test_GetGroupID(t *testing.T) {
 
 func Test_GetListeningPort(t *testing.T) {
 	t.Parallel()
-	restore, err := logging.SetLoggerToEmpty() // avoid logging warnings
+	_, err := logging.SetLoggerToEmpty() // do not log warnings
 	require.NoError(t, err)
-	defer restore()
 	tests := map[string]struct {
 		envValue      string
 		setters       []GetEnvSetter

@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/qdm12/golibs/helpers"
+	"github.com/qdm12/golibs/logging"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_IPHeaders_isVoid(t *testing.T) {
@@ -253,8 +255,8 @@ func Test_getRemoteIP(t *testing.T) {
 
 func Test_extractPublicIPs(t *testing.T) {
 	t.Parallel()
-	// restoreLogger := helpers.SetDefaultLoggerToEmpty()
-	// defer restoreLogger()
+	_, err := logging.SetLoggerToEmpty()
+	require.NoError(t, err)
 	tests := map[string]struct {
 		IPs       []string
 		publicIPs []string
@@ -277,8 +279,8 @@ func Test_extractPublicIPs(t *testing.T) {
 
 func Test_getXForwardedIPs(t *testing.T) {
 	t.Parallel()
-	// restoreLogger := helpers.SetDefaultLoggerToEmpty()
-	// defer restoreLogger()
+	_, err := logging.SetLoggerToEmpty()
+	require.NoError(t, err)
 	tests := map[string]struct {
 		XForwardedFor string
 		IPs           []string
