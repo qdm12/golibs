@@ -411,17 +411,22 @@ func (e *envParamsImpl) GetNodeID(setters ...GetEnvSetter) (nodeID int, err erro
 	return nodeID, nil
 }
 
-// GetURL obtains the URL for the environment variable for the key given.
+// GetURL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
 func (e *envParamsImpl) GetURL(key string, setters ...GetEnvSetter) (URL *url.URL, err error) {
 	s, err := e.GetEnv(key, setters...)
-	if s == "" {
+	if err != nil {
+		return nil, err
+	} else if s == "" {
 		return nil, nil
 	}
 	URL, err = url.Parse(s)
-	if err != nil {
+	if err != nil { // never happens
 		return nil, fmt.Errorf("environment variable %q URL value: %w", key, err)
+	}
+	if URL.Scheme != "http" && URL.Scheme != "https" {
+		return nil, fmt.Errorf("environment variable %q URL value %q is not HTTP(s)", key, URL.String())
 	}
 	return URL, nil
 }
