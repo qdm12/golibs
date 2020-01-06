@@ -51,7 +51,9 @@ func NewClient(timeout time.Duration) Client {
 
 // Close terminates idle connections of the HTTP client
 func (c *ClientImpl) Close() {
-	c.httpClient.CloseIdleConnections()
+	if c.httpClient != nil {
+		c.httpClient.CloseIdleConnections()
+	}
 }
 
 // DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
