@@ -406,7 +406,7 @@ func (e *envParamsImpl) GetNodeID(setters ...GetEnvSetter) (nodeID int, err erro
 	}
 	nodeID, err = strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("environment variable NODE_ID: %w", err)
+		return 0, fmt.Errorf("environment variable NODE_ID value %q is not a valid integer", s)
 	}
 	return nodeID, nil
 }

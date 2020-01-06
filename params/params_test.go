@@ -355,3 +355,156 @@ func Test_GetRootURL(t *testing.T) {
 		})
 	}
 }
+
+func Test_GetLoggerEncoding(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue string
+		setters  []GetEnvSetter
+		encoding string
+		err      error
+	}{
+		"key with json value":              {"json", nil, "json", nil},
+		"key with console value":           {"console", nil, "console", nil},
+		"key with invalid value":           {"bla", nil, "", fmt.Errorf("environment variable LOG_ENCODING: logger encoding \"bla\" unrecognized")},
+		"key without value":                {"", nil, "json", nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("console")}, "console", nil},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"LOG_ENCODING\": cannot make environment variable value compulsory with a default value")},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParamsImpl{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			encoding, err := e.GetLoggerEncoding(tc.setters...)
+			helpers.AssertErrorsEqual(t, tc.err, err)
+			assert.Equal(t, tc.encoding, encoding)
+		})
+	}
+}
+
+func Test_GetLoggerLevel(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue string
+		setters  []GetEnvSetter
+		level    logging.Level
+		err      error
+	}{
+		"key with info value":              {"info", nil, logging.InfoLevel, nil},
+		"key with warning value":           {"warning", nil, logging.WarnLevel, nil},
+		"key with error value":             {"error", nil, logging.ErrorLevel, nil},
+		"key with invalid value":           {"bla", nil, logging.InfoLevel, fmt.Errorf("environment variable LOG_LEVEL: logger level \"bla\" unrecognized")},
+		"key without value":                {"", nil, logging.InfoLevel, nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("warning")}, logging.WarnLevel, nil},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, logging.InfoLevel, fmt.Errorf("environment variable \"LOG_LEVEL\": cannot make environment variable value compulsory with a default value")},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParamsImpl{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			level, err := e.GetLoggerLevel(tc.setters...)
+			helpers.AssertErrorsEqual(t, tc.err, err)
+			assert.Equal(t, tc.level, level)
+		})
+	}
+}
+
+func Test_GetNodeID(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue string
+		setters  []GetEnvSetter
+		nodeID   int
+		err      error
+	}{
+		"key with value 10":                {"10", nil, 10, nil},
+		"key with invalid value":           {"bla", nil, 0, fmt.Errorf("environment variable NODE_ID value \"bla\" is not a valid integer")},
+		"key without value":                {"", nil, 0, nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("2")}, 2, nil},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("environment variable \"NODE_ID\": cannot make environment variable value compulsory with a default value")},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParamsImpl{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			nodeID, err := e.GetNodeID(tc.setters...)
+			helpers.AssertErrorsEqual(t, tc.err, err)
+			assert.Equal(t, tc.nodeID, nodeID)
+		})
+	}
+}
+
+func Test_GetURL(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue string
+		setters  []GetEnvSetter
+		URL      string
+		err      error
+	}{
+		"key with URL value": {"https://google.com", nil, "https://google.com", nil},
+		// "key with invalid value":           {"please help finding me", nil, "", fmt.Errorf("")},
+		"key with non HTTP value":          {"google.com", nil, "", fmt.Errorf("environment variable \"any\" URL value \"google.com\" is not HTTP(s)")},
+		"key without value":                {"", nil, "", nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("https://google.com")}, "https://google.com", nil},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParamsImpl{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			URL, err := e.GetURL("any", tc.setters...)
+			helpers.AssertErrorsEqual(t, tc.err, err)
+			if URL == nil {
+				assert.Empty(t, tc.URL)
+			} else {
+				assert.Equal(t, tc.URL, URL.String())
+			}
+		})
+	}
+}
+
+func Test_GetGotifyURLL(t *testing.T) {
+	t.Parallel()
+	e := &envParamsImpl{
+		getenv: func(key string) string {
+			return "https://google.com"
+		},
+	}
+	URL, err := e.GetGotifyURL()
+	require.NoError(t, err)
+	require.NotNil(t, URL)
+	assert.Equal(t, "https://google.com", URL.String())
+}
+
+func Test_GetGotifyToken(t *testing.T) {
+	t.Parallel()
+	e := &envParamsImpl{
+		getenv: func(key string) string {
+			return "x"
+		},
+	}
+	token, err := e.GetGotifyToken()
+	require.NoError(t, err)
+	assert.Equal(t, "x", token)
+}
