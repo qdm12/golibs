@@ -364,7 +364,7 @@ func (e *envParamsImpl) GetLoggerConfig() (encoding string, level logging.Level,
 // GetLoggerEncoding obtains the logging encoding
 // from the environment variable LOG_ENCODING
 func (e *envParamsImpl) GetLoggerEncoding(setters ...GetEnvSetter) (encoding string, err error) {
-	setters = append(setters, Default("json"))
+	setters = append([]GetEnvSetter{Default("json")}, setters...)
 	s, err := e.GetEnv("LOG_ENCODING", setters...)
 	if err != nil {
 		return "", err
@@ -379,7 +379,7 @@ func (e *envParamsImpl) GetLoggerEncoding(setters ...GetEnvSetter) (encoding str
 // GetLoggerLevel obtains the logging level
 // from the environment variable LOG_LEVEL
 func (e *envParamsImpl) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error) {
-	setters = append(setters, Default("json"))
+	setters = append([]GetEnvSetter{Default("info")}, setters...)
 	s, err := e.GetEnv("LOG_LEVEL", setters...)
 	if err != nil {
 		return level, err
@@ -399,7 +399,7 @@ func (e *envParamsImpl) GetLoggerLevel(setters ...GetEnvSetter) (level logging.L
 // GetNodeID obtains the node instance ID from the environment variable
 // NODE_ID
 func (e *envParamsImpl) GetNodeID(setters ...GetEnvSetter) (nodeID int, err error) {
-	setters = append(setters, Default("0"))
+	setters = append([]GetEnvSetter{Default("0")}, setters...)
 	s, err := e.GetEnv("NODE_ID", setters...)
 	if err != nil {
 		return nodeID, err
