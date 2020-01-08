@@ -14,6 +14,11 @@ type Client struct {
 	mock.Mock
 }
 
+// Close provides a mock function with given fields:
+func (_m *Client) Close() {
+	_m.Called()
+}
+
 // DoHTTPRequest provides a mock function with given fields: request
 func (_m *Client) DoHTTPRequest(request *http.Request) (int, []byte, error) {
 	ret := _m.Called(request)
