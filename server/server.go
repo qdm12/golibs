@@ -2,25 +2,11 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/qdm12/golibs/logging"
 )
-
-// RespondJSON marshals a payload into JSON and writes the JSON data
-// to the response writer with a HTTP status code.
-func RespondJSON(w http.ResponseWriter, code int, payload interface{}) error {
-	response, err := json.Marshal(payload)
-	if err != nil {
-		return fmt.Errorf("JSON formatting failed: %w", err)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
-	return nil
-}
 
 // Settings contains settings to launch an HTTP server
 // Name is simply a unique identifiant used for logging purposes.
