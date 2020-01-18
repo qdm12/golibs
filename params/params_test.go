@@ -150,8 +150,8 @@ func Test_GetOnOff(t *testing.T) {
 		on       bool
 		err      error
 	}{
-		"key with yes value":               {"on", nil, true, nil},
-		"key with no value":                {"off", nil, false, nil},
+		"key with on value":                {"on", nil, true, nil},
+		"key with off value":               {"off", nil, false, nil},
 		"key without value":                {"", nil, false, fmt.Errorf("environment variable \"any\" value is \"\" and can only be \"on\" or \"off\"")},
 		"key without value and default":    {"", []GetEnvSetter{Default("on")}, true, nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, false, fmt.Errorf("no value found for environment variable \"any\"")},
@@ -270,24 +270,26 @@ func Test_GetHTTPTimeout(t *testing.T) {
 
 func Test_GetUserID(t *testing.T) {
 	t.Parallel()
+	const expectedUID = 1
 	e := &envParamsImpl{
 		getuid: func() int {
-			return 1
+			return expectedUID
 		},
 	}
 	uid := e.GetUserID()
-	assert.Equal(t, 1, uid)
+	assert.Equal(t, expectedUID, uid)
 }
 
 func Test_GetGroupID(t *testing.T) {
 	t.Parallel()
+	const expectedUID = 1
 	e := &envParamsImpl{
 		getgid: func() int {
-			return 1
+			return expectedUID
 		},
 	}
 	gid := e.GetGroupID()
-	assert.Equal(t, 1, gid)
+	assert.Equal(t, expectedUID, gid)
 }
 
 func Test_GetListeningPort(t *testing.T) {
@@ -310,12 +312,13 @@ func Test_GetListeningPort(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+			const expectedUID = 1000
 			e := &envParamsImpl{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
 				getuid: func() int {
-					return 1000
+					return expectedUID
 				},
 			}
 			listeningPort, err := e.GetListeningPort(tc.setters...)

@@ -34,15 +34,15 @@ func Test_DoHTTPRequest(t *testing.T) {
 		"no error": {
 			&http.Response{
 				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: 200}, nil, ioutil.ReadAll,
-			200, []byte("body"), nil},
+				StatusCode: http.StatusOK}, nil, ioutil.ReadAll,
+			http.StatusOK, []byte("body"), nil},
 		"http error": {
 			nil, fmt.Errorf("error"), ioutil.ReadAll,
 			0, nil, fmt.Errorf("error")},
 		"body read error": {
 			&http.Response{
 				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: 200},
+				StatusCode: http.StatusOK},
 			nil,
 			func(r io.Reader) ([]byte, error) {
 				return nil, fmt.Errorf("error")
@@ -85,9 +85,9 @@ func Test_GetContent(t *testing.T) {
 			nil,
 			&http.Response{
 				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: 200},
+				StatusCode: http.StatusOK},
 			nil,
-			[]byte("body"), 200, nil},
+			[]byte("body"), http.StatusOK, nil},
 		"http error": {
 			"https://domain.com",
 			nil,
@@ -105,9 +105,9 @@ func Test_GetContent(t *testing.T) {
 			[]GetContentSetter{UseRandomUserAgent()},
 			&http.Response{
 				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: 200},
+				StatusCode: http.StatusOK},
 			nil,
-			[]byte("body"), 200, nil},
+			[]byte("body"), http.StatusOK, nil},
 	}
 	for name, tc := range tests {
 		tc := tc

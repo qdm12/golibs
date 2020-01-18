@@ -1,7 +1,7 @@
 package params
 
 import (
-	"net/url"
+	liburl "net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -37,8 +37,8 @@ type EnvParams interface {
 	GetLoggerEncoding(setters ...GetEnvSetter) (encoding string, err error)
 	GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error)
 	GetNodeID(setters ...GetEnvSetter) (nodeID int, err error)
-	GetURL(key string, setters ...GetEnvSetter) (URL *url.URL, err error)
-	GetGotifyURL(setters ...GetEnvSetter) (URL *url.URL, err error)
+	GetURL(key string, setters ...GetEnvSetter) (URL *liburl.URL, err error)
+	GetGotifyURL(setters ...GetEnvSetter) (URL *liburl.URL, err error)
 	GetGotifyToken(setters ...GetEnvSetter) (token string, err error)
 }
 
@@ -204,14 +204,16 @@ func (e *envParamsImpl) GetDuration(key string, timeUnit time.Duration, setters 
 		return 0, err
 	}
 	value, err := strconv.Atoi(s)
-	if err != nil {
+	switch {
+	case err != nil:
 		return 0, fmt.Errorf("environment variable %q duration value %q is not a valid integer", key, s)
-	} else if value == 0 {
+	case value == 0:
 		return 0, fmt.Errorf("environment variable %q duration value cannot be 0", key)
-	} else if value < 0 {
+	case value < 0:
 		return 0, fmt.Errorf("environment variable %q duration value cannot be lower than 0", key)
+	default:
+		return time.Duration(value) * timeUnit, nil
 	}
-	return time.Duration(value) * timeUnit, nil
 }
 
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
@@ -414,27 +416,27 @@ func (e *envParamsImpl) GetNodeID(setters ...GetEnvSetter) (nodeID int, err erro
 // GetURL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
-func (e *envParamsImpl) GetURL(key string, setters ...GetEnvSetter) (URL *url.URL, err error) {
+func (e *envParamsImpl) GetURL(key string, setters ...GetEnvSetter) (url *liburl.URL, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return nil, err
 	} else if s == "" {
 		return nil, nil
 	}
-	URL, err = url.Parse(s)
+	url, err = liburl.Parse(s)
 	if err != nil { // never happens
 		return nil, fmt.Errorf("environment variable %q URL value: %w", key, err)
 	}
-	if URL.Scheme != "http" && URL.Scheme != "https" {
-		return nil, fmt.Errorf("environment variable %q URL value %q is not HTTP(s)", key, URL.String())
+	if url.Scheme != "http" && url.Scheme != "https" {
+		return nil, fmt.Errorf("environment variable %q URL value %q is not HTTP(s)", key, url.String())
 	}
-	return URL, nil
+	return url, nil
 }
 
 // GetGotifyURL obtains the URL for Gotify server
 // from the environment variable GOTIFY_URL.
 // It returns a nil URL if no value is found.
-func (e *envParamsImpl) GetGotifyURL(setters ...GetEnvSetter) (URL *url.URL, err error) {
+func (e *envParamsImpl) GetGotifyURL(setters ...GetEnvSetter) (url *liburl.URL, err error) {
 	return e.GetURL("GOTIFY_URL", setters...)
 }
 

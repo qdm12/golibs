@@ -52,6 +52,8 @@ func Respond(w http.ResponseWriter, setters ...ResponseSetter) error {
 		w.Header().Set(k, v)
 	}
 	w.WriteHeader(options.status)
-	w.Write(options.body)
+	if _, err := w.Write(options.body); err != nil {
+		return err
+	}
 	return nil
 }

@@ -25,7 +25,7 @@ func Query() error {
 	_, status, err := client.GetContent("http://127.0.0.1:9999")
 	if err != nil {
 		return err
-	} else if status != 200 {
+	} else if status != http.StatusOK {
 		return fmt.Errorf("HTTP status code is %d", status)
 	}
 	return nil

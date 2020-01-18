@@ -67,7 +67,9 @@ func serve(name, addr string, handler http.Handler, chDone chan namedError, chSt
 		err := server.Shutdown(context.Background())
 		if err != nil {
 			logging.Errorf("server "+name+" shutdown error: %s", err)
-			logging.Sync()
+			if err := logging.Sync(); err != nil {
+				fmt.Println("ERROR: could not sync logger")
+			}
 		}
 	}()
 	logging.Infof("HTTP server %s listening on %s", name, addr)

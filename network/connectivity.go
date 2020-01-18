@@ -3,6 +3,7 @@ package network
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"time"
 )
 
@@ -60,12 +61,12 @@ func connectivityCheck(domain string, checkDNS checkDNSFunc, client Client) (err
 	return errs
 }
 
-func httpGetCheck(URL string, client Client) error {
-	_, status, err := client.GetContent(URL)
+func httpGetCheck(url string, client Client) error {
+	_, status, err := client.GetContent(url)
 	if err != nil {
-		return fmt.Errorf("HTTP GET failed for %s: %w", URL, err)
-	} else if status != 200 {
-		return fmt.Errorf("HTTP GET failed for %s: HTTP Status %d", URL, status)
+		return fmt.Errorf("HTTP GET failed for %s: %w", url, err)
+	} else if status != http.StatusOK {
+		return fmt.Errorf("HTTP GET failed for %s: HTTP Status %d", url, status)
 	}
 	return nil
 }

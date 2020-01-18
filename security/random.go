@@ -5,15 +5,16 @@ import (
 	"encoding/binary"
 )
 
-const lowercase = "abcdefghijklmnopqrstuvwxyz"
-const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-const alpha = lowercase + uppercase
-const num = "0123456789"
-const alphaNum = alpha + num
 const (
+	lowercase     = "abcdefghijklmnopqrstuvwxyz"
+	uppercase     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	alpha         = lowercase + uppercase
+	num           = "0123456789"
+	alphaNum      = alpha + num
 	letterIdxBits = 6                    // 6 bits to represent a letter index
 	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
 	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+	maxInt63      = 9223372036854775807
 )
 
 // Random has methods to generate random values
@@ -51,7 +52,8 @@ func (r *RandomImpl) GenerateRandomBytes(n int) ([]byte, error) {
 
 // GenerateRandomInt63 returns a random 63 bit positive integer
 func (r *RandomImpl) GenerateRandomInt63() int64 {
-	b, err := r.GenerateRandomBytes(32) // 256 bits
+	const int63Length = 32 // 256 bits
+	b, err := r.GenerateRandomBytes(int63Length)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -72,7 +74,7 @@ func (r *RandomImpl) GenerateRandomInt(n int) int {
 
 // GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length
 func (r *RandomImpl) GenerateRandomAlphaNum(length uint64) string {
-	if length >= 9223372036854775807 {
+	if length >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
 	n := int64(length)
@@ -94,7 +96,7 @@ func (r *RandomImpl) GenerateRandomAlphaNum(length uint64) string {
 
 // GenerateRandomNum returns a string of random numeric characters of a specified length
 func (r *RandomImpl) GenerateRandomNum(n uint64) string {
-	if n >= 9223372036854775807 {
+	if n >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
 	b := make([]byte, n)

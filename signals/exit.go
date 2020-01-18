@@ -1,21 +1,18 @@
 package signals
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func WaitForExit(cleanup func(signal string) (exitCode int)) {
-	signalsCh := make(chan os.Signal)
+	signalsCh := make(chan os.Signal, 1)
 	signal.Notify(signalsCh,
 		syscall.SIGINT,
 		syscall.SIGTERM,
-		syscall.SIGKILL,
 		os.Interrupt,
 	)
 	signal := <-signalsCh
-	signalStr := fmt.Sprintf("%s", signal)
-	os.Exit(cleanup(signalStr))
+	os.Exit(cleanup(signal.String()))
 }

@@ -16,35 +16,60 @@ const (
 	regexSHA256String = `[a-fA-F0-9]{64}`
 )
 
-func buildSearchFn(regex string) func(s string) []string {
-	return func(s string) []string {
-		return regexp.MustCompile(regex).FindAllString(s, -1)
-	}
-}
-
-func buildMatchFn(regex string) func(s string) bool {
-	return func(s string) bool {
-		return regexp.MustCompile("^" + regex + "$").MatchString(s)
-	}
-}
-
 // Search functions
-var (
-	SearchIPv4  = buildSearchFn(regexIPv4)
-	SearchIPv6  = buildSearchFn(regexIPv6)
-	SearchEmail = buildSearchFn(regexEmail)
-	SearchPhone = buildSearchFn(regexPhoneSearch)
-)
+func search(s, regex string) []string {
+	return regexp.MustCompile(regex).FindAllString(s, -1)
+}
+
+func SearchIPv4(s string) []string {
+	return search(s, regexIPv4)
+}
+
+func SearchIPv6(s string) []string {
+	return search(s, regexIPv6)
+}
+
+func SearchEmail(s string) []string {
+	return search(s, regexEmail)
+}
+
+func SearchPhone(s string) []string {
+	return search(s, regexPhoneSearch)
+}
 
 // Match functions
-var (
-	MatchEmail      = buildMatchFn(regexEmail)
-	MatchPhoneIntl  = buildMatchFn(regexPhoneIntl)
-	MatchPhoneLocal = buildMatchFn(regexPhoneLocal)
-	MatchDomain     = buildMatchFn(regexDomain)
-	MatchHostname   = buildMatchFn(regexHostname)
-	// TODO add tests
-	MatchRootURL      = buildMatchFn(regexRootURL)
-	MatchMD5String    = buildMatchFn(regexMD5String)
-	MatchSHA256String = buildMatchFn(regexSHA256String)
-)
+func match(s, regex string) bool {
+	return regexp.MustCompile("^" + regex + "$").MatchString(s)
+}
+
+func MatchEmail(s string) bool {
+	return match(s, regexEmail)
+}
+
+func MatchPhoneIntl(s string) bool {
+	return match(s, regexPhoneIntl)
+}
+
+func MatchPhoneLocal(s string) bool {
+	return match(s, regexPhoneLocal)
+}
+
+func MatchDomain(s string) bool {
+	return match(s, regexDomain)
+}
+
+func MatchHostname(s string) bool {
+	return match(s, regexHostname)
+}
+
+func MatchRootURL(s string) bool {
+	return match(s, regexRootURL)
+}
+
+func MatchMD5String(s string) bool {
+	return match(s, regexMD5String)
+}
+
+func MatchSHA256String(s string) bool {
+	return match(s, regexSHA256String)
+}

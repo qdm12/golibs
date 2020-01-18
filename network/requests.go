@@ -87,21 +87,21 @@ func UseRandomUserAgent() GetContentSetter {
 }
 
 // GetContent returns the content and eventual error from an HTTP GET to a given URL
-func (c *ClientImpl) GetContent(URL string, setters ...GetContentSetter) (content []byte, status int, err error) {
+func (c *ClientImpl) GetContent(url string, setters ...GetContentSetter) (content []byte, status int, err error) {
 	var options getContentOptions
 	for _, setter := range setters {
 		setter(&options)
 	}
-	req, err := http.NewRequest(http.MethodGet, URL, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", URL, err)
+		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", url, err)
 	}
 	if options.randomUserAgent {
 		req.Header.Set("User-Agent", c.userAgents[c.random.GenerateRandomInt(len(c.userAgents))])
 	}
 	status, content, err = c.DoHTTPRequest(req)
 	if err != nil {
-		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", URL, err)
+		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", url, err)
 	}
 	return content, status, nil
 }

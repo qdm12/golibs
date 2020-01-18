@@ -10,25 +10,6 @@ import (
 	"github.com/qdm12/golibs/verification"
 )
 
-var privateCIDRs []*net.IPNet
-
-func init() {
-	privateCIDRBlocks := [8]string{
-		"127.0.0.1/8",    // localhost
-		"10.0.0.0/8",     // 24-bit block
-		"172.16.0.0/12",  // 20-bit block
-		"192.168.0.0/16", // 16-bit block
-		"169.254.0.0/16", // link local address
-		"::1/128",        // localhost IPv6
-		"fc00::/7",       // unique local address IPv6
-		"fe80::/10",      // link local address IPv6
-	}
-	for _, privateCIDRBlock := range privateCIDRBlocks {
-		_, CIDR, _ := net.ParseCIDR(privateCIDRBlock)
-		privateCIDRs = append(privateCIDRs, CIDR)
-	}
-}
-
 // IPHeaders contains all the raw IP headers of an HTTP request
 type IPHeaders struct {
 	RemoteAddress string
@@ -62,7 +43,7 @@ func GetClientIPHeaders(r *http.Request) (headers IPHeaders) {
 }
 
 // GetClientIP returns one single client IP address
-func GetClientIP(r *http.Request) (IP string, err error) {
+func GetClientIP(r *http.Request) (ip string, err error) {
 	headers := GetClientIPHeaders(r)
 	if headers.isVoid() {
 		return "", fmt.Errorf("no IP address found in client request")
@@ -97,43 +78,54 @@ func GetClientIP(r *http.Request) (IP string, err error) {
 	return remoteIP, nil
 }
 
-func ipIsValid(IP string) bool {
-	netIP := net.ParseIP(IP)
+func ipIsValid(ip string) bool {
+	netIP := net.ParseIP(ip)
 	return netIP != nil
 }
 
 func netIPIsPrivate(netIP net.IP) bool {
-	for i := range privateCIDRs {
-		if privateCIDRs[i].Contains(netIP) {
+	for _, privateCIDRBlock := range [8]string{
+		"127.0.0.1/8",    // localhost
+		"10.0.0.0/8",     // 24-bit block
+		"172.16.0.0/12",  // 20-bit block
+		"192.168.0.0/16", // 16-bit block
+		"169.254.0.0/16", // link local address
+		"::1/128",        // localhost IPv6
+		"fc00::/7",       // unique local address IPv6
+		"fe80::/10",      // link local address IPv6
+	} {
+		_, CIDR, _ := net.ParseCIDR(privateCIDRBlock)
+		if CIDR.Contains(netIP) {
 			return true
 		}
 	}
 	return false
 }
 
-func splitHostPort(address string) (IP, port string, err error) {
+func splitHostPort(address string) (ip, port string, err error) {
 	if strings.ContainsRune(address, '[') && strings.ContainsRune(address, ']') {
 		// should be an IPv6 address with brackets
 		return net.SplitHostPort(address)
 	}
-	if strings.Count(address, ":") > 1 { // could be an IPv6 without brackets
+	const ipv4MaxColons = 1
+	if strings.Count(address, ":") > ipv4MaxColons { // could be an IPv6 without brackets
 		i := strings.LastIndex(address, ":")
-		port = address[i+1 : len(address)]
-		IP = address[0:i]
-		if !ipIsValid(IP) {
+		port = address[i+1:]
+		ip = address[0:i]
+		if !ipIsValid(ip) {
 			return net.SplitHostPort(address)
 		}
-		return IP, port, nil
+		return ip, port, nil
 	}
 	// IPv4 address
 	return net.SplitHostPort(address)
 }
 
-func getRemoteIP(remoteAddr string) (IP string, err error) {
-	IP = remoteAddr
-	if strings.ContainsRune(IP, ':') {
+func getRemoteIP(remoteAddr string) (ip string, err error) {
+	ip = remoteAddr
+	if strings.ContainsRune(ip, ':') {
 		var port string
-		IP, port, err = splitHostPort(IP)
+		ip, port, err = splitHostPort(ip)
 		if err != nil {
 			return "", err
 		}
@@ -143,14 +135,14 @@ func getRemoteIP(remoteAddr string) (IP string, err error) {
 			}
 		}
 	}
-	if !ipIsValid(IP) {
-		return "", fmt.Errorf("IP address %q is not valid", IP)
+	if !ipIsValid(ip) {
+		return "", fmt.Errorf("IP address %q is not valid", ip)
 	}
-	return IP, nil
+	return ip, nil
 }
 
-func extractPublicIPs(IPs []string) (publicIPs []string) {
-	for _, IP := range IPs {
+func extractPublicIPs(ips []string) (publicIPs []string) {
+	for _, IP := range ips {
 		if !ipIsValid(IP) {
 			logging.Warnf("IP address %q is not valid", IP)
 			continue
@@ -164,19 +156,19 @@ func extractPublicIPs(IPs []string) (publicIPs []string) {
 	return publicIPs
 }
 
-func getXForwardedIPs(XForwardedFor string) (IPs []string) {
-	if len(XForwardedFor) == 0 {
+func getXForwardedIPs(xForwardedFor string) (ips []string) {
+	if len(xForwardedFor) == 0 {
 		return nil
 	}
-	XForwardedFor = strings.ReplaceAll(XForwardedFor, " ", "")
-	XForwardedFor = strings.ReplaceAll(XForwardedFor, "\t", "")
-	XForwardForIPs := strings.Split(XForwardedFor, ",")
+	xForwardedFor = strings.ReplaceAll(xForwardedFor, " ", "")
+	xForwardedFor = strings.ReplaceAll(xForwardedFor, "\t", "")
+	XForwardForIPs := strings.Split(xForwardedFor, ",")
 	for _, IP := range XForwardForIPs {
 		if !ipIsValid(IP) {
 			logging.Warnf("IP address %q is not valid", IP)
 			continue
 		}
-		IPs = append(IPs, IP)
+		ips = append(ips, IP)
 	}
-	return IPs
+	return ips
 }

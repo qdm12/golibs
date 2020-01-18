@@ -3,7 +3,7 @@ package admin
 import (
 	"fmt"
 	"net/http"
-	"net/url"
+	liburl "net/url"
 
 	"github.com/gotify/go-api-client/v2/auth"
 	"github.com/gotify/go-api-client/v2/client"
@@ -24,8 +24,8 @@ type gotifyImpl struct {
 }
 
 // NewGotify creates an API client with the token for the Gotify server
-func NewGotify(URL url.URL, token string, httpClient *http.Client) Gotify {
-	client := gotify.NewClient(&URL, httpClient)
+func NewGotify(url liburl.URL, token string, httpClient *http.Client) Gotify {
+	client := gotify.NewClient(&url, httpClient)
 	return &gotifyImpl{client: client, token: token}
 }
 

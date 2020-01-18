@@ -12,19 +12,24 @@ func verifyListeningPort(listeningPort string, uid int) (warning string, err err
 		return "", fmt.Errorf("listening port: %w", err)
 	}
 	value, _ := strconv.Atoi(listeningPort)
-	if value < 1024 {
-		if uid == 0 {
+	const maxPrivilegedPort = 1023
+	const minDynamicPort = 49151
+	switch {
+	case value <= maxPrivilegedPort:
+		switch uid {
+		case 0:
 			return fmt.Sprintf("listening port %s allowed to be in the reserved system ports range as you are running as root", listeningPort), nil
-		} else if uid == -1 {
+		case -1:
 			return fmt.Sprintf("listening port %s allowed to be in the reserved system ports range as you are running in Windows", listeningPort), nil
-		} else {
+		default:
 			return "", fmt.Errorf("listening port %s cannot be in the reserved system ports range (1 to 1023) when running without root", listeningPort)
 		}
-	} else if value > 49151 {
+	case value > minDynamicPort:
 		// dynamic and/or private ports.
 		return fmt.Sprintf("listening port %s is in the dynamic/private ports range (above 49151)", listeningPort), nil
+	default:
+		return "", nil
 	}
-	return "", nil
 }
 
 func verifyRootURL(rootURL string) error {

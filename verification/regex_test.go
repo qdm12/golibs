@@ -6,70 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_buildSearchFn(t *testing.T) {
-	t.Parallel()
-	tests := map[string]struct {
-		regex string
-		s     string
-		finds []string
-	}{
-		"Found two elements": {
-			"ab",
-			"ac ad ab baab",
-			[]string{"ab", "ab"},
-		},
-		"Found no element": {
-			"ab",
-			"acb",
-			nil,
-		},
-	}
-	for name, tc := range tests {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			f := buildSearchFn(tc.regex)
-			if !assert.NotNil(t, f) {
-				t.FailNow()
-			}
-			out := f(tc.s)
-			assert.ElementsMatch(t, tc.finds, out)
-		})
-	}
-}
-
-func Test_buildMatchFn(t *testing.T) {
-	t.Parallel()
-	tests := map[string]struct {
-		regex string
-		s     string
-		match bool
-	}{
-		"Match": {
-			"ab",
-			"ab",
-			true,
-		},
-		"Mismatch": {
-			"ab",
-			"cab",
-			false,
-		},
-	}
-	for name, tc := range tests {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			f := buildMatchFn(tc.regex)
-			if !assert.NotNil(t, f) {
-				t.FailNow()
-			}
-			out := f(tc.s)
-			assert.Exactly(t, tc.match, out)
-		})
-	}
-}
-
 func Test_SearchIPv4(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
@@ -79,12 +15,14 @@ func Test_SearchIPv4(t *testing.T) {
 		"Find nothing in empty string":  {"", nil},
 		"Find nothing":                  {"dsadsa 232.323 s", nil},
 		"Find exactly":                  {"192.168.1.5", []string{"192.168.1.5"}},
-		"Find mutliple in text":         {"sd 192.168.1.5 1.5 1.3.5.4", []string{"192.168.1.5", "1.3.5.4"}},
+		"Find multiple in text":         {"sd 192.168.1.5 1.5 1.3.5.4", []string{"192.168.1.5", "1.3.5.4"}},
 		"Find in other text":            {"bla 192.168.1.0 bla", []string{"192.168.1.0"}},
 		"Find in longer than normal IP": {"0.0.0.0.0", []string{"0.0.0.0"}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := SearchIPv4(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
@@ -104,7 +42,9 @@ func Test_SearchIPv6(t *testing.T) {
 		"Find multiple in text":        {"2001:0db8:85a3:0000:0000:8a2e:0370:7334 sdas ::1", []string{"2001:0db8:85a3:0000:0000:8a2e:0370:7334", "::1"}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := SearchIPv6(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
@@ -122,7 +62,9 @@ func Test_SearchEmail(t *testing.T) {
 		"Find two emails in text":      {"bla@aa.aa bla bla@bla bla@bla.co.uk bla.com", []string{"bla@aa.aa", "bla@bla.co.uk"}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := SearchEmail(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
@@ -144,7 +86,9 @@ func Test_SearchPhone(t *testing.T) {
 		"Complex case": {"b +1 3474 50256 2 fdfd 332 23d 45787e 35226440600", []string{"+1 3474 50256 2", "35226440600"}},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := SearchPhone(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
@@ -168,7 +112,9 @@ func Test_MatchEmail(t *testing.T) {
 		"match for complex email":                 {"aaabc@aaabc.co.uk", true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := MatchEmail(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
@@ -189,7 +135,9 @@ func Test_MatchPhoneIntl(t *testing.T) {
 		"match 2":                             {"+13474502562", true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := MatchPhoneIntl(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
@@ -213,7 +161,9 @@ func Test_MatchPhoneLocal(t *testing.T) {
 		"match for long number with one leading 0":          {"0535226440600", true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := MatchPhoneLocal(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
@@ -237,7 +187,9 @@ func Test_MatchDomain(t *testing.T) {
 		"Match composed EDU TLD":        {"nyu.ac.edu", true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := MatchDomain(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
@@ -261,7 +213,9 @@ func Test_MatchHostname(t *testing.T) {
 		"Match composed EDU TLD":        {"nyu.ac.edu", true},
 	}
 	for name, tc := range tests {
+		tc := tc
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			out := MatchHostname(tc.s)
 			assert.Equal(t, tc.match, out)
 		})

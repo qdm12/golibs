@@ -130,7 +130,7 @@ func Test_GenerateRandomAlphaNum(t *testing.T) {
 	}
 	t.Run("panics with length argument too large", func(t *testing.T) {
 		t.Parallel()
-		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { r.GenerateRandomAlphaNum(9223372036854775808) })
+		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { r.GenerateRandomAlphaNum(maxInt63 + 1) })
 	})
 }
 
@@ -172,6 +172,6 @@ func Test_GenerateRandomNum(t *testing.T) {
 	}
 	t.Run("panics with length argument too large", func(t *testing.T) {
 		t.Parallel()
-		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { r.GenerateRandomNum(9223372036854775808) })
+		assert.PanicsWithValue(t, "length argument cannot be bigger than 2^63 - 1", func() { r.GenerateRandomNum(maxInt63 + 1) })
 	})
 }
