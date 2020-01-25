@@ -475,8 +475,8 @@ func Test_GetLoggerLevel(t *testing.T) {
 				assert.Equal(t, tc.err.Error(), err.Error())
 			} else {
 				assert.NoError(t, err)
+				assert.Equal(t, tc.level, level)
 			}
-			assert.Equal(t, tc.level, level)
 		})
 	}
 }

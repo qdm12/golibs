@@ -3,15 +3,15 @@ package network
 import (
 	"bytes"
 	"fmt"
+	"github.com/qdm12/golibs/crypto/random"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_NewClient(t *testing.T) {
