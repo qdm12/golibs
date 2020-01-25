@@ -22,7 +22,9 @@ type logger struct {
 
 func NewLogger(encoding Encoding, level Level, nodeID int) (l Logger, err error) {
 	var zapLevel zapcore.Level
-	zapLevel.UnmarshalText([]byte(string(level)))
+	if err := zapLevel.UnmarshalText([]byte(string(level))); err != nil {
+		return nil, err
+	}
 	zapLogger, err := zap.Config{
 		Level:    zap.NewAtomicLevelAt(zapLevel),
 		Encoding: string(encoding),
