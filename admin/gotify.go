@@ -2,6 +2,7 @@ package admin
 
 import (
 	"fmt"
+	"github.com/qdm12/golibs/format"
 	"net/http"
 	liburl "net/url"
 
@@ -15,7 +16,7 @@ import (
 // Gotify is a Gotify client
 type Gotify interface {
 	Ping() error
-	Notify(title string, priority int, content string, args ...interface{}) error
+	Notify(title string, priority int, args ...interface{}) error
 }
 
 type gotifyImpl struct {
@@ -37,8 +38,8 @@ func (g *gotifyImpl) Ping() error {
 }
 
 // Notify sends a notification to the Gotify server
-func (g *gotifyImpl) Notify(title string, priority int, content string, args ...interface{}) error {
-	content = fmt.Sprintf(content, args...)
+func (g *gotifyImpl) Notify(title string, priority int, args ...interface{}) error {
+	content := format.ArgsToString(args...)
 	params := message.NewCreateMessageParams()
 	params.Body = &models.MessageExternal{
 		Title:    title,
