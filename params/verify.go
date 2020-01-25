@@ -7,8 +7,8 @@ import (
 	"strconv"
 )
 
-func verifyListeningPort(listeningPort string, uid int) (warning string, err error) {
-	if err := verification.VerifyPort(listeningPort); err != nil {
+func verifyListeningPort(verifier verification.Verifier, listeningPort string, uid int) (warning string, err error) {
+	if err := verifier.VerifyPort(listeningPort); err != nil {
 		return "", fmt.Errorf("listening port: %w", err)
 	}
 	value, _ := strconv.Atoi(listeningPort)
@@ -30,18 +30,4 @@ func verifyListeningPort(listeningPort string, uid int) (warning string, err err
 	default:
 		return "", nil
 	}
-}
-
-func verifyRootURL(rootURL string) error {
-	if !verification.MatchRootURL(rootURL) {
-		return fmt.Errorf("root URL %q is invalid", rootURL)
-	}
-	return nil
-}
-
-func verifyHostname(hostname string) error {
-	if verification.MatchHostname(hostname) {
-		return nil
-	}
-	return fmt.Errorf("hostname %q is not valid", hostname)
 }

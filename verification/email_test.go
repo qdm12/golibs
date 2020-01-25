@@ -13,7 +13,7 @@ func Test_ValidateEmail(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		email    string
-		mxLookup LookupMXFunc
+		mxLookup func(name string) ([]*net.MX, error)
 		err      error
 	}{
 		"Invalid email format": {
@@ -40,7 +40,8 @@ func Test_ValidateEmail(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			err := ValidateEmail(tc.email, tc.mxLookup)
+			v := &verifier{tc.mxLookup}
+			err := v.ValidateEmail(tc.email)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

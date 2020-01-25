@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/qdm12/golibs/logging"
+	"github.com/qdm12/golibs/verification"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -237,6 +238,7 @@ func Test_splitHostPort(t *testing.T) {
 
 func Test_getRemoteIP(t *testing.T) {
 	t.Parallel()
+	verifyPort := verification.NewVerifier().VerifyPort
 	tests := map[string]struct {
 		remoteAddr string
 		IP         string
@@ -259,7 +261,7 @@ func Test_getRemoteIP(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			IP, err := getRemoteIP(tc.remoteAddr)
+			IP, err := getRemoteIP(verifyPort, tc.remoteAddr)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

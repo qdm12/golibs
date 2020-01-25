@@ -6,7 +6,7 @@ import (
 )
 
 // VerifyPort verifies a port number string is valid
-func VerifyPort(port string) error {
+func (v *verifier) VerifyPort(port string) error {
 	const minPort = 1
 	const maxPort = 65535
 	value, err := strconv.Atoi(port)

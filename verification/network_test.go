@@ -10,6 +10,7 @@ import (
 
 func Test_VerifyPort(t *testing.T) {
 	t.Parallel()
+	v := NewVerifier()
 	tests := map[string]struct {
 		port string
 		err  error
@@ -25,7 +26,7 @@ func Test_VerifyPort(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			err := VerifyPort(tc.port)
+			err := v.VerifyPort(tc.port)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

@@ -16,11 +16,13 @@ type IPManager interface {
 }
 
 type ipManager struct {
-	logging logging.Logging
+	logging  logging.Logging
+	verifier verification.Verifier
 }
 
 func NewIPManager(logging logging.Logging) IPManager {
-	return &ipManager{logging}
+	return &ipManager{
+		logging, verification.NewVerifier()}
 }
 
 // IPHeaders contains all the raw IP headers of an HTTP request
@@ -62,7 +64,7 @@ func (m *ipManager) GetClientIP(r *http.Request) (ip string, err error) {
 		return "", fmt.Errorf("no IP address found in client request")
 	}
 	// Extract relevant IP data from headers
-	remoteIP, err := getRemoteIP(headers.RemoteAddress)
+	remoteIP, err := getRemoteIP(m.verifier.VerifyPort, headers.RemoteAddress)
 	if err != nil {
 		return "", err
 	}
@@ -140,7 +142,7 @@ func splitHostPort(address string) (ip, port string, err error) {
 	return net.SplitHostPort(address)
 }
 
-func getRemoteIP(remoteAddr string) (ip string, err error) {
+func getRemoteIP(verifyPort func(port string) error, remoteAddr string) (ip string, err error) {
 	ip = remoteAddr
 	if strings.ContainsRune(ip, ':') {
 		var port string
@@ -149,7 +151,7 @@ func getRemoteIP(remoteAddr string) (ip string, err error) {
 			return "", err
 		}
 		if len(port) > 0 {
-			if err := verification.VerifyPort(port); err != nil {
+			if err := verifyPort(port); err != nil {
 				return "", fmt.Errorf("remote address %q is invalid: %w", remoteAddr, err)
 			}
 		}

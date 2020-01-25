@@ -47,6 +47,7 @@ type envParamsImpl struct {
 	getuid     func() int
 	getgid     func() int
 	executable func() (string, error)
+	verifier   verification.Verifier
 }
 
 // NewEnvParams returns a new EnvParams object
@@ -56,6 +57,7 @@ func NewEnvParams() EnvParams {
 		getuid:     os.Getuid,
 		getgid:     os.Getgid,
 		executable: os.Executable,
+		verifier:   verification.NewVerifier(),
 	}
 }
 
@@ -241,7 +243,7 @@ func (e *envParamsImpl) GetListeningPort(setters ...GetEnvSetter) (listeningPort
 		return "", "", err
 	}
 	uid := e.getuid()
-	warning, err = verifyListeningPort(listeningPort, uid)
+	warning, err = verifyListeningPort(e.verifier, listeningPort, uid)
 	return listeningPort, warning, err
 }
 
@@ -254,8 +256,8 @@ func (e *envParamsImpl) GetRootURL(setters ...GetEnvSetter) (rootURL string, err
 		return rootURL, err
 	}
 	rootURL = path.Clean(rootURL)
-	if err := verifyRootURL(rootURL); err != nil {
-		return "", fmt.Errorf("environment variable ROOT_URL: %w", err)
+	if !e.verifier.MatchRootURL(rootURL) {
+		return "", fmt.Errorf("environment variable ROOT_URL value %q is not valid", rootURL)
 	}
 	rootURL = strings.TrimSuffix(rootURL, "/") // already have / from paths of router
 	return rootURL, nil
@@ -268,9 +270,9 @@ func (e *envParamsImpl) GetDatabaseDetails() (hostname, user, password, dbName s
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
-	if err := verifyHostname(hostname); err != nil {
+	if !e.verifier.MatchHostname(hostname) {
 		return hostname, user, password, dbName,
-			fmt.Errorf("Postgres parameters: %w", err)
+			fmt.Errorf("Postgres parameters: hostname %q is not valid", hostname)
 	}
 	user, err = e.GetEnv("SQL_USER", Default("postgres"))
 	if err != nil {
@@ -295,15 +297,15 @@ func (e *envParamsImpl) GetRedisDetails() (hostname, port, password string, err 
 	if err != nil {
 		return hostname, port, password, err
 	}
-	if err := verifyHostname(hostname); err != nil {
+	if !e.verifier.MatchHostname(hostname) {
 		return hostname, port, password,
-			fmt.Errorf("environment variable \"REDIS_HOST\": %w", err)
+			fmt.Errorf("environment variable \"REDIS_HOST\" value %q is not valid", hostname)
 	}
 	port, err = e.GetEnv("REDIS_PORT", Default("6379"))
 	if err != nil {
 		return hostname, port, password, err
 	}
-	if err := verification.VerifyPort(port); err != nil {
+	if err := e.verifier.VerifyPort(port); err != nil {
 		return hostname, port, password,
 			fmt.Errorf("environment variable REDIS_PORT: %w", err)
 	}

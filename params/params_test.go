@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/qdm12/golibs/logging"
+	"github.com/qdm12/golibs/verification"
 )
 
 func Test_NewEnvParams(t *testing.T) {
@@ -358,6 +359,7 @@ func Test_GetListeningPort(t *testing.T) {
 				getuid: func() int {
 					return expectedUID
 				},
+				verifier: verification.NewVerifier(),
 			}
 			listeningPort, warning, err := e.GetListeningPort(tc.setters...)
 			if tc.err != nil {
@@ -382,7 +384,7 @@ func Test_GetRootURL(t *testing.T) {
 	}{
 		"key with valid value":             {"/a", nil, "/a", nil},
 		"key with valid value and trail /": {"/a/", nil, "/a", nil},
-		"key with invalid value":           {"/a?", nil, "", fmt.Errorf("environment variable ROOT_URL: root URL \"/a?\" is invalid")},
+		"key with invalid value":           {"/a?", nil, "", fmt.Errorf("environment variable ROOT_URL value \"/a?\" is not valid")},
 		"key without value":                {"", nil, "", nil},
 		"key without value and default":    {"", []GetEnvSetter{Default("/a")}, "/a", nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"ROOT_URL\": cannot make environment variable value compulsory with a default value")},
@@ -395,6 +397,7 @@ func Test_GetRootURL(t *testing.T) {
 				getenv: func(key string) string {
 					return tc.envValue
 				},
+				verifier: verification.NewVerifier(),
 			}
 			rootURL, err := e.GetRootURL(tc.setters...)
 			if tc.err != nil {
