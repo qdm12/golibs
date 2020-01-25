@@ -10,6 +10,12 @@ type FileManager interface {
 	FilepathExists(filePath string) (exists bool, err error)
 	FileExists(filePath string) (exists bool, err error)
 	DirectoryExists(filePath string) (exists bool, err error)
+	GetOwnership(filePath string) (userID, groupID int, err error)
+	GetUserPermissions(filePath string) (read, write, execute bool, err error)
+	ReadFile(filePath string) (data []byte, err error)
+	WriteLinesToFile(filePath string, lines []string) error
+	Touch(filePath string) error
+	WriteToFile(filePath string, data []byte) error
 }
 
 type fileManager struct {
