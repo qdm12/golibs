@@ -2,10 +2,7 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-
-	"github.com/qdm12/golibs/logging"
 )
 
 // Settings contains settings to launch an HTTP server
@@ -16,63 +13,47 @@ type Settings struct {
 	Handler http.Handler
 }
 
-type namedError struct {
-	name string
-	err  error
-}
-
 // RunServers manages multiple HTTP servers in parallel and stops
 // them all as soon as one of them fails. It returns one error per HTTP
 // server if there is any.
-func RunServers(settings ...Settings) (errs map[string]error) {
-	errs = make(map[string]error)
-	serverNames := make(map[string][]int)
-	for i := range settings {
-		serverNames[settings[i].Name] = append(serverNames[settings[i].Name], i)
-	}
-	for name, indexes := range serverNames {
-		if len(indexes) > 1 {
-			errs[name] = fmt.Errorf("server settings have the same name %q at indexes: %v", name, indexes)
-		}
-	}
-	if len(errs) > 0 {
-		return errs
-	}
-	chDone := make(chan namedError, len(settings))
+func RunServers(settings ...Settings) (errors []error) {
+	count := len(settings)
+	chDone := make(chan error, count)
+	chShutdownErr := make(chan error, count)
 	chStop := make(chan struct{})
 	for _, setting := range settings {
 		setting := setting
-		go serve(setting.Name, setting.Addr, setting.Handler, chDone, chStop)
+		go serve(setting.Name, setting.Addr, setting.Handler, chStop, chDone, chShutdownErr)
 	}
 	var stopped bool
-	for i := 0; i < cap(chDone); i++ {
-		namedErr := <-chDone
-		if namedErr.err != nil {
-			errs[namedErr.name] = namedErr.err
-		}
-		if !stopped {
-			stopped = true
-			close(chStop)
+	i := 0
+	for i < count {
+		select {
+		case err := <-chDone:
+			i++
+			if err != nil {
+				errors = append(errors, err)
+			}
+			if !stopped {
+				stopped = true
+				close(chStop)
+			}
+		case err := <-chShutdownErr: // best effort to collect shutdown errors
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 	}
-	return errs
+	return errors
 }
 
 // serve listens on an address with the HTTP handler provided.
 // It shuts down the server when it receives a signal from stop.
-func serve(name, addr string, handler http.Handler, chDone chan namedError, chStop <-chan struct{}) {
+func serve(name, addr string, handler http.Handler, chStop <-chan struct{}, chDoneErr, chShutdownErr chan<- error) {
 	server := http.Server{Addr: addr, Handler: handler}
 	go func() {
 		<-chStop
-		err := server.Shutdown(context.Background())
-		if err != nil {
-			logging.Errorf("server "+name+" shutdown error: %s", err)
-			if err := logging.Sync(); err != nil {
-				fmt.Println("ERROR: could not sync logger")
-			}
-		}
+		chShutdownErr <- server.Shutdown(context.Background())
 	}()
-	logging.Infof("HTTP server %s listening on %s", name, addr)
-	err := server.ListenAndServe()
-	chDone <- namedError{name, err}
+	chDoneErr <- server.ListenAndServe()
 }
