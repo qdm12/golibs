@@ -292,7 +292,7 @@ func (_m *EnvParams) GetHTTPTimeout(timeUnit time.Duration, setters ...params.Ge
 }
 
 // GetListeningPort provides a mock function with given fields: setters
-func (_m *EnvParams) GetListeningPort(setters ...params.GetEnvSetter) (string, error) {
+func (_m *EnvParams) GetListeningPort(setters ...params.GetEnvSetter) (string, string, error) {
 	_va := make([]interface{}, len(setters))
 	for _i := range setters {
 		_va[_i] = setters[_i]
@@ -308,25 +308,32 @@ func (_m *EnvParams) GetListeningPort(setters ...params.GetEnvSetter) (string, e
 		r0 = ret.Get(0).(string)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(...params.GetEnvSetter) error); ok {
+	var r1 string
+	if rf, ok := ret.Get(1).(func(...params.GetEnvSetter) string); ok {
 		r1 = rf(setters...)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(string)
 	}
 
-	return r0, r1
+	var r2 error
+	if rf, ok := ret.Get(2).(func(...params.GetEnvSetter) error); ok {
+		r2 = rf(setters...)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // GetLoggerConfig provides a mock function with given fields:
-func (_m *EnvParams) GetLoggerConfig() (string, logging.Level, int, error) {
+func (_m *EnvParams) GetLoggerConfig() (logging.Encoding, logging.Level, int, error) {
 	ret := _m.Called()
 
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
+	var r0 logging.Encoding
+	if rf, ok := ret.Get(0).(func() logging.Encoding); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(string)
+		r0 = ret.Get(0).(logging.Encoding)
 	}
 
 	var r1 logging.Level
@@ -354,7 +361,7 @@ func (_m *EnvParams) GetLoggerConfig() (string, logging.Level, int, error) {
 }
 
 // GetLoggerEncoding provides a mock function with given fields: setters
-func (_m *EnvParams) GetLoggerEncoding(setters ...params.GetEnvSetter) (string, error) {
+func (_m *EnvParams) GetLoggerEncoding(setters ...params.GetEnvSetter) (logging.Encoding, error) {
 	_va := make([]interface{}, len(setters))
 	for _i := range setters {
 		_va[_i] = setters[_i]
@@ -363,11 +370,11 @@ func (_m *EnvParams) GetLoggerEncoding(setters ...params.GetEnvSetter) (string, 
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
-	var r0 string
-	if rf, ok := ret.Get(0).(func(...params.GetEnvSetter) string); ok {
+	var r0 logging.Encoding
+	if rf, ok := ret.Get(0).(func(...params.GetEnvSetter) logging.Encoding); ok {
 		r0 = rf(setters...)
 	} else {
-		r0 = ret.Get(0).(string)
+		r0 = ret.Get(0).(logging.Encoding)
 	}
 
 	var r1 error
