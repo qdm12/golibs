@@ -22,10 +22,6 @@ type httpClient interface {
 	CloseIdleConnections()
 }
 
-func newHTTPClient(timeout time.Duration) httpClient {
-	return &http.Client{Timeout: timeout}
-}
-
 // ClientImpl is the implementation for IClient
 type ClientImpl struct {
 	httpClient httpClient
@@ -37,7 +33,7 @@ type ClientImpl struct {
 // NewClient creates a new easy to use HTTP client
 func NewClient(timeout time.Duration) Client {
 	return &ClientImpl{
-		httpClient: newHTTPClient(timeout),
+		httpClient: &http.Client{Timeout: timeout},
 		readBody:   ioutil.ReadAll,
 		userAgents: []string{
 			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
