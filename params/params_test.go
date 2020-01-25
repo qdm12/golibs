@@ -416,14 +416,14 @@ func Test_GetLoggerEncoding(t *testing.T) {
 	tests := map[string]struct {
 		envValue string
 		setters  []GetEnvSetter
-		encoding string
+		encoding logging.Encoding
 		err      error
 	}{
-		"key with json value":              {"json", nil, "json", nil},
-		"key with console value":           {"console", nil, "console", nil},
+		"key with json value":              {"json", nil, logging.JSONEncoding, nil},
+		"key with console value":           {"console", nil, logging.ConsoleEncoding, nil},
 		"key with invalid value":           {"bla", nil, "", fmt.Errorf("environment variable LOG_ENCODING: logger encoding \"bla\" unrecognized")},
-		"key without value":                {"", nil, "json", nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("console")}, "console", nil},
+		"key without value":                {"", nil, logging.JSONEncoding, nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("console")}, logging.ConsoleEncoding, nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"LOG_ENCODING\": cannot make environment variable value compulsory with a default value")},
 	}
 	for name, tc := range tests {

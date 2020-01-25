@@ -33,8 +33,8 @@ type EnvParams interface {
 	GetRedisDetails() (hostname, port, password string, err error)
 	GetExeDir() (dir string, err error)
 	GetPath(key string, setters ...GetEnvSetter) (path string, err error)
-	GetLoggerConfig() (encoding string, level logging.Level, nodeID int, err error)
-	GetLoggerEncoding(setters ...GetEnvSetter) (encoding string, err error)
+	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error)
+	GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error)
 	GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error)
 	GetNodeID(setters ...GetEnvSetter) (nodeID int, err error)
 	GetURL(key string, setters ...GetEnvSetter) (URL *liburl.URL, err error)
@@ -346,7 +346,7 @@ func (e *envParamsImpl) GetPath(key string, setters ...GetEnvSetter) (path strin
 
 // GetLoggerConfig obtains configuration details for the logger
 // using the environment variables LOG_ENCODING, LOG_LEVEL and NODE_ID.
-func (e *envParamsImpl) GetLoggerConfig() (encoding string, level logging.Level, nodeID int, err error) {
+func (e *envParamsImpl) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error) {
 	encoding, err = e.GetLoggerEncoding()
 	if err != nil {
 		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
@@ -364,17 +364,19 @@ func (e *envParamsImpl) GetLoggerConfig() (encoding string, level logging.Level,
 
 // GetLoggerEncoding obtains the logging encoding
 // from the environment variable LOG_ENCODING
-func (e *envParamsImpl) GetLoggerEncoding(setters ...GetEnvSetter) (encoding string, err error) {
+func (e *envParamsImpl) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error) {
 	setters = append([]GetEnvSetter{Default("json")}, setters...)
 	s, err := e.GetEnv("LOG_ENCODING", setters...)
 	if err != nil {
 		return "", err
 	}
 	s = strings.ToLower(s)
-	if s != "json" && s != "console" {
+	switch s {
+	case "json", "console":
+		return logging.Encoding(s), nil
+	default:
 		return "", fmt.Errorf("environment variable LOG_ENCODING: logger encoding %q unrecognized", s)
 	}
-	return s, nil
 }
 
 // GetLoggerLevel obtains the logging level
