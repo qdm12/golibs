@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/qdm12/golibs/helpers"
 	"github.com/qdm12/golibs/logging"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -138,8 +137,13 @@ func Test_GetClientIP(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			IP, err := GetClientIP(tc.request)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			IP, err := m.GetClientIP(tc.request)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.IP, IP)
 		})
 	}
@@ -215,7 +219,12 @@ func Test_splitHostPort(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			IP, port, err := splitHostPort(tc.address)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.IP, IP)
 			assert.Equal(t, tc.port, port)
 		})
@@ -247,7 +256,12 @@ func Test_getRemoteIP(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			IP, err := getRemoteIP(tc.remoteAddr)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.IP, IP)
 		})
 	}

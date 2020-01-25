@@ -5,7 +5,8 @@ import (
 	"net"
 	"testing"
 
-	"github.com/qdm12/golibs/helpers"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_ValidateEmail(t *testing.T) {
@@ -40,7 +41,12 @@ func Test_ValidateEmail(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			err := ValidateEmail(tc.email, tc.mxLookup)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }

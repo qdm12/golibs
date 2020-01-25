@@ -13,6 +13,7 @@ import (
 	"github.com/qdm12/golibs/security"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_NewClient(t *testing.T) {
@@ -61,7 +62,12 @@ func Test_DoHTTPRequest(t *testing.T) {
 				readBody:   tc.readBody,
 			}
 			status, content, err := c.DoHTTPRequest(nil)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.status, status)
 			assert.Equal(t, tc.content, content)
 			mockHTTPClient.AssertExpectations(t)
@@ -125,7 +131,12 @@ func Test_GetContent(t *testing.T) {
 				random:     security.NewRandom(),
 			}
 			content, status, err := c.GetContent(tc.URL, tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.status, status)
 			assert.Equal(t, tc.content, content)
 			mockHTTPClient.AssertExpectations(t)

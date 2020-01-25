@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/qdm12/golibs/helpers"
 	"github.com/qdm12/golibs/logging"
 )
 
@@ -41,7 +40,12 @@ func Test_GetEnv(t *testing.T) {
 				},
 			}
 			value, err := e.GetEnv("any", tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.value, value)
 		})
 	}
@@ -71,7 +75,12 @@ func Test_GetEnvInt(t *testing.T) {
 				},
 			}
 			n, err := e.GetEnvInt("any", tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.n, n)
 		})
 	}
@@ -105,7 +114,12 @@ func Test_GetEnvIntRange(t *testing.T) {
 				},
 			}
 			n, err := e.GetEnvIntRange("any", tc.lower, tc.upper, tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.n, n)
 		})
 	}
@@ -136,7 +150,12 @@ func Test_GetYesNo(t *testing.T) {
 				},
 			}
 			yes, err := e.GetYesNo("any", tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.yes, yes)
 		})
 	}
@@ -167,7 +186,12 @@ func Test_GetOnOff(t *testing.T) {
 				},
 			}
 			on, err := e.GetOnOff("any", tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.on, on)
 		})
 	}
@@ -198,7 +222,12 @@ func Test_GetValueIfInside(t *testing.T) {
 				},
 			}
 			value, err := e.GetValueIfInside("any", tc.possibilities, tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.value, value)
 		})
 	}
@@ -230,7 +259,12 @@ func Test_GetDuration(t *testing.T) {
 				},
 			}
 			duration, err := e.GetDuration("any", time.Second, tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.duration, duration)
 		})
 	}
@@ -262,7 +296,12 @@ func Test_GetHTTPTimeout(t *testing.T) {
 				},
 			}
 			timeout, err := e.GetHTTPTimeout(time.Second, tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.timeout, timeout)
 		})
 	}
@@ -322,7 +361,13 @@ func Test_GetListeningPort(t *testing.T) {
 				},
 			}
 			listeningPort, err := e.GetListeningPort(tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.warning, warning)
 			assert.Equal(t, tc.listeningPort, listeningPort)
 		})
 	}
@@ -353,7 +398,12 @@ func Test_GetRootURL(t *testing.T) {
 				},
 			}
 			rootURL, err := e.GetRootURL(tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.rootURL, rootURL)
 		})
 	}
@@ -384,7 +434,12 @@ func Test_GetLoggerEncoding(t *testing.T) {
 				},
 			}
 			encoding, err := e.GetLoggerEncoding(tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.encoding, encoding)
 		})
 	}
@@ -416,7 +471,12 @@ func Test_GetLoggerLevel(t *testing.T) {
 				},
 			}
 			level, err := e.GetLoggerLevel(tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.level, level)
 		})
 	}
@@ -446,7 +506,12 @@ func Test_GetNodeID(t *testing.T) {
 				},
 			}
 			nodeID, err := e.GetNodeID(tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			assert.Equal(t, tc.nodeID, nodeID)
 		})
 	}
@@ -477,7 +542,12 @@ func Test_GetURL(t *testing.T) {
 				},
 			}
 			URL, err := e.GetURL("any", tc.setters...)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 			if URL == nil {
 				assert.Empty(t, tc.URL)
 			} else {

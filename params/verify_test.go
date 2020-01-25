@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/qdm12/golibs/helpers"
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_verifyListeningPort(t *testing.T) {
@@ -29,7 +29,12 @@ func Test_verifyListeningPort(t *testing.T) {
 			t.Parallel()
 			warning, err := verifyListeningPort(tc.listeningPort, tc.uid)
 			assert.Equal(t, tc.warning, warning)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }
@@ -49,7 +54,12 @@ func Test_verifyRootURL(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			err := verifyRootURL(tc.rootURL)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }
@@ -68,7 +78,12 @@ func Test_verifyHostname(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			err := verifyHostname(tc.hostname)
-			helpers.AssertErrorsEqual(t, tc.err, err)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 		})
 	}
 }
