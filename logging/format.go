@@ -1,23 +1,23 @@
 package logging
 
-import "fmt"
+import "github.com/qdm12/golibs/format"
 
-// Debugf formats and logs with the Debug level
-func Debugf(format string, a ...interface{}) {
-	Debug(fmt.Sprintf(format, a...))
+// Debug formats and logs with the Debug level
+func (l *logging) Debug(args ...interface{}) {
+	l.logger.Debug(format.ArgsToString(args))
 }
 
-// Infof formats and logs with the Info level
-func Infof(format string, a ...interface{}) {
-	Info(fmt.Sprintf(format, a...))
+// Info formats and logs with the Info level
+func (l *logging) Info(args ...interface{}) {
+	l.logger.Info(format.ArgsToString(args))
 }
 
 // Warnf formats and logs with the Warning level
-func Warnf(format string, a ...interface{}) {
-	Warn(fmt.Sprintf(format, a...))
+func (l *logging) Warn(args ...interface{}) {
+	l.logger.Warn(format.ArgsToString(args))
 }
 
-// Errorf formats and logs with the Error level
-func Errorf(format string, a ...interface{}) {
-	Error(fmt.Sprintf(format, a...))
+// Error formats and logs with the Error level
+func (l *logging) Error(args ...interface{}) {
+	l.logger.Error(format.ArgsToString(args))
 }
