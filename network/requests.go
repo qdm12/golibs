@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/qdm12/golibs/security"
+	"github.com/qdm12/golibs/crypto/random"
 )
 
 // Client has methods to do HTTP requests as a client
@@ -27,7 +27,7 @@ type ClientImpl struct {
 	httpClient httpClient
 	readBody   func(r io.Reader) ([]byte, error)
 	userAgents []string
-	random     security.Random
+	random     random.Random
 }
 
 // NewClient creates a new easy to use HTTP client

@@ -1,8 +1,9 @@
-package security
+package random
 
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"fmt"
 )
 
 const (
@@ -26,23 +27,31 @@ type Random interface {
 	GenerateRandomNum(n uint64) string
 }
 
-// RandomImpl implements Random
-type RandomImpl struct {
+// random implements Random
+type random struct {
 	randReader func(b []byte) error
 }
 
 // NewRandom returns a new Random object
 func NewRandom() Random {
-	return &RandomImpl{
-		randReader: func(b []byte) error {
-			_, err := rand.Read(b)
-			return err
-		},
+	return &random{
+		randReader: randReader,
 	}
 }
 
+func randReader(b []byte) error {
+	l := len(b)
+	n, err := rand.Read(b)
+	if l != n {
+		return fmt.Errorf("read %d random bytes instead of expected %d bytes", n, l)
+	} else if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GenerateRandomBytes generates n random bytes
-func (r *RandomImpl) GenerateRandomBytes(n int) ([]byte, error) {
+func (r *random) GenerateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	if err := r.randReader(b); err != nil {
 		return nil, err
@@ -51,7 +60,7 @@ func (r *RandomImpl) GenerateRandomBytes(n int) ([]byte, error) {
 }
 
 // GenerateRandomInt63 returns a random 63 bit positive integer
-func (r *RandomImpl) GenerateRandomInt63() int64 {
+func (r *random) GenerateRandomInt63() int64 {
 	const int63Length = 32 // 256 bits
 	b, err := r.GenerateRandomBytes(int63Length)
 	if err != nil {
@@ -65,7 +74,7 @@ func (r *RandomImpl) GenerateRandomInt63() int64 {
 }
 
 // GenerateRandomInt returns a random integer between 0 and n
-func (r *RandomImpl) GenerateRandomInt(n int) int {
+func (r *random) GenerateRandomInt(n int) int {
 	if n == 0 {
 		return 0
 	}
@@ -73,7 +82,7 @@ func (r *RandomImpl) GenerateRandomInt(n int) int {
 }
 
 // GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length
-func (r *RandomImpl) GenerateRandomAlphaNum(length uint64) string {
+func (r *random) GenerateRandomAlphaNum(length uint64) string {
 	if length >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
@@ -95,7 +104,7 @@ func (r *RandomImpl) GenerateRandomAlphaNum(length uint64) string {
 }
 
 // GenerateRandomNum returns a string of random numeric characters of a specified length
-func (r *RandomImpl) GenerateRandomNum(n uint64) string {
+func (r *random) GenerateRandomNum(n uint64) string {
 	if n >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}

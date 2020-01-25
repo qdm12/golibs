@@ -1,22 +1,18 @@
-package security
+package crypto
 
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
 	"fmt"
-	"io"
 )
 
-// EncryptAES encrypts some plaintext with a key using AES and returns the ciphertext
-func EncryptAES(plaintext []byte, key []byte) (ciphertext []byte, err error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, fmt.Errorf("EncryptAES: %w", err)
-	}
+// EncryptAES256 encrypts some plaintext with a key using AES and returns the ciphertext
+func (c *crypto) EncryptAES256(plaintext []byte, key [32]byte) (ciphertext []byte, err error) {
+	block, _ := aes.NewCipher(key[:])
 	ciphertext = make([]byte, aes.BlockSize+len(plaintext))
 	iv := ciphertext[:aes.BlockSize]
-	_, err = io.ReadFull(rand.Reader, iv)
+	randBytes, err := c.random.GenerateRandomBytes(len(iv))
+	copy(iv, randBytes)
 	if err != nil {
 		return nil, fmt.Errorf("EncryptAES: %w", err)
 	}
@@ -25,12 +21,9 @@ func EncryptAES(plaintext []byte, key []byte) (ciphertext []byte, err error) {
 	return ciphertext, nil
 }
 
-// DecryptAES decrypts some ciphertext with a key using AES and returns the plaintext
-func DecryptAES(ciphertext []byte, key []byte) (plaintext []byte, err error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, fmt.Errorf("DecryptAES: %w", err)
-	}
+// DecryptAES256 decrypts some ciphertext with a key using AES and returns the plaintext
+func (c *crypto) DecryptAES256(ciphertext []byte, key [32]byte) (plaintext []byte, err error) {
+	block, _ := aes.NewCipher(key[:])
 	if len(ciphertext) < aes.BlockSize {
 		return nil, fmt.Errorf("DecryptAES: cipher size %d should be bigger than block size %d", len(ciphertext), aes.BlockSize)
 	}

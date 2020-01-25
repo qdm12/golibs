@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qdm12/golibs/helpers"
-	"github.com/qdm12/golibs/security"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -128,7 +126,7 @@ func Test_GetContent(t *testing.T) {
 				httpClient: mockHTTPClient,
 				readBody:   ioutil.ReadAll,
 				userAgents: []string{"abc"},
-				random:     security.NewRandom(),
+				random:     random.NewRandom(),
 			}
 			content, status, err := c.GetContent(tc.URL, tc.setters...)
 			if tc.err != nil {

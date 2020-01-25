@@ -1,4 +1,4 @@
-package security
+package random
 
 import (
 	"crypto/rand"
@@ -24,6 +24,7 @@ func Test_GenerateRandomBytes(t *testing.T) {
 			},
 			nil,
 		},
+		// TODO add test case
 		"error": {
 			0,
 			func(b []byte) error {
@@ -36,7 +37,7 @@ func Test_GenerateRandomBytes(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			r := &RandomImpl{
+			r := &random{
 				randReader: tc.randReader,
 			}
 			out, err := r.GenerateRandomBytes(tc.n)
@@ -63,7 +64,7 @@ func Test_GenerateRandomInt63(t *testing.T) {
 	}
 	t.Run("panics from rand.Read error", func(t *testing.T) {
 		t.Parallel()
-		r := &RandomImpl{
+		r := &random{
 			randReader: func(b []byte) error {
 				return fmt.Errorf("error")
 			},

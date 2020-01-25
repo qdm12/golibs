@@ -13,5 +13,6 @@ require (
 	go.uber.org/atomic v1.5.1 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
 	go.uber.org/zap v1.10.0
+	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529
 	gotest.tools v2.2.0+incompatible
 )
