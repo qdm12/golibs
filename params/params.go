@@ -27,7 +27,7 @@ type EnvParams interface {
 	GetHTTPTimeout(timeUnit time.Duration, setters ...GetEnvSetter) (duration time.Duration, err error)
 	GetUserID() int
 	GetGroupID() int
-	GetListeningPort(setters ...GetEnvSetter) (listeningPort string, err error)
+	GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error)
 	GetRootURL(setters ...GetEnvSetter) (rootURL string, err error)
 	GetDatabaseDetails() (hostname, user, password, dbName string, err error)
 	GetRedisDetails() (hostname, port, password string, err error)
@@ -234,18 +234,15 @@ func (e *envParamsImpl) GetGroupID() int {
 
 // GetListeningPort obtains and checks the listening port
 // from the environment variable LISTENING_PORT
-func (e *envParamsImpl) GetListeningPort(setters ...GetEnvSetter) (listeningPort string, err error) {
+func (e *envParamsImpl) GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error) {
 	setters = append([]GetEnvSetter{Default("8000")}, setters...)
 	listeningPort, err = e.GetEnv("LISTENING_PORT", setters...)
 	if err != nil {
-		return listeningPort, err
+		return "", "", err
 	}
 	uid := e.getuid()
-	warning, err := verifyListeningPort(listeningPort, uid)
-	if warning != "" {
-		logging.Warn(warning)
-	}
-	return listeningPort, err
+	warning, err = verifyListeningPort(listeningPort, uid)
+	return listeningPort, warning, err
 }
 
 // GetRootURL obtains and checks the root URL

@@ -333,19 +333,18 @@ func Test_GetGroupID(t *testing.T) {
 
 func Test_GetListeningPort(t *testing.T) {
 	t.Parallel()
-	_, err := logging.SetLoggerToEmpty() // do not log warnings
-	require.NoError(t, err)
 	tests := map[string]struct {
 		envValue      string
 		setters       []GetEnvSetter
 		listeningPort string
+		warning       string
 		err           error
 	}{
-		"key with valid value":             {"9000", nil, "9000", nil},
-		"key with valid warning value":     {"60000", nil, "60000", nil},
-		"key without value":                {"", nil, "8000", nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("9000")}, "9000", nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"LISTENING_PORT\": cannot make environment variable value compulsory with a default value")},
+		"key with valid value":             {"9000", nil, "9000", "", nil},
+		"key with valid warning value":     {"60000", nil, "60000", "listening port 60000 is in the dynamic/private ports range (above 49151)", nil},
+		"key without value":                {"", nil, "8000", "", nil},
+		"key without value and default":    {"", []GetEnvSetter{Default("9000")}, "9000", "", nil},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", "", fmt.Errorf("environment variable \"LISTENING_PORT\": cannot make environment variable value compulsory with a default value")},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -360,7 +359,7 @@ func Test_GetListeningPort(t *testing.T) {
 					return expectedUID
 				},
 			}
-			listeningPort, err := e.GetListeningPort(tc.setters...)
+			listeningPort, warning, err := e.GetListeningPort(tc.setters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
