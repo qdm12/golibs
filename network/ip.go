@@ -10,6 +10,19 @@ import (
 	"github.com/qdm12/golibs/verification"
 )
 
+type IPManager interface {
+	GetClientIPHeaders(r *http.Request) (headers IPHeaders)
+	GetClientIP(r *http.Request) (ip string, err error)
+}
+
+type ipManager struct {
+	logging logging.Logging
+}
+
+func NewIPManager(logging logging.Logging) IPManager {
+	return &ipManager{logging}
+}
+
 // IPHeaders contains all the raw IP headers of an HTTP request
 type IPHeaders struct {
 	RemoteAddress string
@@ -32,7 +45,7 @@ func (headers *IPHeaders) isVoid() bool {
 }
 
 // GetClientIPHeaders returns the IP related HTTP headers from a request
-func GetClientIPHeaders(r *http.Request) (headers IPHeaders) {
+func (m *ipManager) GetClientIPHeaders(r *http.Request) (headers IPHeaders) {
 	if r == nil {
 		return headers
 	}
@@ -43,8 +56,8 @@ func GetClientIPHeaders(r *http.Request) (headers IPHeaders) {
 }
 
 // GetClientIP returns one single client IP address
-func GetClientIP(r *http.Request) (ip string, err error) {
-	headers := GetClientIPHeaders(r)
+func (m *ipManager) GetClientIP(r *http.Request) (ip string, err error) {
+	headers := m.GetClientIPHeaders(r)
 	if headers.isVoid() {
 		return "", fmt.Errorf("no IP address found in client request")
 	}
@@ -59,9 +72,15 @@ func GetClientIP(r *http.Request) (ip string, err error) {
 	}
 	// 3. RemoteAddress is the proxy server forwarding the IP so
 	// we look into the HTTP headers to get the client IP
-	xForwardedIPs := getXForwardedIPs(headers.XForwardedFor)
+	xForwardedIPs, warnings := getXForwardedIPs(headers.XForwardedFor)
+	for _, warning := range warnings {
+		m.logging.Warn(warning)
+	}
 	// TODO check number of ips to match number of proxies setup
-	publicXForwardedIPs := extractPublicIPs(xForwardedIPs)
+	publicXForwardedIPs, warnings := extractPublicIPs(xForwardedIPs)
+	for _, warning := range warnings {
+		m.logging.Warn(warning)
+	}
 	if len(publicXForwardedIPs) > 0 {
 		// first XForwardedIP should be the client IP
 		return publicXForwardedIPs[0], nil
@@ -141,10 +160,10 @@ func getRemoteIP(remoteAddr string) (ip string, err error) {
 	return ip, nil
 }
 
-func extractPublicIPs(ips []string) (publicIPs []string) {
+func extractPublicIPs(ips []string) (publicIPs []string, warnings []string) {
 	for _, IP := range ips {
 		if !ipIsValid(IP) {
-			logging.Warnf("IP address %q is not valid", IP)
+			warnings = append(warnings, fmt.Sprintf("IP address %q is not valid", IP))
 			continue
 		}
 		netIP := net.ParseIP(IP)
@@ -153,22 +172,22 @@ func extractPublicIPs(ips []string) (publicIPs []string) {
 			publicIPs = append(publicIPs, IP)
 		}
 	}
-	return publicIPs
+	return publicIPs, warnings
 }
 
-func getXForwardedIPs(xForwardedFor string) (ips []string) {
+func getXForwardedIPs(xForwardedFor string) (ips []string, warnings []string) {
 	if len(xForwardedFor) == 0 {
-		return nil
+		return nil, nil
 	}
 	xForwardedFor = strings.ReplaceAll(xForwardedFor, " ", "")
 	xForwardedFor = strings.ReplaceAll(xForwardedFor, "\t", "")
 	XForwardForIPs := strings.Split(xForwardedFor, ",")
 	for _, IP := range XForwardForIPs {
 		if !ipIsValid(IP) {
-			logging.Warnf("IP address %q is not valid", IP)
+			warnings = append(warnings, fmt.Sprintf("IP address %q is not valid", IP))
 			continue
 		}
 		ips = append(ips, IP)
 	}
-	return ips
+	return ips, warnings
 }

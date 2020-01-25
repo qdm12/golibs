@@ -347,15 +347,15 @@ func (e *envParamsImpl) GetPath(key string, setters ...GetEnvSetter) (path strin
 func (e *envParamsImpl) GetLoggerConfig() (encoding string, level logging.Level, nodeID int, err error) {
 	encoding, err = e.GetLoggerEncoding()
 	if err != nil {
-		return "", 0, 0, fmt.Errorf("logger configuration error: %w", err)
+		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
 	}
 	level, err = e.GetLoggerLevel()
 	if err != nil {
-		return "", 0, 0, fmt.Errorf("logger configuration error: %w", err)
+		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
 	}
 	nodeID, err = e.GetNodeID()
 	if err != nil {
-		return "", 0, 0, fmt.Errorf("logger configuration error: %w", err)
+		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
 	}
 	return encoding, level, nodeID, nil
 }

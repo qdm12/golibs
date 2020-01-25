@@ -53,6 +53,8 @@ func Test_IPHeaders_String(t *testing.T) {
 
 func Test_GetClientIPHeaders(t *testing.T) {
 	t.Parallel()
+	emptyLogging, _ := logging.NewEmptyLogging()
+	m := NewIPManager(emptyLogging)
 	tests := map[string]struct {
 		request *http.Request
 		headers IPHeaders
@@ -75,7 +77,7 @@ func Test_GetClientIPHeaders(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			headers := GetClientIPHeaders(tc.request)
+			headers := m.GetClientIPHeaders(tc.request)
 			assert.Equal(t, tc.headers, headers)
 		})
 	}
@@ -83,6 +85,8 @@ func Test_GetClientIPHeaders(t *testing.T) {
 
 func Test_GetClientIP(t *testing.T) {
 	t.Parallel()
+	emptyLogging, _ := logging.NewEmptyLogging()
+	m := NewIPManager(emptyLogging)
 	tests := map[string]struct {
 		request *http.Request
 		IP      string
@@ -269,47 +273,47 @@ func Test_getRemoteIP(t *testing.T) {
 
 func Test_extractPublicIPs(t *testing.T) {
 	t.Parallel()
-	_, err := logging.SetLoggerToEmpty()
-	require.NoError(t, err)
 	tests := map[string]struct {
 		IPs       []string
 		publicIPs []string
+		warnings  []string
 	}{
-		"no IPs":                       {[]string{}, nil},
-		"2 private IPv4":               {[]string{"127.0.0.3", "192.168.178.5"}, nil},
-		"2 private and 1 invalid IPv4": {[]string{"127.0.0.3", "192.168.178.5", "58"}, nil},
-		"2 private and 1 public IPv4":  {[]string{"127.0.0.3", "192.168.178.5", "58.58.58.58"}, []string{"58.58.58.58"}},
-		"1 private and 1 public IPv6":  {[]string{"fd8d:8d72:b629:0f87:0000:0000:0000:0000", "2001:db8::8a2e:370:7334"}, []string{"2001:db8::8a2e:370:7334"}},
+		"no IPs":                       {[]string{}, nil, nil},
+		"2 private IPv4":               {[]string{"127.0.0.3", "192.168.178.5"}, nil, nil},
+		"2 private and 1 invalid IPv4": {[]string{"127.0.0.3", "192.168.178.5", "58"}, nil, []string{`IP address "58" is not valid`}},
+		"2 private and 1 public IPv4":  {[]string{"127.0.0.3", "192.168.178.5", "58.58.58.58"}, []string{"58.58.58.58"}, nil},
+		"1 private and 1 public IPv6":  {[]string{"fd8d:8d72:b629:0f87:0000:0000:0000:0000", "2001:db8::8a2e:370:7334"}, []string{"2001:db8::8a2e:370:7334"}, nil},
 	}
 	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			publicIPs := extractPublicIPs(tc.IPs)
+			publicIPs, warnings := extractPublicIPs(tc.IPs)
 			assert.ElementsMatch(t, tc.publicIPs, publicIPs)
+			assert.ElementsMatch(t, tc.warnings, warnings)
 		})
 	}
 }
 
 func Test_getXForwardedIPs(t *testing.T) {
 	t.Parallel()
-	_, err := logging.SetLoggerToEmpty()
-	require.NoError(t, err)
 	tests := map[string]struct {
 		XForwardedFor string
 		IPs           []string
+		warnings      []string
 	}{
-		"no XForwardedFor": {"", nil},
-		"3 IPv4":           {"192.99.99.58, 54.54.55.56,54.54.55.100", []string{"192.99.99.58", "54.54.55.56", "54.54.55.100"}},
-		"2 IPv4 and 1 invalid with multiple spaces": {"192.99.99.58,  54.54.55.56,99.99.87", []string{"192.99.99.58", "54.54.55.56"}},
-		"1 IPv4 and 1 IPv6 with \\t":                {" 192.99.99.58, \t2001:db8::8a2e:370:7334", []string{"192.99.99.58", "2001:db8::8a2e:370:7334"}},
+		"no XForwardedFor": {"", nil, nil},
+		"3 IPv4":           {"192.99.99.58, 54.54.55.56,54.54.55.100", []string{"192.99.99.58", "54.54.55.56", "54.54.55.100"}, nil},
+		"2 IPv4 and 1 invalid with multiple spaces": {"192.99.99.58,  54.54.55.56,99.99.87", []string{"192.99.99.58", "54.54.55.56"}, []string{`IP address "99.99.87" is not valid`}},
+		"1 IPv4 and 1 IPv6 with \\t":                {" 192.99.99.58, \t2001:db8::8a2e:370:7334", []string{"192.99.99.58", "2001:db8::8a2e:370:7334"}, nil},
 	}
 	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			IPs := getXForwardedIPs(tc.XForwardedFor)
+			IPs, warnings := getXForwardedIPs(tc.XForwardedFor)
 			assert.ElementsMatch(t, tc.IPs, IPs)
+			assert.ElementsMatch(t, tc.warnings, warnings)
 		})
 	}
 }
