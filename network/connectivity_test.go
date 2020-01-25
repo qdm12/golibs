@@ -38,7 +38,7 @@ func Test_ConnectivityChecks(t *testing.T) {
 				mockClient.On("GetContent", "https://"+domain).
 					Return(nil, 200, nil).Once()
 			}
-			connectivity := &ConnectivityImpl{
+			connectivity := &connectivity{
 				checkDNS: checkDNS,
 				client:   mockClient,
 			}

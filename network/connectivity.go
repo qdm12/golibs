@@ -12,15 +12,14 @@ type Connectivity interface {
 	Checks(domains ...string) (errs []error)
 }
 
-// ConnectivityImpl implements Connectivity
-type ConnectivityImpl struct {
+type connectivity struct {
 	checkDNS checkDNSFunc
 	client   Client
 }
 
 // NewConnectivity returns a new connectivity object
 func NewConnectivity(timeout time.Duration) Connectivity {
-	return &ConnectivityImpl{
+	return &connectivity{
 		checkDNS: func(domain string) error {
 			_, err := net.LookupIP(domain)
 			return err
@@ -32,7 +31,7 @@ func NewConnectivity(timeout time.Duration) Connectivity {
 type checkDNSFunc func(domain string) error
 
 // Checks verifies the connection to the domains in terms of DNS, HTTP and HTTPS
-func (c *ConnectivityImpl) Checks(domains ...string) (errs []error) {
+func (c *connectivity) Checks(domains ...string) (errs []error) {
 	chErrors := make(chan []error)
 	for _, domain := range domains {
 		go func(domain string) {
