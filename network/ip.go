@@ -16,13 +16,13 @@ type IPManager interface {
 }
 
 type ipManager struct {
-	logging  logging.Logging
+	logger   logging.Logger
 	verifier verification.Verifier
 }
 
-func NewIPManager(logging logging.Logging) IPManager {
+func NewIPManager(logger logging.Logger) IPManager {
 	return &ipManager{
-		logging, verification.NewVerifier()}
+		logger, verification.NewVerifier()}
 }
 
 // IPHeaders contains all the raw IP headers of an HTTP request
@@ -76,12 +76,12 @@ func (m *ipManager) GetClientIP(r *http.Request) (ip string, err error) {
 	// we look into the HTTP headers to get the client IP
 	xForwardedIPs, warnings := getXForwardedIPs(headers.XForwardedFor)
 	for _, warning := range warnings {
-		m.logging.Warn(warning)
+		m.logger.Warn(warning)
 	}
 	// TODO check number of ips to match number of proxies setup
 	publicXForwardedIPs, warnings := extractPublicIPs(xForwardedIPs)
 	for _, warning := range warnings {
-		m.logging.Warn(warning)
+		m.logger.Warn(warning)
 	}
 	if len(publicXForwardedIPs) > 0 {
 		// first XForwardedIP should be the client IP

@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type Logging interface {
+type Logger interface {
 	// Sync synchronizes the buffer to ensure everything is printed out
 	Sync() error
 	Debug(args ...interface{})
@@ -16,14 +16,14 @@ type Logging interface {
 	Error(args ...interface{})
 }
 
-type logging struct {
-	logger *zap.Logger
+type logger struct {
+	zapLogger *zap.Logger
 }
 
-func NewLogging(encoding Encoding, level Level, nodeID int) (l Logging, err error) {
+func NewLogger(encoding Encoding, level Level, nodeID int) (l Logger, err error) {
 	var zapLevel zapcore.Level
 	zapLevel.UnmarshalText([]byte(string(level)))
-	logger, err := zap.Config{
+	zapLogger, err := zap.Config{
 		Level:    zap.NewAtomicLevelAt(zapLevel),
 		Encoding: string(encoding),
 		EncoderConfig: zapcore.EncoderConfig{
@@ -43,22 +43,22 @@ func NewLogging(encoding Encoding, level Level, nodeID int) (l Logging, err erro
 		return nil, fmt.Errorf("logger initialization failed: %w", err)
 	}
 	if nodeID != -1 {
-		logger = logger.With(zap.Int("node_id", nodeID))
+		zapLogger = zapLogger.With(zap.Int("node_id", nodeID))
 	}
-	return &logging{logger}, nil
+	return &logger{zapLogger}, nil
 }
 
-func (l *logging) Sync() error {
-	return l.logger.Sync()
+func (l *logger) Sync() error {
+	return l.zapLogger.Sync()
 }
 
 // NewEmptyLogging returns a logging that does not print anything
-func NewEmptyLogging() (l Logging, err error) {
+func NewEmptyLogging() (l Logger, err error) {
 	loggerConfig := zap.NewDevelopmentConfig()
 	loggerConfig.OutputPaths, loggerConfig.ErrorOutputPaths = nil, nil
-	logger, err := loggerConfig.Build()
+	zapLogger, err := loggerConfig.Build()
 	if err != nil {
 		return nil, err
 	}
-	return &logging{logger}, nil
+	return &logger{zapLogger}, nil
 }
