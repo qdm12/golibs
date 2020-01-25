@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/qdm12/golibs/logging"
 
 	"github.com/qdm12/golibs/network"
 )
@@ -38,7 +37,6 @@ func CreateRouter(isHealthy func() error) *httprouter.Router {
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		err := isHealthy()
 		if err != nil {
-			logging.Warnf("Unhealthy: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
