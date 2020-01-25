@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
-
 	"github.com/qdm12/golibs/network"
 )
 
@@ -30,17 +28,14 @@ func Query() error {
 	return nil
 }
 
-// CreateRouter creates a HTTP router with the route and configuration
-// to run a healthcheck server locally
-func CreateRouter(isHealthy func() error) *httprouter.Router {
-	router := httprouter.New()
-	router.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// GetHandler returns a handler function to handle healthcheck queries locally
+func GetHandler(isHealthy func() error) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		err := isHealthy()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-	})
-	return router
+	}
 }
