@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -39,9 +40,7 @@ func RunServers(settings ...Settings) (errors []error) {
 				close(chStop)
 			}
 		case err := <-chShutdownErr: // best effort to collect shutdown errors
-			if err != nil {
-				errors = append(errors, err)
-			}
+			errors = append(errors, err)
 		}
 	}
 	return errors
@@ -49,11 +48,19 @@ func RunServers(settings ...Settings) (errors []error) {
 
 // serve listens on an address with the HTTP handler provided.
 // It shuts down the server when it receives a signal from stop.
-func serve(name, addr string, handler http.Handler, chStop <-chan struct{}, chDoneErr, chShutdownErr chan<- error) {
+func serve(name, addr string, handler http.Handler, chStop <-chan struct{}, chDone, chShutdownErr chan<- error) {
 	server := http.Server{Addr: addr, Handler: handler}
 	go func() {
 		<-chStop
-		chShutdownErr <- server.Shutdown(context.Background())
+		err := server.Shutdown(context.Background())
+		if err != nil {
+			chShutdownErr <- fmt.Errorf("server %q failed shutting down: %w", name, err)
+		}
 	}()
-	chDoneErr <- server.ListenAndServe()
+	err := server.ListenAndServe()
+	if err != nil {
+		chDone <- fmt.Errorf("server %q failed: %w", name, err)
+	} else {
+		chDone <- nil
+	}
 }
