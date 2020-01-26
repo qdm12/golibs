@@ -2,6 +2,7 @@ package format
 
 import (
 	"fmt"
+	"github.com/mr-tron/base58"
 	"strings"
 )
 
@@ -24,4 +25,8 @@ func ArgsToString(args ...interface{}) (s string) {
 		}
 		return strings.Join(words, " ")
 	}
+}
+
+func ReadableBytes(bytes []byte) string {
+	return base58.Encode(bytes)
 }

@@ -26,3 +26,24 @@ func Test_ArgsToString(t *testing.T) {
 		})
 	}
 }
+
+func Test_ReadableBytes(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		bytes []byte
+		s     string
+	}{
+		"nil":            {nil, ""},
+		"empty":          {[]byte{}, ""},
+		"one byte":       {[]byte{1}, "2"},
+		"multiple bytes": {[]byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, "4HUtbHhN2TkpR"},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			s := ReadableBytes(tc.bytes)
+			assert.Equal(t, tc.s, s)
+		})
+	}
+}
