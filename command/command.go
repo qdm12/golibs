@@ -5,8 +5,22 @@ import (
 	"strings"
 )
 
-func Run(command string, arg ...string) (output string, err error) {
-	cmd := exec.Command(command, arg...)
+type Command interface {
+	Run(name string, arg ...string) (output string, err error)
+}
+
+type command struct {
+	execCommand func(name string, arg ...string) *exec.Cmd
+}
+
+func NewCommand() Command {
+	return &command{
+		execCommand: exec.Command,
+	}
+}
+
+func (c *command) Run(name string, arg ...string) (output string, err error) {
+	cmd := c.execCommand(name, arg...)
 	stdout, err := cmd.Output()
 	if err != nil {
 		return "", err
