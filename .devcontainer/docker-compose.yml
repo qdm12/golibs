@@ -8,6 +8,8 @@ services:
       - ~/.ssh:/home/vscode/.ssh:ro
       - ~/.ssh:/root/.ssh:ro
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=America/Montreal
     cap_add:
       - SYS_PTRACE
     security_opt:
