@@ -54,8 +54,8 @@ func (l *logger) Sync() error {
 	return l.zapLogger.Sync()
 }
 
-// NewEmptyLogging returns a logging that does not print anything
-func NewEmptyLogging() (l Logger, err error) {
+// NewEmptyLogger returns a logging that does not print anything
+func NewEmptyLogger() (l Logger, err error) {
 	loggerConfig := zap.NewDevelopmentConfig()
 	loggerConfig.OutputPaths, loggerConfig.ErrorOutputPaths = nil, nil
 	zapLogger, err := loggerConfig.Build()

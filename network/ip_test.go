@@ -54,7 +54,7 @@ func Test_IPHeaders_String(t *testing.T) {
 
 func Test_GetClientIPHeaders(t *testing.T) {
 	t.Parallel()
-	emptyLogging, _ := logging.NewEmptyLogging()
+	emptyLogging, _ := logging.NewEmptyLogger()
 	m := NewIPManager(emptyLogging)
 	tests := map[string]struct {
 		request *http.Request
@@ -86,7 +86,7 @@ func Test_GetClientIPHeaders(t *testing.T) {
 
 func Test_GetClientIP(t *testing.T) {
 	t.Parallel()
-	emptyLogging, _ := logging.NewEmptyLogging()
+	emptyLogging, _ := logging.NewEmptyLogger()
 	m := NewIPManager(emptyLogging)
 	tests := map[string]struct {
 		request *http.Request
