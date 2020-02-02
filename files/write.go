@@ -8,6 +8,9 @@ import (
 // WriteLinesToFile writes a slice of strings as lines to a file.
 // It creates any directory not existing in the file path if necessary.
 func (f *fileManager) WriteLinesToFile(filePath string, lines []string) error {
+	if len(lines) == 0 || (len(lines) == 1 && len(lines[0]) == 0) {
+		return f.WriteToFile(filePath, nil)
+	}
 	data := []byte(strings.Join(lines, "\n"))
 	return f.WriteToFile(filePath, data)
 }
