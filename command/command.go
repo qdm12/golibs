@@ -27,6 +27,9 @@ func (c *commander) Start(name string, arg ...string) (stdoutPipe io.ReadCloser,
 	if err != nil {
 		return nil, nil, err
 	}
+	if err := cmd.Start(); err != nil {
+		return nil, nil, err
+	}
 	return stdout, cmd.Wait, nil
 }
 
