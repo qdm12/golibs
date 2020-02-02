@@ -26,9 +26,6 @@ func NewCommander() Commander {
 func (c *commander) Run(name string, arg ...string) (output string, err error) {
 	cmd := c.execCommand(name, arg...)
 	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", err
-	}
 	output = string(stdout)
 	output = strings.TrimSuffix(output, "\n")
 	lines := stringToLines(output)
@@ -37,7 +34,7 @@ func (c *commander) Run(name string, arg ...string) (output string, err error) {
 		lines[i] = strings.TrimSuffix(lines[i], "'")
 	}
 	output = strings.Join(lines, "\n")
-	return output, nil
+	return output, err
 }
 
 func stringToLines(s string) (lines []string) {
