@@ -1,27 +1,38 @@
 package command
 
 import (
+	"io"
 	"os/exec"
 	"strings"
 )
 
-type Command interface {
+type Commander interface {
 	Run(name string, arg ...string) (output string, err error)
+	Start(name string, arg ...string) (stdoutPipe io.ReadCloser, waitFn func() error, err error)
 }
 
-type command struct {
+type commander struct {
 	execCommand func(name string, arg ...string) *exec.Cmd
 }
 
-func NewCommand() Command {
-	return &command{
+func NewCommander() Commander {
+	return &commander{
 		execCommand: exec.Command,
 	}
 }
 
-func (c *command) Run(name string, arg ...string) (output string, err error) {
+func (c *commander) Start(name string, arg ...string) (stdoutPipe io.ReadCloser, waitFn func() error, err error) {
 	cmd := c.execCommand(name, arg...)
-	stdout, err := cmd.Output()
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, nil, err
+	}
+	return stdout, cmd.Wait, nil
+}
+
+func (c *commander) Run(name string, arg ...string) (output string, err error) {
+	cmd := c.execCommand(name, arg...)
+	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", err
 	}
