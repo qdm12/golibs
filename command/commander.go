@@ -1,7 +1,6 @@
 package command
 
 import (
-	"context"
 	"io"
 	"os/exec"
 	"strings"
@@ -10,7 +9,6 @@ import (
 type Commander interface {
 	Run(name string, arg ...string) (output string, err error)
 	Start(name string, arg ...string) (stdoutPipe io.ReadCloser, waitFn func() error, err error)
-	MergeLineReaders(ctx context.Context, onNewLine func(line string), readers map[string]io.ReadCloser) error
 }
 
 type commander struct {
@@ -35,6 +33,18 @@ func (c *commander) Run(name string, arg ...string) (output string, err error) {
 	}
 	output = strings.Join(lines, "\n")
 	return output, err
+}
+
+func (c *commander) Start(name string, arg ...string) (stdoutPipe io.ReadCloser, waitFn func() error, err error) {
+	cmd := c.execCommand(name, arg...)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := cmd.Start(); err != nil {
+		return nil, nil, err
+	}
+	return stdout, cmd.Wait, nil
 }
 
 func stringToLines(s string) (lines []string) {
