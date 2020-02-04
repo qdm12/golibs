@@ -5,63 +5,62 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"strings"
 )
 
 type StreamMerger interface {
-	Add(name string, stream io.ReadCloser)
-	ListenToAll(ctx context.Context, onNewLine func(line string)) error
+	// Merge merges the given stream with the given name to the CollectLines method, and should be run in a goroutine
+	Merge(name string, stream io.ReadCloser)
+	// CollectLines collects lines received from each stream merged in the streammerger and runs onNewLine on each line
+	CollectLines(onNewLine func(line string)) error
 }
 
 type streamMerger struct {
-	readers map[string]io.ReadCloser
+	ctx    context.Context
+	cancel context.CancelFunc
+	chLine chan string
+	chErr  chan error
 }
 
-func NewStreamMerger() StreamMerger {
-	return &streamMerger{
-		readers: make(map[string]io.ReadCloser),
-	}
-}
-
-func (s *streamMerger) Add(name string, stream io.ReadCloser) {
-	s.readers[name] = stream
-}
-
-func (s *streamMerger) ListenToAll(ctx context.Context, onNewLine func(line string)) error {
+func NewStreamMerger(ctx context.Context) StreamMerger {
 	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	chLine := make(chan string)
-	chErr := make(chan error)
-	// Read from all buffers asynchronously
-	for name, reader := range s.readers {
-		go func(name string, reader io.ReadCloser) {
-			defer reader.Close()
-			go func() { // Read lines infinitely
-				scanner := bufio.NewScanner(reader)
-				for scanner.Scan() {
-					b := scanner.Bytes()
-					for _, line := range strings.Split(string(b), "\n") {
-						chLine <- fmt.Sprintf("%s: %s", name, line)
-					}
-				}
-				if err := scanner.Err(); err != nil {
-					chErr <- fmt.Errorf("%s: %w", name, err)
-				}
-			}()
-			<-ctx.Done() // blocks until context is canceled
-		}(name, reader)
+	return &streamMerger{
+		ctx:    ctx,
+		cancel: cancel,
+		chLine: make(chan string),
+		chErr:  make(chan error),
 	}
-	// Collect lines from all buffers synchronously
+}
+
+// Merge merges the given stream with the given name to the CollectLines method, and should be run in a goroutine
+func (s *streamMerger) Merge(name string, stream io.ReadCloser) {
+	defer stream.Close()
+	go func() { // Read lines infinitely
+		scanner := bufio.NewScanner(stream)
+		for scanner.Scan() {
+			line := string(scanner.Bytes())
+			s.chLine <- line
+		}
+		if err := scanner.Err(); err != nil {
+			s.chErr <- fmt.Errorf("%s: stream error: %w", name, err)
+		}
+	}()
+	<-s.ctx.Done() // blocks until context is canceled
+}
+
+// CollectLines collects lines received from each stream merged in the streammerger and runs onNewLine on each line
+func (s *streamMerger) CollectLines(onNewLine func(line string)) error {
+	defer func() {
+		s.cancel() // stops other streams
+		close(s.chLine)
+		close(s.chErr)
+	}()
 	for {
 		select {
-		case line := <-chLine:
+		case line := <-s.chLine:
 			onNewLine(line)
-		case err := <-chErr:
-			cancel()
-			close(chLine)
+		case err := <-s.chErr:
 			return err
-		case <-ctx.Done():
-			close(chLine)
+		case <-s.ctx.Done():
 			return nil
 		}
 	}

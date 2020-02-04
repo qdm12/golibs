@@ -3,7 +3,6 @@
 package mocks
 
 import (
-	context "context"
 	io "io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -14,21 +13,21 @@ type StreamMerger struct {
 	mock.Mock
 }
 
-// Add provides a mock function with given fields: name, stream
-func (_m *StreamMerger) Add(name string, stream io.ReadCloser) {
-	_m.Called(name, stream)
-}
-
-// ListenToAll provides a mock function with given fields: ctx, onNewLine
-func (_m *StreamMerger) ListenToAll(ctx context.Context, onNewLine func(string)) error {
-	ret := _m.Called(ctx, onNewLine)
+// CollectLines provides a mock function with given fields: onNewLine
+func (_m *StreamMerger) CollectLines(onNewLine func(string)) error {
+	ret := _m.Called(onNewLine)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, func(string)) error); ok {
-		r0 = rf(ctx, onNewLine)
+	if rf, ok := ret.Get(0).(func(func(string)) error); ok {
+		r0 = rf(onNewLine)
 	} else {
 		r0 = ret.Error(0)
 	}
 
 	return r0
+}
+
+// Merge provides a mock function with given fields: name, stream
+func (_m *StreamMerger) Merge(name string, stream io.ReadCloser) {
+	_m.Called(name, stream)
 }
