@@ -17,13 +17,13 @@ type Crypto interface {
 }
 
 type crypto struct {
-	shakeHash sha3.ShakeHash
-	random    random.Random
+	shakeHashFactory func() sha3.ShakeHash
+	random           random.Random
 }
 
 func NewCrypto() Crypto {
 	return &crypto{
-		shakeHash: sha3.NewShake256(),
-		random:    random.NewRandom(),
+		shakeHashFactory: func() sha3.ShakeHash { return sha3.NewShake256() },
+		random:           random.NewRandom(),
 	}
 }

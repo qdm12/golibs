@@ -105,7 +105,8 @@
         },
         "go.testEnvVars": {},
         "go.testFlags": [
-            "-v"
+            "-v",
+            "-race"
         ],
         "go.testTimeout": "600s"
     }

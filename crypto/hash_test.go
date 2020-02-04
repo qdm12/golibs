@@ -2,9 +2,11 @@ package crypto
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
+	"golang.org/x/crypto/sha3"
 
 	"github.com/qdm12/golibs/crypto/mocks"
 )
@@ -104,7 +106,6 @@ func Test_Shake256_Mocked(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			mockShakeHash := &mocks.ShakeHash{}
-			mockShakeHash.On("Reset").Once()
 			if tc.shakehashWrite.call {
 				mockShakeHash.On("Write", tc.data).
 					Return(tc.shakehashWrite.n, tc.shakehashWrite.err).Once()
@@ -113,7 +114,7 @@ func Test_Shake256_Mocked(t *testing.T) {
 				mockShakeHash.On("Read", make([]byte, shakeSum256DigestSize)).
 					Return(tc.shakehashRead.n, tc.shakehashRead.err).Once()
 			}
-			c := crypto{shakeHash: mockShakeHash}
+			c := crypto{shakeHashFactory: func() sha3.ShakeHash { return mockShakeHash }}
 			digest, err := c.ShakeSum256(tc.data)
 			if tc.err != nil {
 				require.Error(t, err)
