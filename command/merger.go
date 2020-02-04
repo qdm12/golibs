@@ -38,7 +38,7 @@ func (s *streamMerger) Merge(name string, stream io.ReadCloser) {
 		scanner := bufio.NewScanner(stream)
 		for scanner.Scan() {
 			line := string(scanner.Bytes())
-			s.chLine <- line
+			s.chLine <- fmt.Sprintf("%s: %s", name, line)
 		}
 		if err := scanner.Err(); err != nil {
 			s.chErr <- fmt.Errorf("%s: stream error: %w", name, err)
