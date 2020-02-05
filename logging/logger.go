@@ -14,9 +14,11 @@ type Logger interface {
 	Info(args ...interface{})
 	Warn(args ...interface{})
 	Error(args ...interface{})
+	WithPrefix(prefix string) Logger
 }
 
 type logger struct {
+	prefix    string
 	zapLogger *zap.Logger
 }
 
@@ -47,7 +49,7 @@ func NewLogger(encoding Encoding, level Level, nodeID int) (l Logger, err error)
 	if nodeID != -1 {
 		zapLogger = zapLogger.With(zap.Int("node_id", nodeID))
 	}
-	return &logger{zapLogger}, nil
+	return &logger{zapLogger: zapLogger}, nil
 }
 
 func (l *logger) Sync() error {
@@ -62,5 +64,12 @@ func NewEmptyLogger() (l Logger, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return &logger{zapLogger}, nil
+	return &logger{zapLogger: zapLogger}, nil
+}
+
+func (l *logger) WithPrefix(prefix string) Logger {
+	return &logger{
+		prefix:    l.prefix + prefix,
+		zapLogger: l.zapLogger,
+	}
 }
