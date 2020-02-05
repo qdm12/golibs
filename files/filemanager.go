@@ -13,9 +13,9 @@ type FileManager interface {
 	GetOwnership(filePath string) (userID, groupID int, err error)
 	GetUserPermissions(filePath string) (read, write, execute bool, err error)
 	ReadFile(filePath string) (data []byte, err error)
-	WriteLinesToFile(filePath string, lines []string) error
-	Touch(filePath string) error
-	WriteToFile(filePath string, data []byte) error
+	WriteLinesToFile(filePath string, lines []string, options ...WriteOptionSetter) error
+	Touch(filePath string, options ...WriteOptionSetter) error
+	WriteToFile(filePath string, data []byte, options ...WriteOptionSetter) error
 }
 
 type fileManager struct {
@@ -25,6 +25,7 @@ type fileManager struct {
 	filepathDir func(path string) string
 	mkdirAll    func(path string, perm os.FileMode) error
 	writeFile   func(filename string, data []byte, perm os.FileMode) error
+	chown       func(name string, uid int, gid int) error
 }
 
 func NewFileManager() FileManager {
@@ -35,5 +36,6 @@ func NewFileManager() FileManager {
 		filepathDir: filepath.Dir,
 		mkdirAll:    os.MkdirAll,
 		writeFile:   ioutil.WriteFile,
+		chown:       os.Chown,
 	}
 }
