@@ -8,7 +8,7 @@ import (
 
 type Commander interface {
 	Run(name string, arg ...string) (output string, err error)
-	Start(name string, arg ...string) (stdoutPipe io.ReadCloser, waitFn func() error, err error)
+	Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)
 }
 
 type commander struct {
@@ -35,16 +35,20 @@ func (c *commander) Run(name string, arg ...string) (output string, err error) {
 	return output, err
 }
 
-func (c *commander) Start(name string, arg ...string) (stdoutPipe io.ReadCloser, waitFn func() error, err error) {
+func (c *commander) Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error) {
 	cmd := c.execCommand(name, arg...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, nil, nil, err
 	}
 	if err := cmd.Start(); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return stdout, cmd.Wait, nil
+	return stdout, stderr, cmd.Wait, nil
 }
 
 func stringToLines(s string) (lines []string) {

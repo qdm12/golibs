@@ -42,7 +42,7 @@ func (_m *Commander) Run(name string, arg ...string) (string, error) {
 }
 
 // Start provides a mock function with given fields: name, arg
-func (_m *Commander) Start(name string, arg ...string) (io.ReadCloser, func() error, error) {
+func (_m *Commander) Start(name string, arg ...string) (io.ReadCloser, io.ReadCloser, func() error, error) {
 	_va := make([]interface{}, len(arg))
 	for _i := range arg {
 		_va[_i] = arg[_i]
@@ -61,21 +61,30 @@ func (_m *Commander) Start(name string, arg ...string) (io.ReadCloser, func() er
 		}
 	}
 
-	var r1 func() error
-	if rf, ok := ret.Get(1).(func(string, ...string) func() error); ok {
+	var r1 io.ReadCloser
+	if rf, ok := ret.Get(1).(func(string, ...string) io.ReadCloser); ok {
 		r1 = rf(name, arg...)
 	} else {
 		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(func() error)
+			r1 = ret.Get(1).(io.ReadCloser)
 		}
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func(string, ...string) error); ok {
+	var r2 func() error
+	if rf, ok := ret.Get(2).(func(string, ...string) func() error); ok {
 		r2 = rf(name, arg...)
 	} else {
-		r2 = ret.Error(2)
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).(func() error)
+		}
 	}
 
-	return r0, r1, r2
+	var r3 error
+	if rf, ok := ret.Get(3).(func(string, ...string) error); ok {
+		r3 = rf(name, arg...)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
