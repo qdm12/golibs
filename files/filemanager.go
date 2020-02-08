@@ -14,9 +14,9 @@ type FileManager interface {
 	GetUserPermissions(filePath string) (read, write, execute bool, err error)
 	SetUserPermissions(filepath string, mod os.FileMode) error
 	ReadFile(filePath string) (data []byte, err error)
-	WriteLinesToFile(filePath string, lines []string, options ...WriteOptionSetter) error
-	Touch(filePath string, options ...WriteOptionSetter) error
-	WriteToFile(filePath string, data []byte, options ...WriteOptionSetter) error
+	WriteLinesToFile(filePath string, lines []string, setters ...WriteOptionSetter) error
+	Touch(filePath string, setters ...WriteOptionSetter) error
+	WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error
 }
 
 type fileManager struct {

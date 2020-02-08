@@ -177,11 +177,11 @@ func (_m *FileManager) SetUserPermissions(filepath string, mod os.FileMode) erro
 	return r0
 }
 
-// Touch provides a mock function with given fields: filePath, options
-func (_m *FileManager) Touch(filePath string, options ...files.WriteOptionSetter) error {
-	_va := make([]interface{}, len(options))
-	for _i := range options {
-		_va[_i] = options[_i]
+// Touch provides a mock function with given fields: filePath, setters
+func (_m *FileManager) Touch(filePath string, setters ...files.WriteOptionSetter) error {
+	_va := make([]interface{}, len(setters))
+	for _i := range setters {
+		_va[_i] = setters[_i]
 	}
 	var _ca []interface{}
 	_ca = append(_ca, filePath)
@@ -190,7 +190,7 @@ func (_m *FileManager) Touch(filePath string, options ...files.WriteOptionSetter
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, ...files.WriteOptionSetter) error); ok {
-		r0 = rf(filePath, options...)
+		r0 = rf(filePath, setters...)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -198,11 +198,11 @@ func (_m *FileManager) Touch(filePath string, options ...files.WriteOptionSetter
 	return r0
 }
 
-// WriteLinesToFile provides a mock function with given fields: filePath, lines, options
-func (_m *FileManager) WriteLinesToFile(filePath string, lines []string, options ...files.WriteOptionSetter) error {
-	_va := make([]interface{}, len(options))
-	for _i := range options {
-		_va[_i] = options[_i]
+// WriteLinesToFile provides a mock function with given fields: filePath, lines, setters
+func (_m *FileManager) WriteLinesToFile(filePath string, lines []string, setters ...files.WriteOptionSetter) error {
+	_va := make([]interface{}, len(setters))
+	for _i := range setters {
+		_va[_i] = setters[_i]
 	}
 	var _ca []interface{}
 	_ca = append(_ca, filePath, lines)
@@ -211,7 +211,7 @@ func (_m *FileManager) WriteLinesToFile(filePath string, lines []string, options
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, []string, ...files.WriteOptionSetter) error); ok {
-		r0 = rf(filePath, lines, options...)
+		r0 = rf(filePath, lines, setters...)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -219,11 +219,11 @@ func (_m *FileManager) WriteLinesToFile(filePath string, lines []string, options
 	return r0
 }
 
-// WriteToFile provides a mock function with given fields: filePath, data, options
-func (_m *FileManager) WriteToFile(filePath string, data []byte, options ...files.WriteOptionSetter) error {
-	_va := make([]interface{}, len(options))
-	for _i := range options {
-		_va[_i] = options[_i]
+// WriteToFile provides a mock function with given fields: filePath, data, setters
+func (_m *FileManager) WriteToFile(filePath string, data []byte, setters ...files.WriteOptionSetter) error {
+	_va := make([]interface{}, len(setters))
+	for _i := range setters {
+		_va[_i] = setters[_i]
 	}
 	var _ca []interface{}
 	_ca = append(_ca, filePath, data)
@@ -232,7 +232,7 @@ func (_m *FileManager) WriteToFile(filePath string, data []byte, options ...file
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(string, []byte, ...files.WriteOptionSetter) error); ok {
-		r0 = rf(filePath, data, options...)
+		r0 = rf(filePath, data, setters...)
 	} else {
 		r0 = ret.Error(0)
 	}
