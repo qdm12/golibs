@@ -18,7 +18,7 @@ func newWriteOptions(defaultPermissions os.FileMode) writeOptions {
 
 type WriteOptionSetter func(o *writeOptions)
 
-func FileOwnership(uid, gid int) WriteOptionSetter {
+func Ownership(uid, gid int) WriteOptionSetter {
 	return func(options *writeOptions) {
 		options.ownership = &struct {
 			UID int
@@ -27,7 +27,7 @@ func FileOwnership(uid, gid int) WriteOptionSetter {
 	}
 }
 
-func FilePermissions(permissions os.FileMode) WriteOptionSetter {
+func Permissions(permissions os.FileMode) WriteOptionSetter {
 	return func(options *writeOptions) {
 		options.permissions = permissions
 	}
