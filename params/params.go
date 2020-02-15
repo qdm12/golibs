@@ -23,8 +23,8 @@ type EnvParams interface {
 	GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err error)
 	GetOnOff(key string, setters ...GetEnvSetter) (on bool, err error)
 	GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error)
-	GetDuration(key string, timeUnit time.Duration, setters ...GetEnvSetter) (duration time.Duration, err error)
-	GetHTTPTimeout(timeUnit time.Duration, setters ...GetEnvSetter) (duration time.Duration, err error)
+	GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error)
+	GetHTTPTimeout(setters ...GetEnvSetter) (duration time.Duration, err error)
 	GetUserID() int
 	GetGroupID() int
 	GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error)
@@ -199,29 +199,30 @@ func (e *envParamsImpl) GetValueIfInside(key string, possibilities []string, set
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.
-// If none is set, it returns defaultValue * timeUnit.
-func (e *envParamsImpl) GetDuration(key string, timeUnit time.Duration, setters ...GetEnvSetter) (duration time.Duration, err error) {
+func (e *envParamsImpl) GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return 0, err
+	} else if len(s) == 0 {
+		return 0, fmt.Errorf("environment variable %q duration value is empty", key)
 	}
-	value, err := strconv.Atoi(s)
+	duration, err = time.ParseDuration(s)
 	switch {
 	case err != nil:
-		return 0, fmt.Errorf("environment variable %q duration value %q is not a valid integer", key, s)
-	case value == 0:
-		return 0, fmt.Errorf("environment variable %q duration value cannot be 0", key)
-	case value < 0:
+		return 0, fmt.Errorf("environment variable %q duration value is malformed: %w", key, err)
+	case duration < 0:
 		return 0, fmt.Errorf("environment variable %q duration value cannot be lower than 0", key)
+	case duration == 0:
+		return 0, fmt.Errorf("environment variable %q duration value cannot be 0", key)
 	default:
-		return time.Duration(value) * timeUnit, nil
+		return duration, nil
 	}
 }
 
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
 // from the environment variable HTTP_TIMEOUT
-func (e *envParamsImpl) GetHTTPTimeout(timeUnit time.Duration, setters ...GetEnvSetter) (timeout time.Duration, err error) {
-	return e.GetDuration("HTTP_TIMEOUT", timeUnit, setters...)
+func (e *envParamsImpl) GetHTTPTimeout(setters ...GetEnvSetter) (timeout time.Duration, err error) {
+	return e.GetDuration("HTTP_TIMEOUT", setters...)
 }
 
 // GetUserID obtains the user ID running the program

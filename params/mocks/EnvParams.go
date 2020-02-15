@@ -60,27 +60,27 @@ func (_m *EnvParams) GetDatabaseDetails() (string, string, string, string, error
 	return r0, r1, r2, r3, r4
 }
 
-// GetDuration provides a mock function with given fields: key, timeUnit, setters
-func (_m *EnvParams) GetDuration(key string, timeUnit time.Duration, setters ...params.GetEnvSetter) (time.Duration, error) {
+// GetDuration provides a mock function with given fields: key, setters
+func (_m *EnvParams) GetDuration(key string, setters ...params.GetEnvSetter) (time.Duration, error) {
 	_va := make([]interface{}, len(setters))
 	for _i := range setters {
 		_va[_i] = setters[_i]
 	}
 	var _ca []interface{}
-	_ca = append(_ca, key, timeUnit)
+	_ca = append(_ca, key)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
 	var r0 time.Duration
-	if rf, ok := ret.Get(0).(func(string, time.Duration, ...params.GetEnvSetter) time.Duration); ok {
-		r0 = rf(key, timeUnit, setters...)
+	if rf, ok := ret.Get(0).(func(string, ...params.GetEnvSetter) time.Duration); ok {
+		r0 = rf(key, setters...)
 	} else {
 		r0 = ret.Get(0).(time.Duration)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(string, time.Duration, ...params.GetEnvSetter) error); ok {
-		r1 = rf(key, timeUnit, setters...)
+	if rf, ok := ret.Get(1).(func(string, ...params.GetEnvSetter) error); ok {
+		r1 = rf(key, setters...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -263,27 +263,26 @@ func (_m *EnvParams) GetGroupID() int {
 	return r0
 }
 
-// GetHTTPTimeout provides a mock function with given fields: timeUnit, setters
-func (_m *EnvParams) GetHTTPTimeout(timeUnit time.Duration, setters ...params.GetEnvSetter) (time.Duration, error) {
+// GetHTTPTimeout provides a mock function with given fields: setters
+func (_m *EnvParams) GetHTTPTimeout(setters ...params.GetEnvSetter) (time.Duration, error) {
 	_va := make([]interface{}, len(setters))
 	for _i := range setters {
 		_va[_i] = setters[_i]
 	}
 	var _ca []interface{}
-	_ca = append(_ca, timeUnit)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
 
 	var r0 time.Duration
-	if rf, ok := ret.Get(0).(func(time.Duration, ...params.GetEnvSetter) time.Duration); ok {
-		r0 = rf(timeUnit, setters...)
+	if rf, ok := ret.Get(0).(func(...params.GetEnvSetter) time.Duration); ok {
+		r0 = rf(setters...)
 	} else {
 		r0 = ret.Get(0).(time.Duration)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(time.Duration, ...params.GetEnvSetter) error); ok {
-		r1 = rf(timeUnit, setters...)
+	if rf, ok := ret.Get(1).(func(...params.GetEnvSetter) error); ok {
+		r1 = rf(setters...)
 	} else {
 		r1 = ret.Error(1)
 	}

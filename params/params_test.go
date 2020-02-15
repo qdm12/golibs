@@ -242,12 +242,12 @@ func Test_GetDuration(t *testing.T) {
 		duration time.Duration
 		err      error
 	}{
-		"key with non integer value":       {"a", nil, 0, fmt.Errorf("environment variable \"any\" duration value \"a\" is not a valid integer")},
-		"key with positive integer value":  {"1", nil, time.Second, nil},
+		"key with non integer value":       {"a", nil, 0, fmt.Errorf("environment variable \"any\" duration value is malformed: time: invalid duration a")},
+		"key without unit":                 {"1", nil, 0, fmt.Errorf("environment variable \"any\" duration value is malformed: time: missing unit in duration 1")},
 		"key with 0 integer value":         {"0", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be 0")},
-		"key with negative integer value":  {"-1", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be lower than 0")},
-		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"any\" duration value \"\" is not a valid integer")},
-		"key without value and default":    {"", []GetEnvSetter{Default("1")}, time.Second, nil},
+		"key with negative duration":       {"-1s", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be lower than 0")},
+		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"any\" duration value is empty")},
+		"key without value and default":    {"", []GetEnvSetter{Default("1s")}, time.Second, nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"any\"")},
 	}
 	for name, tc := range tests {
@@ -259,7 +259,7 @@ func Test_GetDuration(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			duration, err := e.GetDuration("any", time.Second, tc.setters...)
+			duration, err := e.GetDuration("any", tc.setters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -279,12 +279,12 @@ func Test_GetHTTPTimeout(t *testing.T) {
 		timeout  time.Duration
 		err      error
 	}{
-		"key with non integer value":       {"a", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value \"a\" is not a valid integer")},
-		"key with positive integer value":  {"1", nil, time.Second, nil},
+		"key with non integer value":       {"a", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is malformed: time: invalid duration a")},
+		"key without unit":                 {"1", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is malformed: time: missing unit in duration 1")},
 		"key with 0 integer value":         {"0", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be 0")},
-		"key with negative integer value":  {"-1", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be lower than 0")},
-		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value \"\" is not a valid integer")},
-		"key without value and default":    {"", []GetEnvSetter{Default("1")}, time.Second, nil},
+		"key with negative duration":       {"-1s", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be lower than 0")},
+		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is empty")},
+		"key without value and default":    {"", []GetEnvSetter{Default("1s")}, time.Second, nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"HTTP_TIMEOUT\"")},
 	}
 	for name, tc := range tests {
@@ -296,7 +296,7 @@ func Test_GetHTTPTimeout(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			timeout, err := e.GetHTTPTimeout(time.Second, tc.setters...)
+			timeout, err := e.GetHTTPTimeout(tc.setters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
