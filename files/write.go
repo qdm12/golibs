@@ -21,6 +21,22 @@ func (f *fileManager) Touch(filePath string, options ...WriteOptionSetter) error
 	return f.WriteToFile(filePath, nil, options...)
 }
 
+func (f *fileManager) CreateDir(filePath string, setters ...WriteOptionSetter) error {
+	options := newWriteOptions(0700)
+	for _, setter := range setters {
+		setter(&options)
+	}
+	if err := f.mkdirAll(filePath, options.permissions); err != nil {
+		return err
+	}
+	if options.ownership != nil {
+		if err := f.chown(filePath, options.ownership.UID, options.ownership.GID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WriteToFile writes data bytes to a file, and creates any
 // directory not existing in the file path if necessary.
 func (f *fileManager) WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error {

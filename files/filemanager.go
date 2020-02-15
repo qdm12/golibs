@@ -17,6 +17,7 @@ type FileManager interface {
 	WriteLinesToFile(filePath string, lines []string, setters ...WriteOptionSetter) error
 	Touch(filePath string, setters ...WriteOptionSetter) error
 	WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error
+	CreateDir(filePath string, setters ...WriteOptionSetter) error
 }
 
 type fileManager struct {

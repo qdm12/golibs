@@ -14,6 +14,27 @@ type FileManager struct {
 	mock.Mock
 }
 
+// CreateDir provides a mock function with given fields: filePath, setters
+func (_m *FileManager) CreateDir(filePath string, setters ...files.WriteOptionSetter) error {
+	_va := make([]interface{}, len(setters))
+	for _i := range setters {
+		_va[_i] = setters[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, filePath)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, ...files.WriteOptionSetter) error); ok {
+		r0 = rf(filePath, setters...)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DirectoryExists provides a mock function with given fields: filePath
 func (_m *FileManager) DirectoryExists(filePath string) (bool, error) {
 	ret := _m.Called(filePath)
