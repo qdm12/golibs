@@ -62,8 +62,9 @@ func NewEnvParams() EnvParams {
 }
 
 type getEnvOptions struct {
-	compulsory   bool
-	defaultValue string
+	compulsory         bool
+	caseSensitiveValue bool
+	defaultValue       string
 }
 
 // GetEnvSetter is a setter for options to GetEnv functions
@@ -91,6 +92,14 @@ func Default(defaultValue string) GetEnvSetter {
 	}
 }
 
+// CaseSensitiveValue makes the value processing case sensitive
+func CaseSensitiveValue() GetEnvSetter {
+	return func(options *getEnvOptions) error {
+		options.caseSensitiveValue = true
+		return nil
+	}
+}
+
 // GetEnv returns the value stored for a named environment variable,
 // and a default if no value is found
 func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
@@ -106,6 +115,9 @@ func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value strin
 			return "", fmt.Errorf("no value found for environment variable %q", key)
 		}
 		value = options.defaultValue
+	}
+	if !options.caseSensitiveValue {
+		value = strings.ToLower(value)
 	}
 	return value, nil
 }
@@ -186,11 +198,18 @@ func (e *envParamsImpl) GetOnOff(key string, setters ...GetEnvSetter) (on bool, 
 // GetValueIfInside obtains the value stored for a named environment variable if it is part of a
 // list of possible values. You can optionally specify a defaultValue
 func (e *envParamsImpl) GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error) {
+	options := getEnvOptions{}
+	for _, setter := range setters {
+		_ = setter(&options) // error is checked in e.GetEnv
+	}
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return "", err
 	}
 	for _, possibility := range possibilities {
+		if !options.caseSensitiveValue {
+			possibility = strings.ToLower(possibility)
+		}
 		if s == possibility {
 			return s, nil
 		}

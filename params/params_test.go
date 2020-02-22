@@ -27,6 +27,8 @@ func Test_GetEnv(t *testing.T) {
 		err      error
 	}{
 		"key with value":                   {"value", nil, "value", nil},
+		"key with uppercase value":         {"VALUE", nil, "value", nil},
+		"key with case sensitive value":    {"VALUE", []GetEnvSetter{CaseSensitiveValue()}, "VALUE", nil},
 		"key without value and default":    {"", []GetEnvSetter{Default("default")}, "default", nil},
 		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
 		"bad options":                      {"", []GetEnvSetter{Compulsory(), Default("a")}, "", fmt.Errorf("environment variable \"any\": cannot set default value for environment variable value which is compulsory")},
@@ -207,11 +209,14 @@ func Test_GetValueIfInside(t *testing.T) {
 		value         string
 		err           error
 	}{
-		"key with value in possibilities":     {[]string{"a", "b"}, "a", nil, "a", nil},
-		"key with value not in possibilities": {[]string{"a", "b"}, "c", nil, "", fmt.Errorf("environment variable \"any\" value is \"c\" and can only be one of: a, b")},
-		"key without value":                   {[]string{"a", "b"}, "", nil, "", fmt.Errorf("environment variable \"any\" value is \"\" and can only be one of: a, b")},
-		"key without value and default":       {[]string{"a", "b"}, "", []GetEnvSetter{Default("a")}, "a", nil},
-		"key without value and compulsory":    {[]string{"a", "b"}, "", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
+		"key with value in possibilities":                {[]string{"a", "b"}, "a", nil, "a", nil},
+		"key with value in uppercase possibilities":      {[]string{"A", "b"}, "a", nil, "a", nil},
+		"key with uppercase value in possibilities":      {[]string{"a", "b"}, "A", nil, "a", nil},
+		"key with case sensitive value in possibilities": {[]string{"A", "b"}, "a", []GetEnvSetter{CaseSensitiveValue()}, "", fmt.Errorf("environment variable \"any\" value is \"a\" and can only be one of: A, b")},
+		"key with value not in possibilities":            {[]string{"a", "b"}, "c", nil, "", fmt.Errorf("environment variable \"any\" value is \"c\" and can only be one of: a, b")},
+		"key without value":                              {[]string{"a", "b"}, "", nil, "", fmt.Errorf("environment variable \"any\" value is \"\" and can only be one of: a, b")},
+		"key without value and default":                  {[]string{"a", "b"}, "", []GetEnvSetter{Default("a")}, "a", nil},
+		"key without value and compulsory":               {[]string{"a", "b"}, "", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
 	}
 	for name, tc := range tests {
 		tc := tc
