@@ -583,6 +583,7 @@ func Test_GetGotifyToken(t *testing.T) {
 		getenv: func(key string) string {
 			return "x"
 		},
+		unset: func(k string) error { return nil },
 	}
 	token, err := e.GetGotifyToken()
 	require.NoError(t, err)

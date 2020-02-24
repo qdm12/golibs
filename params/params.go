@@ -48,6 +48,7 @@ type envParamsImpl struct {
 	getgid     func() int
 	executable func() (string, error)
 	verifier   verification.Verifier
+	unset      func(k string) error
 }
 
 // NewEnvParams returns a new EnvParams object
@@ -58,12 +59,14 @@ func NewEnvParams() EnvParams {
 		getgid:     os.Getgid,
 		executable: os.Executable,
 		verifier:   verification.NewVerifier(),
+		unset:      os.Unsetenv,
 	}
 }
 
 type getEnvOptions struct {
 	compulsory         bool
 	caseSensitiveValue bool
+	unset              bool
 	defaultValue       string
 }
 
@@ -100,24 +103,41 @@ func CaseSensitiveValue() GetEnvSetter {
 	}
 }
 
+// Unset unsets the environment variable after it has been read
+func Unset() GetEnvSetter {
+	return func(options *getEnvOptions) error {
+		options.unset = true
+		return nil
+	}
+}
+
 // GetEnv returns the value stored for a named environment variable,
 // and a default if no value is found
 func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range setters {
 		if err := setter(&options); err != nil {
+			if options.unset {
+				_ = e.unset(key)
+			}
 			return "", fmt.Errorf("environment variable %q: %w", key, err)
 		}
 	}
 	value = e.getenv(key)
 	if len(value) == 0 {
 		if options.compulsory {
+			if options.unset {
+				_ = e.unset(key)
+			}
 			return "", fmt.Errorf("no value found for environment variable %q", key)
 		}
 		value = options.defaultValue
 	}
 	if !options.caseSensitiveValue {
 		value = strings.ToLower(value)
+	}
+	if options.unset {
+		return value, e.unset(key)
 	}
 	return value, nil
 }
@@ -298,7 +318,7 @@ func (e *envParamsImpl) GetDatabaseDetails() (hostname, user, password, dbName s
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
-	password, err = e.GetEnv("SQL_PASSWORD", Default("postgres"), CaseSensitiveValue())
+	password, err = e.GetEnv("SQL_PASSWORD", Default("postgres"), CaseSensitiveValue(), Unset())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
@@ -329,7 +349,7 @@ func (e *envParamsImpl) GetRedisDetails() (hostname, port, password string, err 
 		return hostname, port, password,
 			fmt.Errorf("environment variable REDIS_PORT: %w", err)
 	}
-	password, err = e.GetEnv("REDIS_PASSWORD", CaseSensitiveValue())
+	password, err = e.GetEnv("REDIS_PASSWORD", CaseSensitiveValue(), Unset())
 	if err != nil {
 		return hostname, port, password, err
 	}
@@ -464,6 +484,6 @@ func (e *envParamsImpl) GetGotifyURL(setters ...GetEnvSetter) (url *liburl.URL, 
 // GetGotifyToken obtains the token for the app on the Gotify server
 // from the environment variable GOTIFY_TOKEN.
 func (e *envParamsImpl) GetGotifyToken(setters ...GetEnvSetter) (token string, err error) {
-	setters = append(setters, CaseSensitiveValue())
+	setters = append(setters, CaseSensitiveValue(), Unset())
 	return e.GetEnv("GOTIFY_TOKEN", setters...)
 }
