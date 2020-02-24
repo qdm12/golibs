@@ -294,15 +294,15 @@ func (e *envParamsImpl) GetDatabaseDetails() (hostname, user, password, dbName s
 		return hostname, user, password, dbName,
 			fmt.Errorf("Postgres parameters: hostname %q is not valid", hostname)
 	}
-	user, err = e.GetEnv("SQL_USER", Default("postgres"))
+	user, err = e.GetEnv("SQL_USER", Default("postgres"), CaseSensitiveValue())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
-	password, err = e.GetEnv("SQL_PASSWORD", Default("postgres"))
+	password, err = e.GetEnv("SQL_PASSWORD", Default("postgres"), CaseSensitiveValue())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
-	dbName, err = e.GetEnv("SQL_DBNAME", Default("postgres"))
+	dbName, err = e.GetEnv("SQL_DBNAME", Default("postgres"), CaseSensitiveValue())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
@@ -329,7 +329,7 @@ func (e *envParamsImpl) GetRedisDetails() (hostname, port, password string, err 
 		return hostname, port, password,
 			fmt.Errorf("environment variable REDIS_PORT: %w", err)
 	}
-	password, err = e.GetEnv("REDIS_PASSWORD")
+	password, err = e.GetEnv("REDIS_PASSWORD", CaseSensitiveValue())
 	if err != nil {
 		return hostname, port, password, err
 	}
@@ -464,5 +464,6 @@ func (e *envParamsImpl) GetGotifyURL(setters ...GetEnvSetter) (url *liburl.URL, 
 // GetGotifyToken obtains the token for the app on the Gotify server
 // from the environment variable GOTIFY_TOKEN.
 func (e *envParamsImpl) GetGotifyToken(setters ...GetEnvSetter) (token string, err error) {
+	setters = append(setters, CaseSensitiveValue())
 	return e.GetEnv("GOTIFY_TOKEN", setters...)
 }
