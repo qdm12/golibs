@@ -12,10 +12,15 @@ func (f *fileManager) GetOwnership(filePath string) (userID, groupID int, err er
 	if err != nil {
 		return 0, 0, fmt.Errorf("cannot get ownership: %w", err)
 	}
-	info.Mode()
 	stat, ok := info.Sys().(*syscall.Stat_t) // TODO change to use stat directly
 	if !ok {
 		return 0, 0, nil // Windows
 	}
 	return int(stat.Uid), int(stat.Gid), nil
+}
+
+// SetOwnership sets the ownership of a file or directory with
+// the user ID and group ID given.
+func (f *fileManager) SetOwnership(filePath string, userID, groupID int) error {
+	return f.chown(filePath, userID, groupID)
 }

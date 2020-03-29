@@ -184,6 +184,20 @@ func (_m *FileManager) ReadFile(filePath string) ([]byte, error) {
 	return r0, r1
 }
 
+// SetOwnership provides a mock function with given fields: filePath, userID, groupID
+func (_m *FileManager) SetOwnership(filePath string, userID int, groupID int) error {
+	ret := _m.Called(filePath, userID, groupID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, int, int) error); ok {
+		r0 = rf(filePath, userID, groupID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // SetUserPermissions provides a mock function with given fields: filepath, mod
 func (_m *FileManager) SetUserPermissions(filepath string, mod os.FileMode) error {
 	ret := _m.Called(filepath, mod)

@@ -11,6 +11,7 @@ type FileManager interface {
 	FileExists(filePath string) (exists bool, err error)
 	DirectoryExists(filePath string) (exists bool, err error)
 	GetOwnership(filePath string) (userID, groupID int, err error)
+	SetOwnership(filePath string, userID, groupID int) error
 	GetUserPermissions(filePath string) (read, write, execute bool, err error)
 	SetUserPermissions(filepath string, mod os.FileMode) error
 	ReadFile(filePath string) (data []byte, err error)
