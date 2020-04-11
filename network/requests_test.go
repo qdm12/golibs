@@ -58,7 +58,7 @@ func Test_DoHTTPRequest(t *testing.T) {
 			mockHTTPClient := NewMockHTTPClient(mockCtrl)
 			mockHTTPClient.EXPECT().Do(gomock.Any()).
 				Return(tc.response, tc.clientErr).Times(1)
-			c := &ClientImpl{
+			c := &client{
 				httpClient: mockHTTPClient,
 				readBody:   tc.readBody,
 			}
@@ -126,7 +126,7 @@ func Test_GetContent(t *testing.T) {
 				mockHTTPClient.EXPECT().Do(gomock.Any()).
 					Return(tc.response, tc.clientErr).Times(1)
 			}
-			c := &ClientImpl{
+			c := &client{
 				httpClient: mockHTTPClient,
 				readBody:   ioutil.ReadAll,
 				userAgents: []string{"abc"},

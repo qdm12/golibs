@@ -37,7 +37,7 @@ func Test_GetEnv(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -72,7 +72,7 @@ func Test_GetEnvInt(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -111,7 +111,7 @@ func Test_GetEnvIntRange(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -147,7 +147,7 @@ func Test_GetYesNo(t *testing.T) { //nolint:dupl
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -183,7 +183,7 @@ func Test_GetOnOff(t *testing.T) { //nolint:dupl
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -222,7 +222,7 @@ func Test_GetValueIfInside(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -259,7 +259,7 @@ func Test_GetDuration(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -296,7 +296,7 @@ func Test_GetHTTPTimeout(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -316,7 +316,7 @@ func Test_GetHTTPTimeout(t *testing.T) {
 func Test_GetUserID(t *testing.T) {
 	t.Parallel()
 	const expectedUID = 1
-	e := &envParamsImpl{
+	e := &envParams{
 		getuid: func() int {
 			return expectedUID
 		},
@@ -328,7 +328,7 @@ func Test_GetUserID(t *testing.T) {
 func Test_GetGroupID(t *testing.T) {
 	t.Parallel()
 	const expectedUID = 1
-	e := &envParamsImpl{
+	e := &envParams{
 		getgid: func() int {
 			return expectedUID
 		},
@@ -357,7 +357,7 @@ func Test_GetListeningPort(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			const expectedUID = 1000
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -398,7 +398,7 @@ func Test_GetRootURL(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -435,7 +435,7 @@ func Test_GetLoggerEncoding(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -472,7 +472,7 @@ func Test_GetLoggerLevel(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -507,7 +507,7 @@ func Test_GetNodeID(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -543,7 +543,7 @@ func Test_GetURL(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParamsImpl{
+			e := &envParams{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -566,7 +566,7 @@ func Test_GetURL(t *testing.T) {
 
 func Test_GetGotifyURLL(t *testing.T) {
 	t.Parallel()
-	e := &envParamsImpl{
+	e := &envParams{
 		getenv: func(key string) string {
 			return "https://google.com"
 		},
@@ -579,7 +579,7 @@ func Test_GetGotifyURLL(t *testing.T) {
 
 func Test_GetGotifyToken(t *testing.T) {
 	t.Parallel()
-	e := &envParamsImpl{
+	e := &envParams{
 		getenv: func(key string) string {
 			return "x"
 		},

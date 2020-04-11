@@ -22,8 +22,7 @@ type httpClient interface {
 	CloseIdleConnections()
 }
 
-// ClientImpl is the implementation for IClient
-type ClientImpl struct {
+type client struct {
 	httpClient httpClient
 	readBody   func(r io.Reader) ([]byte, error)
 	userAgents []string
@@ -32,7 +31,7 @@ type ClientImpl struct {
 
 // NewClient creates a new easy to use HTTP client
 func NewClient(timeout time.Duration) Client {
-	return &ClientImpl{
+	return &client{
 		httpClient: &http.Client{Timeout: timeout},
 		readBody:   ioutil.ReadAll,
 		userAgents: []string{
@@ -47,14 +46,14 @@ func NewClient(timeout time.Duration) Client {
 }
 
 // Close terminates idle connections of the HTTP client
-func (c *ClientImpl) Close() {
+func (c *client) Close() {
 	if c.httpClient != nil {
 		c.httpClient.CloseIdleConnections()
 	}
 }
 
 // DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
-func (c *ClientImpl) DoHTTPRequest(request *http.Request) (status int, content []byte, err error) {
+func (c *client) DoHTTPRequest(request *http.Request) (status int, content []byte, err error) {
 	response, err := c.httpClient.Do(request)
 	if response != nil {
 		defer response.Body.Close()
@@ -84,7 +83,7 @@ func UseRandomUserAgent() GetContentSetter {
 }
 
 // GetContent returns the content and eventual error from an HTTP GET to a given URL
-func (c *ClientImpl) GetContent(url string, setters ...GetContentSetter) (content []byte, status int, err error) {
+func (c *client) GetContent(url string, setters ...GetContentSetter) (content []byte, status int, err error) {
 	var options getContentOptions
 	for _, setter := range setters {
 		setter(&options)

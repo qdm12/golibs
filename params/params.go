@@ -42,7 +42,7 @@ type EnvParams interface {
 	GetGotifyToken(setters ...GetEnvSetter) (token string, err error)
 }
 
-type envParamsImpl struct {
+type envParams struct {
 	getenv     func(key string) string
 	getuid     func() int
 	getgid     func() int
@@ -53,7 +53,7 @@ type envParamsImpl struct {
 
 // NewEnvParams returns a new EnvParams object
 func NewEnvParams() EnvParams {
-	return &envParamsImpl{
+	return &envParams{
 		getenv:     os.Getenv,
 		getuid:     os.Getuid,
 		getgid:     os.Getgid,
@@ -113,7 +113,7 @@ func Unset() GetEnvSetter {
 
 // GetEnv returns the value stored for a named environment variable,
 // and a default if no value is found
-func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
+func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range setters {
 		if err := setter(&options); err != nil {
@@ -145,7 +145,7 @@ func (e *envParamsImpl) GetEnv(key string, setters ...GetEnvSetter) (value strin
 // GetEnvInt returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer, an error is returned.
-func (e *envParamsImpl) GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error) {
+func (e *envParams) GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return n, err
@@ -160,7 +160,7 @@ func (e *envParamsImpl) GetEnvInt(key string, setters ...GetEnvSetter) (n int, e
 // GetEnvIntRange returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer in the range specified, an error is returned.
-func (e *envParamsImpl) GetEnvIntRange(key string, lower, upper int, setters ...GetEnvSetter) (n int, err error) {
+func (e *envParams) GetEnvIntRange(key string, lower, upper int, setters ...GetEnvSetter) (n int, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return n, err
@@ -180,7 +180,7 @@ func (e *envParamsImpl) GetEnvIntRange(key string, lower, upper int, setters ...
 // if the value is 'no', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParamsImpl) GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err error) {
+func (e *envParams) GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return false, err
@@ -200,7 +200,7 @@ func (e *envParamsImpl) GetYesNo(key string, setters ...GetEnvSetter) (yes bool,
 // if the value is 'off', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParamsImpl) GetOnOff(key string, setters ...GetEnvSetter) (on bool, err error) {
+func (e *envParams) GetOnOff(key string, setters ...GetEnvSetter) (on bool, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return false, err
@@ -217,7 +217,7 @@ func (e *envParamsImpl) GetOnOff(key string, setters ...GetEnvSetter) (on bool, 
 
 // GetValueIfInside obtains the value stored for a named environment variable if it is part of a
 // list of possible values. You can optionally specify a defaultValue
-func (e *envParamsImpl) GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error) {
+func (e *envParams) GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range setters {
 		_ = setter(&options) // error is checked in e.GetEnv
@@ -238,7 +238,7 @@ func (e *envParamsImpl) GetValueIfInside(key string, possibilities []string, set
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.
-func (e *envParamsImpl) GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error) {
+func (e *envParams) GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return 0, err
@@ -260,23 +260,23 @@ func (e *envParamsImpl) GetDuration(key string, setters ...GetEnvSetter) (durati
 
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
 // from the environment variable HTTP_TIMEOUT
-func (e *envParamsImpl) GetHTTPTimeout(setters ...GetEnvSetter) (timeout time.Duration, err error) {
+func (e *envParams) GetHTTPTimeout(setters ...GetEnvSetter) (timeout time.Duration, err error) {
 	return e.GetDuration("HTTP_TIMEOUT", setters...)
 }
 
 // GetUserID obtains the user ID running the program
-func (e *envParamsImpl) GetUserID() int {
+func (e *envParams) GetUserID() int {
 	return e.getuid()
 }
 
 // GetGroupID obtains the user ID running the program
-func (e *envParamsImpl) GetGroupID() int {
+func (e *envParams) GetGroupID() int {
 	return e.getgid()
 }
 
 // GetListeningPort obtains and checks the listening port
 // from the environment variable LISTENING_PORT
-func (e *envParamsImpl) GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error) {
+func (e *envParams) GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error) {
 	setters = append([]GetEnvSetter{Default("8000")}, setters...)
 	listeningPort, err = e.GetEnv("LISTENING_PORT", setters...)
 	if err != nil {
@@ -289,7 +289,7 @@ func (e *envParamsImpl) GetListeningPort(setters ...GetEnvSetter) (listeningPort
 
 // GetRootURL obtains and checks the root URL
 // from the environment variable ROOT_URL
-func (e *envParamsImpl) GetRootURL(setters ...GetEnvSetter) (rootURL string, err error) {
+func (e *envParams) GetRootURL(setters ...GetEnvSetter) (rootURL string, err error) {
 	setters = append([]GetEnvSetter{Default("/")}, setters...)
 	rootURL, err = e.GetEnv("ROOT_URL", setters...)
 	if err != nil {
@@ -305,7 +305,7 @@ func (e *envParamsImpl) GetRootURL(setters ...GetEnvSetter) (rootURL string, err
 
 // GetDatabaseDetails obtains the SQL database details from the
 // environment variables SQL_USER, SQL_PASSWORD and SQL_DBNAME
-func (e *envParamsImpl) GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
+func (e *envParams) GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
 	hostname, err = e.GetEnv("SQL_HOST", Default("postgres"))
 	if err != nil {
 		return hostname, user, password, dbName, err
@@ -332,7 +332,7 @@ func (e *envParamsImpl) GetDatabaseDetails() (hostname, user, password, dbName s
 
 // GetRedisDetails obtains the Redis details from the
 // environment variables REDIS_HOST, REDIS_PORT and REDIS_PASSWORD
-func (e *envParamsImpl) GetRedisDetails() (hostname, port, password string, err error) {
+func (e *envParams) GetRedisDetails() (hostname, port, password string, err error) {
 	hostname, err = e.GetEnv("REDIS_HOST", Default("redis"))
 	if err != nil {
 		return hostname, port, password, err
@@ -357,7 +357,7 @@ func (e *envParamsImpl) GetRedisDetails() (hostname, port, password string, err 
 }
 
 // GetExeDir obtains the executable directory
-func (e *envParamsImpl) GetExeDir() (dir string, err error) {
+func (e *envParams) GetExeDir() (dir string, err error) {
 	ex, err := e.executable()
 	if err != nil {
 		return dir, err
@@ -370,7 +370,7 @@ func (e *envParamsImpl) GetExeDir() (dir string, err error) {
 // to key, and verifies it is valid. If it is a relative path,
 // it prepends it with the executable path to obtain an absolute path.
 // It uses defaultValue if no value is found
-func (e *envParamsImpl) GetPath(key string, setters ...GetEnvSetter) (path string, err error) {
+func (e *envParams) GetPath(key string, setters ...GetEnvSetter) (path string, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return "", err
@@ -386,7 +386,7 @@ func (e *envParamsImpl) GetPath(key string, setters ...GetEnvSetter) (path strin
 
 // GetLoggerConfig obtains configuration details for the logger
 // using the environment variables LOG_ENCODING, LOG_LEVEL and NODE_ID.
-func (e *envParamsImpl) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error) {
+func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error) {
 	encoding, err = e.GetLoggerEncoding()
 	if err != nil {
 		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
@@ -404,7 +404,7 @@ func (e *envParamsImpl) GetLoggerConfig() (encoding logging.Encoding, level logg
 
 // GetLoggerEncoding obtains the logging encoding
 // from the environment variable LOG_ENCODING
-func (e *envParamsImpl) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error) {
+func (e *envParams) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error) {
 	setters = append([]GetEnvSetter{Default("json")}, setters...)
 	s, err := e.GetEnv("LOG_ENCODING", setters...)
 	if err != nil {
@@ -421,7 +421,7 @@ func (e *envParamsImpl) GetLoggerEncoding(setters ...GetEnvSetter) (encoding log
 
 // GetLoggerLevel obtains the logging level
 // from the environment variable LOG_LEVEL
-func (e *envParamsImpl) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error) {
+func (e *envParams) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error) {
 	setters = append([]GetEnvSetter{Default("info")}, setters...)
 	s, err := e.GetEnv("LOG_LEVEL", setters...)
 	if err != nil {
@@ -441,7 +441,7 @@ func (e *envParamsImpl) GetLoggerLevel(setters ...GetEnvSetter) (level logging.L
 
 // GetNodeID obtains the node instance ID from the environment variable
 // NODE_ID
-func (e *envParamsImpl) GetNodeID(setters ...GetEnvSetter) (nodeID int, err error) {
+func (e *envParams) GetNodeID(setters ...GetEnvSetter) (nodeID int, err error) {
 	setters = append([]GetEnvSetter{Default("0")}, setters...)
 	s, err := e.GetEnv("NODE_ID", setters...)
 	if err != nil {
@@ -457,7 +457,7 @@ func (e *envParamsImpl) GetNodeID(setters ...GetEnvSetter) (nodeID int, err erro
 // GetURL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
-func (e *envParamsImpl) GetURL(key string, setters ...GetEnvSetter) (url *liburl.URL, err error) {
+func (e *envParams) GetURL(key string, setters ...GetEnvSetter) (url *liburl.URL, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return nil, err
@@ -477,13 +477,13 @@ func (e *envParamsImpl) GetURL(key string, setters ...GetEnvSetter) (url *liburl
 // GetGotifyURL obtains the URL for Gotify server
 // from the environment variable GOTIFY_URL.
 // It returns a nil URL if no value is found.
-func (e *envParamsImpl) GetGotifyURL(setters ...GetEnvSetter) (url *liburl.URL, err error) {
+func (e *envParams) GetGotifyURL(setters ...GetEnvSetter) (url *liburl.URL, err error) {
 	return e.GetURL("GOTIFY_URL", setters...)
 }
 
 // GetGotifyToken obtains the token for the app on the Gotify server
 // from the environment variable GOTIFY_TOKEN.
-func (e *envParamsImpl) GetGotifyToken(setters ...GetEnvSetter) (token string, err error) {
+func (e *envParams) GetGotifyToken(setters ...GetEnvSetter) (token string, err error) {
 	setters = append(setters, CaseSensitiveValue(), Unset())
 	return e.GetEnv("GOTIFY_TOKEN", setters...)
 }

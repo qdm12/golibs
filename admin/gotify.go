@@ -10,7 +10,7 @@ import (
 	"github.com/gotify/go-api-client/v2/auth"
 	"github.com/gotify/go-api-client/v2/client"
 	"github.com/gotify/go-api-client/v2/client/message"
-	"github.com/gotify/go-api-client/v2/gotify"
+	gotifylib "github.com/gotify/go-api-client/v2/gotify"
 	"github.com/gotify/go-api-client/v2/models"
 )
 
@@ -20,18 +20,18 @@ type Gotify interface {
 	Notify(title string, priority int, args ...interface{}) error
 }
 
-type gotifyImpl struct {
+type gotify struct {
 	client *client.GotifyREST
 	token  string
 }
 
 // NewGotify creates an API client with the token for the Gotify server
 func NewGotify(url liburl.URL, token string, httpClient *http.Client) Gotify {
-	client := gotify.NewClient(&url, httpClient)
-	return &gotifyImpl{client: client, token: token}
+	client := gotifylib.NewClient(&url, httpClient)
+	return &gotify{client: client, token: token}
 }
 
-func (g *gotifyImpl) Ping() error {
+func (g *gotify) Ping() error {
 	if _, err := g.client.Version.GetVersion(nil); err != nil {
 		return fmt.Errorf("cannot communicate with Gotify server: %w", err)
 	}
@@ -39,7 +39,7 @@ func (g *gotifyImpl) Ping() error {
 }
 
 // Notify sends a notification to the Gotify server
-func (g *gotifyImpl) Notify(title string, priority int, args ...interface{}) error {
+func (g *gotify) Notify(title string, priority int, args ...interface{}) error {
 	content := format.ArgsToString(args...)
 	params := message.NewCreateMessageParams()
 	params.Body = &models.MessageExternal{
