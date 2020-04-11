@@ -2,12 +2,11 @@
 
 *Golang libraries I use across my projects*
 
-<img height="250" src="https://github.com/qdm12/golibs/master/title.svg?sanitize=true">
+<img height="250" src="https://raw.githubusercontent.com/qdm12/golibs/master/title.svg?sanitize=true">
 
-[![Build status](https://github.com/qdm12/golibs/workflows/Buildx%20latest/badge.svg)](https://github.com/qdm12/golibs/actions?query=workflow%3A%22Buildx+latest%22)
-
-[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/golibs.svg)](https://github.com/qdm12/golibs/issues)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/golibs.svg)](https://github.com/qdm12/golibs/issues)
+[![Build status](https://github.com/qdm12/golibs/workflows/Docker%20build/badge.svg?branch=master)](https://github.com/qdm12/golibs/actions?query=workflow%3A"Docker+build")
+[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/golibs.svg)](https://github.com/qdm12/golibs/commits/master)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/golibs.svg)](https://github.com/qdm12/golibs/graphs/contributors)
 [![GitHub issues](https://img.shields.io/github/issues/qdm12/golibs.svg)](https://github.com/qdm12/golibs/issues)
 
 ## Setup
