@@ -2,7 +2,7 @@
 
 *Golang libraries I use across my projects*
 
-[![golibs](https://github.com/qdm12/golibs/raw/master/title.png)](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER)
+<img height="250" src="https://github.com/qdm12/golibs/master/title.svg?sanitize=true">
 
 [![Build Status](https://travis-ci.org/qdm12/golibs.svg?branch=master)](https://travis-ci.org/qdm12/golibs)
 
