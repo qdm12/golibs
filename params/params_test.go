@@ -128,7 +128,7 @@ func Test_GetEnvIntRange(t *testing.T) {
 	}
 }
 
-func Test_GetYesNo(t *testing.T) {
+func Test_GetYesNo(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		envValue string
@@ -164,7 +164,7 @@ func Test_GetYesNo(t *testing.T) {
 	}
 }
 
-func Test_GetOnOff(t *testing.T) {
+func Test_GetOnOff(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		envValue string

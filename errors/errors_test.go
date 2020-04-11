@@ -33,7 +33,7 @@ func Test_HTTPStatus(t *testing.T) {
 	}
 }
 
-func Test_NewInternal(t *testing.T) {
+func Test_NewInternal(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		args         []interface{}
@@ -51,7 +51,7 @@ func Test_NewInternal(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			var err error
+			var err error //nolint:gosimple
 			err = NewInternal(tc.args...)
 			assert.IsType(t, tc.expectedType, err)
 			assert.Equal(t, tc.errString, err.Error())
@@ -59,7 +59,7 @@ func Test_NewInternal(t *testing.T) {
 	}
 }
 
-func Test_NewBadRequest(t *testing.T) {
+func Test_NewBadRequest(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		args         []interface{}
@@ -77,7 +77,7 @@ func Test_NewBadRequest(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			var err error
+			var err error //nolint:gosimple
 			err = NewBadRequest(tc.args...)
 			assert.IsType(t, tc.expectedType, err)
 			assert.Equal(t, tc.errString, err.Error())
@@ -85,7 +85,7 @@ func Test_NewBadRequest(t *testing.T) {
 	}
 }
 
-func Test_NewNotFound(t *testing.T) {
+func Test_NewNotFound(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		args         []interface{}
@@ -103,7 +103,7 @@ func Test_NewNotFound(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			var err error
+			var err error //nolint:gosimple
 			err = NewNotFound(tc.args...)
 			assert.IsType(t, tc.expectedType, err)
 			assert.Equal(t, tc.errString, err.Error())
@@ -111,7 +111,7 @@ func Test_NewNotFound(t *testing.T) {
 	}
 }
 
-func Test_NewConflict(t *testing.T) {
+func Test_NewConflict(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		args         []interface{}
@@ -129,7 +129,7 @@ func Test_NewConflict(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			var err error
+			var err error //nolint:gosimple
 			err = NewConflict(tc.args...)
 			assert.IsType(t, tc.expectedType, err)
 			assert.Equal(t, tc.errString, err.Error())

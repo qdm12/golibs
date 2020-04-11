@@ -2,8 +2,9 @@ package format
 
 import (
 	"fmt"
-	"github.com/mr-tron/base58"
 	"strings"
+
+	"github.com/mr-tron/base58"
 )
 
 // ArgsToString converts arguments to a single string, using the first argument as a format if possible

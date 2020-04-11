@@ -28,7 +28,7 @@ func WrapDoErr(err error) error {
 
 // IsNil returns true if the reply is nil
 func IsNil(reply interface{}) bool {
-	switch reply.(type) {
+	switch reply.(type) { //nolint:gocritic
 	case nil:
 		return true
 	}

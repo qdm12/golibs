@@ -26,7 +26,7 @@ type crypto struct {
 
 func NewCrypto() Crypto {
 	return &crypto{
-		shakeHashFactory: func() sha3.ShakeHash { return sha3.NewShake256() },
+		shakeHashFactory: func() sha3.ShakeHash { return sha3.NewShake256() }, //nolint:gocritic
 		argon2ID:         argon2.IDKey,
 		random:           random.NewRandom(),
 	}
