@@ -36,6 +36,8 @@ Simply import one of the following libraries in your Go code:
 1. In Visual Studio Code, press on `F1` and select `Remote-Containers: Open Folder in Container...`
 1. Your dev environment is ready to go!... and it's running in a container :+1:
 
+Regenerate mocks for tests using `go generate ./....`
+
 ## TODOs
 
 - HTTP server/client unit tests

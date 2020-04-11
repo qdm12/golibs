@@ -3,6 +3,7 @@ module github.com/qdm12/golibs
 go 1.13
 
 require (
+	github.com/golang/mock v1.4.3
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gotify/go-api-client/v2 v2.0.4
 	github.com/mr-tron/base58 v1.1.3

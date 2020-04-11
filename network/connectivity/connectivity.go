@@ -1,20 +1,23 @@
-package network
+package connectivity
 
 import (
 	"fmt"
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/qdm12/golibs/network"
 )
 
 // Connectivity has methods to check Internet connectivity
+//go:generate mockgen -destination=mockClient_test.go -package=connectivity github.com/qdm12/golibs/network Client
 type Connectivity interface {
 	Checks(domains ...string) (errs []error)
 }
 
 type connectivity struct {
 	checkDNS checkDNSFunc
-	client   Client
+	client   network.Client
 }
 
 // NewConnectivity returns a new connectivity object
@@ -24,7 +27,7 @@ func NewConnectivity(timeout time.Duration) Connectivity {
 			_, err := net.LookupIP(domain)
 			return err
 		},
-		client: NewClient(timeout),
+		client: network.NewClient(timeout),
 	}
 }
 
@@ -46,7 +49,7 @@ func (c *connectivity) Checks(domains ...string) (errs []error) {
 	return errs
 }
 
-func connectivityCheck(domain string, checkDNS checkDNSFunc, client Client) (errs []error) {
+func connectivityCheck(domain string, checkDNS checkDNSFunc, client network.Client) (errs []error) {
 	chError := make(chan error)
 	go func() { chError <- domainNameResolutionCheck(domain, checkDNS) }()
 	go func() { chError <- httpGetCheck("http://"+domain, client) }()
@@ -60,7 +63,7 @@ func connectivityCheck(domain string, checkDNS checkDNSFunc, client Client) (err
 	return errs
 }
 
-func httpGetCheck(url string, client Client) error {
+func httpGetCheck(url string, client network.Client) error {
 	_, status, err := client.GetContent(url)
 	if err != nil {
 		return fmt.Errorf("HTTP GET failed for %s: %w", url, err)

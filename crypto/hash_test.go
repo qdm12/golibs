@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/sha3"
-
-	"github.com/qdm12/golibs/crypto/mocks"
 )
 
 func Test_Shake256(t *testing.T) {
@@ -46,6 +45,7 @@ func Test_Shake256(t *testing.T) {
 	}
 }
 
+//go:generate mockgen -destination=mockShakeHash_test.go -package=crypto golang.org/x/crypto/sha3 ShakeHash
 func Test_Shake256_Mocked(t *testing.T) {
 	t.Parallel()
 	type mockShakehashWrite struct {
@@ -105,14 +105,16 @@ func Test_Shake256_Mocked(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			mockShakeHash := &mocks.ShakeHash{}
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockShakeHash := NewMockShakeHash(mockCtrl)
 			if tc.shakehashWrite.call {
-				mockShakeHash.On("Write", tc.data).
-					Return(tc.shakehashWrite.n, tc.shakehashWrite.err).Once()
+				mockShakeHash.EXPECT().Write(tc.data).
+					Return(tc.shakehashWrite.n, tc.shakehashWrite.err).Times(1)
 			}
 			if tc.shakehashRead.call {
-				mockShakeHash.On("Read", make([]byte, shakeSum256DigestSize)).
-					Return(tc.shakehashRead.n, tc.shakehashRead.err).Once()
+				mockShakeHash.EXPECT().Read(make([]byte, shakeSum256DigestSize)).
+					Return(tc.shakehashRead.n, tc.shakehashRead.err).Times(1)
 			}
 			c := crypto{shakeHashFactory: func() sha3.ShakeHash { return mockShakeHash }}
 			digest, err := c.ShakeSum256(tc.data)
@@ -123,7 +125,6 @@ func Test_Shake256_Mocked(t *testing.T) {
 				assert.NoError(t, err)
 			}
 			assert.Equal(t, tc.digest, digest)
-			mockShakeHash.AssertExpectations(t)
 		})
 	}
 }

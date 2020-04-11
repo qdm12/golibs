@@ -1,9 +1,11 @@
-package network
+package connectivity
 
 import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,12 +33,14 @@ func Test_ConnectivityChecks(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			checkDNS := func(domain string) error { return tc.DNSErr }
-			mockClient := &MockClient{}
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockClient := NewMockClient(mockCtrl)
 			for _, domain := range tc.domains {
-				mockClient.On("GetContent", "http://"+domain).
-					Return(nil, 200, nil).Once()
-				mockClient.On("GetContent", "https://"+domain).
-					Return(nil, 200, nil).Once()
+				mockClient.EXPECT().GetContent("http://"+domain).
+					Return(nil, 200, nil).Times(1)
+				mockClient.EXPECT().GetContent("https://"+domain).
+					Return(nil, 200, nil).Times(1)
 			}
 			connectivity := &connectivity{
 				checkDNS: checkDNS,
@@ -52,7 +56,6 @@ func Test_ConnectivityChecks(t *testing.T) {
 				errsString = append(errsString, err.Error())
 			}
 			assert.ElementsMatch(t, expectedErrsString, errsString)
-			mockClient.AssertExpectations(t)
 		})
 	}
 }
@@ -76,11 +79,13 @@ func Test_connectivityCheck(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			checkDNS := func(domain string) error { return tc.DNSErr }
-			mockClient := &MockClient{}
-			mockClient.On("GetContent", "http://domain.com").
-				Return(nil, 200, tc.HTTPErr).Once()
-			mockClient.On("GetContent", "https://domain.com").
-				Return(nil, 200, tc.HTTPSErr).Once()
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockClient := NewMockClient(mockCtrl)
+			mockClient.EXPECT().GetContent("http://domain.com").
+				Return(nil, 200, tc.HTTPErr).Times(1)
+			mockClient.EXPECT().GetContent("https://domain.com").
+				Return(nil, 200, tc.HTTPSErr).Times(1)
 			errs := connectivityCheck("domain.com", checkDNS, mockClient)
 			expectedErrsString := []string{}
 			for _, err := range tc.errs {
@@ -91,7 +96,6 @@ func Test_connectivityCheck(t *testing.T) {
 				errsString = append(errsString, err.Error())
 			}
 			assert.ElementsMatch(t, expectedErrsString, errsString)
-			mockClient.AssertExpectations(t)
 		})
 	}
 }
@@ -111,9 +115,11 @@ func Test_httpGetCheck(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			mockClient := &MockClient{}
-			mockClient.On("GetContent", "https://domain.com").
-				Return(nil, tc.getContentStatus, tc.getContentErr).Once()
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockClient := NewMockClient(mockCtrl)
+			mockClient.EXPECT().GetContent("https://domain.com").
+				Return(nil, tc.getContentStatus, tc.getContentErr).Times(1)
 			err := httpGetCheck("https://domain.com", mockClient)
 			if tc.err != nil {
 				require.Error(t, err)
@@ -121,7 +127,6 @@ func Test_httpGetCheck(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
-			mockClient.AssertExpectations(t)
 		})
 	}
 }

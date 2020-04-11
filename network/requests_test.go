@@ -3,15 +3,16 @@ package network
 import (
 	"bytes"
 	"fmt"
-	"github.com/qdm12/golibs/crypto/random"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/golang/mock/gomock"
+	"github.com/qdm12/golibs/crypto/random"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_NewClient(t *testing.T) {
@@ -52,9 +53,11 @@ func Test_DoHTTPRequest(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			mockHTTPClient := &mockHttpClient{}
-			mockHTTPClient.On("Do", mock.Anything).
-				Return(tc.response, tc.clientErr).Once()
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockHTTPClient := NewMockHTTPClient(mockCtrl)
+			mockHTTPClient.EXPECT().Do(gomock.Any()).
+				Return(tc.response, tc.clientErr).Times(1)
 			c := &ClientImpl{
 				httpClient: mockHTTPClient,
 				readBody:   tc.readBody,
@@ -68,7 +71,6 @@ func Test_DoHTTPRequest(t *testing.T) {
 			}
 			assert.Equal(t, tc.status, status)
 			assert.Equal(t, tc.content, content)
-			mockHTTPClient.AssertExpectations(t)
 		})
 	}
 }
@@ -103,7 +105,7 @@ func Test_GetContent(t *testing.T) {
 			nil,
 			nil,
 			nil,
-			nil, 0, fmt.Errorf("cannot GET content of URL \n: parse \n: net/url: invalid control character in URL")},
+			nil, 0, fmt.Errorf("cannot GET content of URL \n: parse \"\\n\": net/url: invalid control character in URL")},
 		"set random user agent": {
 			"https://domain.com",
 			[]GetContentSetter{UseRandomUserAgent()},
@@ -117,10 +119,12 @@ func Test_GetContent(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			mockHTTPClient := &mockHttpClient{}
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
+			mockHTTPClient := NewMockHTTPClient(mockCtrl)
 			if tc.clientErr != nil || (tc.response != nil && tc.response.Body != nil) {
-				mockHTTPClient.On("Do", mock.Anything).
-					Return(tc.response, tc.clientErr).Once()
+				mockHTTPClient.EXPECT().Do(gomock.Any()).
+					Return(tc.response, tc.clientErr).Times(1)
 			}
 			c := &ClientImpl{
 				httpClient: mockHTTPClient,
@@ -137,7 +141,6 @@ func Test_GetContent(t *testing.T) {
 			}
 			assert.Equal(t, tc.status, status)
 			assert.Equal(t, tc.content, content)
-			mockHTTPClient.AssertExpectations(t)
 		})
 	}
 }
