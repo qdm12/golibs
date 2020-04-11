@@ -28,15 +28,49 @@ Simply import one of the following libraries in your Go code:
 
 ## Development
 
-### Using VSCode and Docker
+1. Setup your environment
 
-1. Install [Docker](https://docs.docker.com/install/)
-    - On Windows, share a drive with Docker Desktop and have the project on that partition
-1. With [Visual Studio Code](https://code.visualstudio.com/download), install the [remote containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-1. In Visual Studio Code, press on `F1` and select `Remote-Containers: Open Folder in Container...`
-1. Your dev environment is ready to go!... and it's running in a container :+1:
+    <details><summary>Using VSCode and Docker (easier)</summary><p>
 
-Regenerate mocks for tests using `go generate ./....`
+    1. Install [Docker](https://docs.docker.com/install/)
+       - On Windows, share a drive with Docker Desktop and have the project on that partition
+       - On OSX, share your project directory with Docker Desktop
+    1. With [Visual Studio Code](https://code.visualstudio.com/download), install the [remote containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+    1. In Visual Studio Code, press on `F1` and select `Remote-Containers: Open Folder in Container...`
+    1. Your dev environment is ready to go!... and it's running in a container :+1: So you can discard it and update it easily!
+
+    </p></details>
+
+    <details><summary>Locally</summary><p>
+
+    1. Install [Go](https://golang.org/dl/), [Docker](https://www.docker.com/products/docker-desktop) and [Git](https://git-scm.com/downloads)
+    1. Install Go dependencies with
+
+        ```sh
+        go mod download
+        ```
+
+    1. Install [golangci-lint](https://github.com/golangci/golangci-lint#install)
+    1. You might want to use an editor such as [Visual Studio Code](https://code.visualstudio.com/download) with the [Go extension](https://code.visualstudio.com/docs/languages/go). Working settings are already in [.vscode/settings.json](https://github.com/qdm12/golibs/master/.vscode/settings.json).
+
+    </p></details>
+
+1. Commands available:
+
+    ```sh
+    # Build the binary
+    go build cmd/app/main.go
+    # Test the code
+    go test ./...
+    # Regenerate mocks for tests
+    go generate ./...
+    # Lint the code
+    golangci-lint run
+    # Build the Docker image to run tests and linting
+    docker build .
+    ```
+
+1. See [Contributing](https://github.com/qdm12/golibs/master/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
 
 ## TODOs
 
