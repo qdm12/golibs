@@ -4,7 +4,7 @@
 
 <img height="250" src="https://github.com/qdm12/golibs/master/title.svg?sanitize=true">
 
-[![Build Status](https://travis-ci.org/qdm12/golibs.svg?branch=master)](https://travis-ci.org/qdm12/golibs)
+[![Build status](https://github.com/qdm12/golibs/workflows/Buildx%20latest/badge.svg)](https://github.com/qdm12/golibs/actions?query=workflow%3A%22Buildx+latest%22)
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/golibs.svg)](https://github.com/qdm12/golibs/issues)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/golibs.svg)](https://github.com/qdm12/golibs/issues)
