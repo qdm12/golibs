@@ -19,7 +19,7 @@ type Logger interface {
 
 type logger struct {
 	prefix    string
-	zapLogger *zap.Logger
+	zapLogger Zap
 }
 
 func NewLogger(encoding Encoding, level Level, nodeID int) (l Logger, err error) {
