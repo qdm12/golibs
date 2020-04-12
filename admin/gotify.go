@@ -17,7 +17,9 @@ import (
 // Gotify is a Gotify client
 //go:generate mockgen -destination=mock_admin/gotify.go . Gotify
 type Gotify interface {
+	// Ping obtains silently the version from the Gotify server and returns an error on failure
 	Ping() error
+	// Notify formats and sends a message to the Gotify server
 	Notify(title string, priority int, args ...interface{}) error
 }
 
@@ -32,6 +34,7 @@ func NewGotify(url liburl.URL, token string, httpClient *http.Client) Gotify {
 	return &gotify{client: client, token: token}
 }
 
+// Ping obtains silently the version from the Gotify server and returns an error on failure
 func (g *gotify) Ping() error {
 	if _, err := g.client.Version.GetVersion(nil); err != nil {
 		return fmt.Errorf("cannot communicate with Gotify server: %w", err)
@@ -39,7 +42,7 @@ func (g *gotify) Ping() error {
 	return nil
 }
 
-// Notify sends a notification to the Gotify server
+// Notify formats and sends a message to the Gotify server
 func (g *gotify) Notify(title string, priority int, args ...interface{}) error {
 	content := format.ArgsToString(args...)
 	params := message.NewCreateMessageParams()

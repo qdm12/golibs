@@ -15,6 +15,7 @@ type Logger interface {
 	Info(args ...interface{})
 	Warn(args ...interface{})
 	Error(args ...interface{})
+	// WithPrefix returns another logger that will use the prefix given for all logging operations
 	WithPrefix(prefix string) Logger
 }
 

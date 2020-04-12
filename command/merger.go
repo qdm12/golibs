@@ -7,6 +7,8 @@ import (
 	"io"
 )
 
+// StreamMerger contains methods to merge some IO streams and process them line by line.
+// It was designed to use for processing the outputs of multiple programs in a single goroutine.
 //go:generate mockgen -destination=mock_command/streammerger.go . StreamMerger
 type StreamMerger interface {
 	// Merge merges the given stream with the given name to the CollectLines method, and should be run in a goroutine

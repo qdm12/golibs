@@ -6,9 +6,12 @@ import (
 	"strings"
 )
 
+// Commander contains methods to run and start shell commands
 //go:generate mockgen -destination=mock_command/commander.go . Commander
 type Commander interface {
+	// Run runs a command in a blocking manner, returning its output and an error if it failed
 	Run(name string, arg ...string) (output string, err error)
+	// Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function
 	Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)
 }
 
@@ -22,6 +25,7 @@ func NewCommander() Commander {
 	}
 }
 
+// Run runs a command in a blocking manner, returning its output and an error if it failed
 func (c *commander) Run(name string, arg ...string) (output string, err error) {
 	cmd := c.execCommand(name, arg...)
 	stdout, err := cmd.CombinedOutput()
@@ -36,6 +40,7 @@ func (c *commander) Run(name string, arg ...string) (output string, err error) {
 	return output, err
 }
 
+// Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function
 func (c *commander) Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error) {
 	cmd := c.execCommand(name, arg...)
 	stdout, err := cmd.StdoutPipe()

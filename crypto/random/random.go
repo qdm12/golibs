@@ -21,10 +21,15 @@ const (
 // Random has methods to generate random values
 //go:generate mockgen -destination=mock_random/random.go . Random
 type Random interface {
+	// GenerateRandomBytes generates a byte slice of n random bytes
 	GenerateRandomBytes(n int) ([]byte, error)
+	// GenerateRandomInt63 generates a random 64 bits signed integer
 	GenerateRandomInt63() int64
+	// GenerateRandomInt generates a random signed integer
 	GenerateRandomInt(n int) int
-	GenerateRandomAlphaNum(length uint64) string
+	// GenerateRandomAlphaNum generates a random alphanumeric string of n characters
+	GenerateRandomAlphaNum(n uint64) string
+	// GenerateRandomNum generates a random numeric string of n characters
 	GenerateRandomNum(n uint64) string
 }
 

@@ -12,6 +12,8 @@ import (
 // Connectivity has methods to check Internet connectivity
 //go:generate mockgen -destination=mock_connectivity/connectivity.go . Connectivity
 type Connectivity interface {
+	// Checks runs a DNS lookup, HTTP and HTTPs requests to all the domains given.
+	// It returns any error encountered when doing so.
 	Checks(domains ...string) (errs []error)
 }
 

@@ -7,15 +7,24 @@ import (
 	"github.com/qdm12/golibs/crypto/random"
 )
 
+// Crypto contains methods to run cryptographic operations
 //go:generate mockgen -destination=mock_crypto/crypto.go . Crypto
 type Crypto interface {
+	// EncryptAES256 uses the AES algorithm with a 256 bits key to encrypt a plaintext and returns a ciphertext
 	EncryptAES256(plaintext []byte, key [32]byte) (ciphertext []byte, err error)
+	// DecryptAES256 uses the AES algorithm with a 256 bits key to decrypt a ciphertext and returns a plaintext
 	DecryptAES256(ciphertext []byte, key [32]byte) (plaintext []byte, err error)
+	// ShakeSum256 uses the SHA3 Shake Hash 256 algorithm to produce a 512 bits digest from some data
 	ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, err error)
+	// Argon2ID uses the Argon2ID hash algorithm to produce a 512 bits digest from some data
 	Argon2ID(data []byte, time, memory uint32) (digest [argon2IDDigestSize]byte)
+	// Checksumize adds a checksum to some data using the SHA2 256 algorithm
 	Checksumize(data []byte) (checksumedData []byte, err error)
+	// Dehecksumize verifies the checksum matches the data and removes it if so, it uses the SHA2 256 algorithm
 	Dechecksumize(checksumData []byte) (data []byte, err error)
+	// SignEd25519 signs a message with a 512 bits signing key and returns the signature
 	SignEd25519(message []byte, signingKey [signKeySize]byte) (signature []byte)
+	// NewSalt generates a random 256 bits salt
 	NewSalt() (salt [saltSize]byte, err error)
 }
 
