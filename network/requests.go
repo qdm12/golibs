@@ -11,6 +11,7 @@ import (
 )
 
 // Client has methods to do HTTP requests as a client
+//go:generate mockgen -destination=mock_network/client.go . Client
 type Client interface {
 	DoHTTPRequest(request *http.Request) (status int, content []byte, err error)
 	GetContent(URL string, setters ...GetContentSetter) (content []byte, status int, err error)

@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+//go:generate mockgen -destination=mock_logging/logger.go . Logger
 type Logger interface {
 	// Sync synchronizes the buffer to ensure everything is printed out
 	Sync() error

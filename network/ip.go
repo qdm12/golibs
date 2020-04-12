@@ -10,6 +10,7 @@ import (
 	"github.com/qdm12/golibs/verification"
 )
 
+//go:generate mockgen -destination=mock_network/ip.go . IPManager
 type IPManager interface {
 	GetClientIPHeaders(r *http.Request) (headers IPHeaders)
 	GetClientIP(r *http.Request) (ip string, err error)

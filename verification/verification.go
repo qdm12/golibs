@@ -2,6 +2,7 @@ package verification
 
 import "net"
 
+//go:generate mockgen -destination=mock_verification/verifier.go . Verifier
 type Verifier interface {
 	VerifyPort(port string) error
 	ValidateEmail(email string) error

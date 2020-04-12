@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+//go:generate mockgen -destination=mock_command/commander.go . Commander
 type Commander interface {
 	Run(name string, arg ...string) (output string, err error)
 	Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)

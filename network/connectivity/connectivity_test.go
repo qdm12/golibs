@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
+	"github.com/qdm12/golibs/network/mock_network"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,7 +36,7 @@ func Test_ConnectivityChecks(t *testing.T) {
 			checkDNS := func(domain string) error { return tc.DNSErr }
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
-			mockClient := NewMockClient(mockCtrl)
+			mockClient := mock_network.NewMockClient(mockCtrl)
 			for _, domain := range tc.domains {
 				mockClient.EXPECT().GetContent("http://"+domain).
 					Return(nil, 200, nil).Times(1)
@@ -81,7 +82,7 @@ func Test_connectivityCheck(t *testing.T) {
 			checkDNS := func(domain string) error { return tc.DNSErr }
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
-			mockClient := NewMockClient(mockCtrl)
+			mockClient := mock_network.NewMockClient(mockCtrl)
 			mockClient.EXPECT().GetContent("http://domain.com").
 				Return(nil, 200, tc.HTTPErr).Times(1)
 			mockClient.EXPECT().GetContent("https://domain.com").
@@ -117,7 +118,7 @@ func Test_httpGetCheck(t *testing.T) {
 			t.Parallel()
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
-			mockClient := NewMockClient(mockCtrl)
+			mockClient := mock_network.NewMockClient(mockCtrl)
 			mockClient.EXPECT().GetContent("https://domain.com").
 				Return(nil, tc.getContentStatus, tc.getContentErr).Times(1)
 			err := httpGetCheck("https://domain.com", mockClient)

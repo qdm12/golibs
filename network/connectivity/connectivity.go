@@ -10,7 +10,7 @@ import (
 )
 
 // Connectivity has methods to check Internet connectivity
-//go:generate mockgen -destination=mockClient_test.go -package=connectivity github.com/qdm12/golibs/network Client
+//go:generate mockgen -destination=mock_connectivity/connectivity.go . Connectivity
 type Connectivity interface {
 	Checks(domains ...string) (errs []error)
 }

@@ -25,6 +25,14 @@ Simply import one of the following libraries in your Go code:
 - `"github.com/qdm12/golibs/signals"` for termination signal catching for a graceful shutdown of the application
 - `"github.com/qdm12/golibs/verification"` for verification functions such as email checking or regex based checking.
 
+For each package, some mocks are generated using [mockgen](https://github.com/golang/mock#running-mockgen) and can be imported with, for example
+
+```go
+import github.com/qdm12/golibs/verification/mock_verification
+```
+
+and used with [gomock](https://github.com/golang/mock#building-mocks) for testing.
+
 ## Development
 
 1. Setup your environment

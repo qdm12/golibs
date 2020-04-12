@@ -7,6 +7,7 @@ import (
 	"github.com/qdm12/golibs/crypto/random"
 )
 
+//go:generate mockgen -destination=mock_crypto/crypto.go . Crypto
 type Crypto interface {
 	EncryptAES256(plaintext []byte, key [32]byte) (ciphertext []byte, err error)
 	DecryptAES256(ciphertext []byte, key [32]byte) (plaintext []byte, err error)

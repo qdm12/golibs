@@ -19,6 +19,7 @@ const (
 )
 
 // Random has methods to generate random values
+//go:generate mockgen -destination=mock_random/random.go . Random
 type Random interface {
 	GenerateRandomBytes(n int) ([]byte, error)
 	GenerateRandomInt63() int64

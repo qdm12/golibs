@@ -15,6 +15,7 @@ import (
 )
 
 // Gotify is a Gotify client
+//go:generate mockgen -destination=mock_admin/gotify.go . Gotify
 type Gotify interface {
 	Ping() error
 	Notify(title string, priority int, args ...interface{}) error

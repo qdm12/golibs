@@ -16,6 +16,7 @@ import (
 )
 
 // EnvParams has functions to obtain values from environment variables
+//go:generate mockgen -destination=mock_params/envparams.go . EnvParams
 type EnvParams interface {
 	GetEnv(key string, setters ...GetEnvSetter) (value string, err error)
 	GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error)

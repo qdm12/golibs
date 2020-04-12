@@ -7,6 +7,7 @@ import (
 	"io"
 )
 
+//go:generate mockgen -destination=mock_command/streammerger.go . StreamMerger
 type StreamMerger interface {
 	// Merge merges the given stream with the given name to the CollectLines method, and should be run in a goroutine
 	Merge(name string, stream io.ReadCloser)
