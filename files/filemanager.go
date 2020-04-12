@@ -19,6 +19,7 @@ type FileManager interface {
 	Touch(filePath string, setters ...WriteOptionSetter) error
 	WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error
 	CreateDir(filePath string, setters ...WriteOptionSetter) error
+	Remove(filePath string) (err error)
 }
 
 type fileManager struct {
@@ -30,6 +31,7 @@ type fileManager struct {
 	writeFile   func(filename string, data []byte, perm os.FileMode) error
 	chown       func(name string, uid int, gid int) error
 	chmod       func(name string, mod os.FileMode) error
+	rm          func(path string) error
 }
 
 func NewFileManager() FileManager {
@@ -42,5 +44,6 @@ func NewFileManager() FileManager {
 		writeFile:   ioutil.WriteFile,
 		chown:       os.Chown,
 		chmod:       os.Chmod,
+		rm:          os.RemoveAll,
 	}
 }
