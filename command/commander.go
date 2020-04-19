@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"io"
 	"os/exec"
 	"strings"
@@ -10,24 +11,24 @@ import (
 //go:generate mockgen -destination=mock_command/commander.go . Commander
 type Commander interface {
 	// Run runs a command in a blocking manner, returning its output and an error if it failed
-	Run(name string, arg ...string) (output string, err error)
+	Run(ctx context.Context, name string, arg ...string) (output string, err error)
 	// Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function
-	Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)
+	Start(ctx context.Context, name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)
 }
 
 type commander struct {
-	execCommand func(name string, arg ...string) *exec.Cmd
+	execCommand func(ctx context.Context, name string, arg ...string) *exec.Cmd
 }
 
 func NewCommander() Commander {
 	return &commander{
-		execCommand: exec.Command,
+		execCommand: exec.CommandContext,
 	}
 }
 
 // Run runs a command in a blocking manner, returning its output and an error if it failed
-func (c *commander) Run(name string, arg ...string) (output string, err error) {
-	cmd := c.execCommand(name, arg...)
+func (c *commander) Run(ctx context.Context, name string, arg ...string) (output string, err error) {
+	cmd := c.execCommand(ctx, name, arg...)
 	stdout, err := cmd.CombinedOutput()
 	output = string(stdout)
 	output = strings.TrimSuffix(output, "\n")
@@ -41,8 +42,8 @@ func (c *commander) Run(name string, arg ...string) (output string, err error) {
 }
 
 // Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function
-func (c *commander) Start(name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error) {
-	cmd := c.execCommand(name, arg...)
+func (c *commander) Start(ctx context.Context, name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error) {
+	cmd := c.execCommand(ctx, name, arg...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return nil, nil, nil, err
