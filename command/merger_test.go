@@ -13,17 +13,17 @@ import (
 
 func Test_StreamMerger(t *testing.T) {
 	t.Parallel()
-	const wait = 30 * time.Millisecond
+	const wait = 100 * time.Millisecond
 	ctx, cancel := context.WithCancel(context.Background())
 	streamMerger := NewStreamMerger(ctx)
 	streamA := ioutil.NopCloser(strings.NewReader("1\n2\n"))
 	streamB := ioutil.NopCloser(strings.NewReader("3\n"))
 	streamC := ioutil.NopCloser(strings.NewReader("4"))
 	streamD := ioutil.NopCloser(strings.NewReader("5"))
-	go streamMerger.Merge("A", streamA)
-	go streamMerger.Merge("B", streamB)
-	go streamMerger.Merge("C", streamC)
-	go streamMerger.Merge("D", streamD)
+	go streamMerger.Merge(streamA, MergeName("A"))
+	go streamMerger.Merge(streamB, MergeName("B"))
+	go streamMerger.Merge(streamC, MergeName("C"))
+	go streamMerger.Merge(streamD, MergeName("D"))
 
 	start := time.Now()
 	time.AfterFunc(wait, cancel)
