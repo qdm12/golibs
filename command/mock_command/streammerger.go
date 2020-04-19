@@ -6,6 +6,7 @@ package mock_command
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	command "github.com/qdm12/golibs/command"
 	io "io"
 	reflect "reflect"
 )
@@ -48,13 +49,18 @@ func (mr *MockStreamMergerMockRecorder) CollectLines(arg0 interface{}) *gomock.C
 }
 
 // Merge mocks base method
-func (m *MockStreamMerger) Merge(arg0 string, arg1 io.ReadCloser) {
+func (m *MockStreamMerger) Merge(arg0 io.ReadCloser, arg1 ...command.MergeOptionSetter) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Merge", arg0, arg1)
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "Merge", varargs...)
 }
 
 // Merge indicates an expected call of Merge
-func (mr *MockStreamMergerMockRecorder) Merge(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockStreamMergerMockRecorder) Merge(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Merge", reflect.TypeOf((*MockStreamMerger)(nil).Merge), arg0, arg1)
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Merge", reflect.TypeOf((*MockStreamMerger)(nil).Merge), varargs...)
 }
