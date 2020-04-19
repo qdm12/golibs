@@ -91,8 +91,6 @@ func (s *streamMerger) Merge(stream io.ReadCloser, setters ...MergeOptionSetter)
 func (s *streamMerger) CollectLines(onNewLine func(line string)) error {
 	defer func() {
 		s.cancel() // stops other streams
-		close(s.chLine)
-		close(s.chErr)
 	}()
 	for {
 		select {
