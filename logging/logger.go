@@ -3,6 +3,7 @@ package logging
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -21,6 +22,7 @@ type Logger interface {
 
 type logger struct {
 	prefix    string
+	color     *color.Color
 	zapLogger Zap
 }
 
@@ -73,5 +75,11 @@ func (l *logger) WithPrefix(prefix string) Logger {
 	return &logger{
 		prefix:    l.prefix + prefix,
 		zapLogger: l.zapLogger,
+	}
+}
+
+func (l *logger) WithColor(color *color.Color) Logger {
+	return &logger{
+		color: color,
 	}
 }
