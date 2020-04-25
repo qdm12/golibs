@@ -222,6 +222,21 @@ func (mr *MockFileManagerMockRecorder) IsDirectory(arg0 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsDirectory", reflect.TypeOf((*MockFileManager)(nil).IsDirectory), arg0)
 }
 
+// IsExecutable mocks base method
+func (m *MockFileManager) IsExecutable(arg0 string, arg1, arg2 int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsExecutable", arg0, arg1, arg2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsExecutable indicates an expected call of IsExecutable
+func (mr *MockFileManagerMockRecorder) IsExecutable(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsExecutable", reflect.TypeOf((*MockFileManager)(nil).IsExecutable), arg0, arg1, arg2)
+}
+
 // IsFile mocks base method
 func (m *MockFileManager) IsFile(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -235,6 +250,36 @@ func (m *MockFileManager) IsFile(arg0 string) (bool, error) {
 func (mr *MockFileManagerMockRecorder) IsFile(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFile", reflect.TypeOf((*MockFileManager)(nil).IsFile), arg0)
+}
+
+// IsReadable mocks base method
+func (m *MockFileManager) IsReadable(arg0 string, arg1, arg2 int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsReadable", arg0, arg1, arg2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsReadable indicates an expected call of IsReadable
+func (mr *MockFileManagerMockRecorder) IsReadable(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsReadable", reflect.TypeOf((*MockFileManager)(nil).IsReadable), arg0, arg1, arg2)
+}
+
+// IsWritable mocks base method
+func (m *MockFileManager) IsWritable(arg0 string, arg1, arg2 int) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsWritable", arg0, arg1, arg2)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsWritable indicates an expected call of IsWritable
+func (mr *MockFileManagerMockRecorder) IsWritable(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsWritable", reflect.TypeOf((*MockFileManager)(nil).IsWritable), arg0, arg1, arg2)
 }
 
 // ReadFile mocks base method

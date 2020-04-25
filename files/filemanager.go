@@ -49,6 +49,9 @@ type FileManager interface {
 	CopyFile(fromPath, toPath string) (err error)
 	// CopySymLink copies a symlink to another path
 	CopySymLink(fromPath, toPath string) error
+	IsReadable(filePath string, uid, gid int) (readable bool, err error)
+	IsWritable(filePath string, uid, gid int) (writable bool, err error)
+	IsExecutable(filePath string, uid, gid int) (executable bool, err error)
 }
 
 type fileManager struct {
