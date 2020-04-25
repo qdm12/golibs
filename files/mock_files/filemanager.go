@@ -34,6 +34,48 @@ func (m *MockFileManager) EXPECT() *MockFileManagerMockRecorder {
 	return m.recorder
 }
 
+// CopyDirectory mocks base method
+func (m *MockFileManager) CopyDirectory(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CopyDirectory", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CopyDirectory indicates an expected call of CopyDirectory
+func (mr *MockFileManagerMockRecorder) CopyDirectory(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyDirectory", reflect.TypeOf((*MockFileManager)(nil).CopyDirectory), arg0, arg1)
+}
+
+// CopyFile mocks base method
+func (m *MockFileManager) CopyFile(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CopyFile", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CopyFile indicates an expected call of CopyFile
+func (mr *MockFileManagerMockRecorder) CopyFile(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyFile", reflect.TypeOf((*MockFileManager)(nil).CopyFile), arg0, arg1)
+}
+
+// CopySymLink mocks base method
+func (m *MockFileManager) CopySymLink(arg0, arg1 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CopySymLink", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CopySymLink indicates an expected call of CopySymLink
+func (mr *MockFileManagerMockRecorder) CopySymLink(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopySymLink", reflect.TypeOf((*MockFileManager)(nil).CopySymLink), arg0, arg1)
+}
+
 // CreateDir mocks base method
 func (m *MockFileManager) CreateDir(arg0 string, arg1 ...files.WriteOptionSetter) error {
 	m.ctrl.T.Helper()

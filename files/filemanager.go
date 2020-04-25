@@ -43,6 +43,12 @@ type FileManager interface {
 	IsFile(filePath string) (bool, error)
 	// IsDirectory returns true if the path points to a directory
 	IsDirectory(filePath string) (bool, error)
+	// CopyDirectory copies all files, directories and symlinks recursively to another path
+	CopyDirectory(fromPath, toPath string) error
+	// CopyFile copies a file from a path to another path
+	CopyFile(fromPath, toPath string) (err error)
+	// CopySymLink copies a symlink to another path
+	CopySymLink(fromPath, toPath string) error
 }
 
 type fileManager struct {
@@ -55,6 +61,11 @@ type fileManager struct {
 	chown       func(name string, uid int, gid int) error
 	chmod       func(name string, mod os.FileMode) error
 	rm          func(path string) error
+	create      func(name string) (*os.File, error)
+	open        func(name string) (*os.File, error)
+	readlink    func(name string) (string, error)
+	symlink     func(oldName, newName string) error
+	readDir     func(dirname string) ([]os.FileInfo, error)
 }
 
 func NewFileManager() FileManager {
@@ -68,5 +79,10 @@ func NewFileManager() FileManager {
 		chown:       os.Chown,
 		chmod:       os.Chmod,
 		rm:          os.RemoveAll,
+		create:      os.Create,
+		open:        os.Open,
+		readlink:    os.Readlink,
+		symlink:     os.Symlink,
+		readDir:     ioutil.ReadDir,
 	}
 }
