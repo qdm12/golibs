@@ -165,6 +165,36 @@ func (mr *MockFileManagerMockRecorder) GetUserPermissions(arg0 interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserPermissions", reflect.TypeOf((*MockFileManager)(nil).GetUserPermissions), arg0)
 }
 
+// IsDirectory mocks base method
+func (m *MockFileManager) IsDirectory(arg0 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsDirectory", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsDirectory indicates an expected call of IsDirectory
+func (mr *MockFileManagerMockRecorder) IsDirectory(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsDirectory", reflect.TypeOf((*MockFileManager)(nil).IsDirectory), arg0)
+}
+
+// IsFile mocks base method
+func (m *MockFileManager) IsFile(arg0 string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsFile", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsFile indicates an expected call of IsFile
+func (mr *MockFileManagerMockRecorder) IsFile(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFile", reflect.TypeOf((*MockFileManager)(nil).IsFile), arg0)
+}
+
 // ReadFile mocks base method
 func (m *MockFileManager) ReadFile(arg0 string) ([]byte, error) {
 	m.ctrl.T.Helper()

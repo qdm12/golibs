@@ -39,6 +39,10 @@ type FileManager interface {
 	CreateDir(filePath string, setters ...WriteOptionSetter) error
 	// Remove removes a file or directory at the file path specified
 	Remove(filePath string) (err error)
+	// IsFile returns true if the path points to a file
+	IsFile(filePath string) (bool, error)
+	// IsDirectory returns true if the path points to a directory
+	IsDirectory(filePath string) (bool, error)
 }
 
 type fileManager struct {
