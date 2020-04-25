@@ -21,6 +21,10 @@ type FileManager interface {
 	SetOwnership(filePath string, userID, groupID int) error
 	// GetUserPermissions obtains the permissions for a file or directory
 	GetUserPermissions(filePath string) (read, write, execute bool, err error)
+	// GetGroupPermissions obtains the permissions of the group owning the file path
+	GetGroupPermissions(filePath string) (read, write, execute bool, err error)
+	// GetOthersPermissions obtains the permissions for users and groups not owning the file path
+	GetOthersPermissions(filePath string) (read, write, execute bool, err error)
 	// SetUserPermissions sets the permissions for a file or directory
 	SetUserPermissions(filepath string, mod os.FileMode) error
 	// ReadFile reads an entire file and returns its data

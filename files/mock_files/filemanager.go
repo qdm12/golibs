@@ -98,6 +98,40 @@ func (mr *MockFileManagerMockRecorder) FilepathExists(arg0 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilepathExists", reflect.TypeOf((*MockFileManager)(nil).FilepathExists), arg0)
 }
 
+// GetGroupPermissions mocks base method
+func (m *MockFileManager) GetGroupPermissions(arg0 string) (bool, bool, bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGroupPermissions", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(bool)
+	ret2, _ := ret[2].(bool)
+	ret3, _ := ret[3].(error)
+	return ret0, ret1, ret2, ret3
+}
+
+// GetGroupPermissions indicates an expected call of GetGroupPermissions
+func (mr *MockFileManagerMockRecorder) GetGroupPermissions(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupPermissions", reflect.TypeOf((*MockFileManager)(nil).GetGroupPermissions), arg0)
+}
+
+// GetOthersPermissions mocks base method
+func (m *MockFileManager) GetOthersPermissions(arg0 string) (bool, bool, bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetOthersPermissions", arg0)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(bool)
+	ret2, _ := ret[2].(bool)
+	ret3, _ := ret[3].(error)
+	return ret0, ret1, ret2, ret3
+}
+
+// GetOthersPermissions indicates an expected call of GetOthersPermissions
+func (mr *MockFileManagerMockRecorder) GetOthersPermissions(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOthersPermissions", reflect.TypeOf((*MockFileManager)(nil).GetOthersPermissions), arg0)
+}
+
 // GetOwnership mocks base method
 func (m *MockFileManager) GetOwnership(arg0 string) (int, int, error) {
 	m.ctrl.T.Helper()
