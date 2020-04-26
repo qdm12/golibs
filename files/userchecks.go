@@ -62,11 +62,11 @@ func (f *fileManager) isAccessible(filePath string, uid, gid int, accessibility 
 		accessible := false
 		switch accessibility {
 		case readable:
-			accessible, _, _, err = f.GetGroupPermissions(filePath)
+			accessible, _, _, err = f.GetUserPermissions(filePath)
 		case writable:
-			_, accessible, _, err = f.GetGroupPermissions(filePath)
+			_, accessible, _, err = f.GetUserPermissions(filePath)
 		case executable:
-			_, _, accessible, err = f.GetGroupPermissions(filePath)
+			_, _, accessible, err = f.GetUserPermissions(filePath)
 		}
 		if err != nil {
 			return false, fmt.Errorf("%s: %w", errPrefix, err)
