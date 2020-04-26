@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // Settings contains settings to launch an HTTP server
@@ -16,8 +17,8 @@ type Settings struct {
 
 // RunServers manages multiple HTTP servers in parallel and stops
 // them all as soon as one of them fails. It returns one error per HTTP
-// server if there is any.
-func RunServers(settings ...Settings) (errors []error) {
+// server if there is any. It stops them also if the context is canceled.
+func RunServers(ctx context.Context, settings ...Settings) (errors []error) {
 	count := len(settings)
 	chDone := make(chan error, count)
 	chShutdownErr := make(chan error, count)
@@ -26,12 +27,11 @@ func RunServers(settings ...Settings) (errors []error) {
 		setting := setting
 		go serve(setting.Name, setting.Addr, setting.Handler, chStop, chDone, chShutdownErr)
 	}
-	var stopped bool
-	i := 0
-	for i < count {
+	stopped := false
+	doneErrorsLeft, shutdownErrorsLeft := count, count
+	for doneErrorsLeft > 0 || shutdownErrorsLeft > 0 {
 		select {
 		case err := <-chDone:
-			i++
 			if err != nil {
 				errors = append(errors, err)
 			}
@@ -39,8 +39,17 @@ func RunServers(settings ...Settings) (errors []error) {
 				stopped = true
 				close(chStop)
 			}
-		case err := <-chShutdownErr: // best effort to collect shutdown errors
-			errors = append(errors, err)
+			doneErrorsLeft--
+		case err := <-chShutdownErr:
+			if err != nil {
+				errors = append(errors, err)
+			}
+			shutdownErrorsLeft--
+		case <-ctx.Done():
+			if !stopped {
+				stopped = true
+				close(chStop)
+			}
 		}
 	}
 	return errors
@@ -52,13 +61,15 @@ func serve(name, addr string, handler http.Handler, chStop <-chan struct{}, chDo
 	server := http.Server{Addr: addr, Handler: handler}
 	go func() {
 		<-chStop
-		err := server.Shutdown(context.Background())
-		if err != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(ctx); err != nil {
 			chShutdownErr <- fmt.Errorf("server %q failed shutting down: %w", name, err)
+		} else {
+			chShutdownErr <- nil
 		}
 	}()
-	err := server.ListenAndServe()
-	if err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		chDone <- fmt.Errorf("server %q failed: %w", name, err)
 	} else {
 		chDone <- nil
