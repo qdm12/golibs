@@ -5,6 +5,7 @@
 package mock_command
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -45,15 +46,15 @@ func (mr *MockWaiterMockRecorder) Add(arg0 interface{}) *gomock.Call {
 }
 
 // WaitForAll mocks base method
-func (m *MockWaiter) WaitForAll() []error {
+func (m *MockWaiter) WaitForAll(arg0 context.Context) []error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WaitForAll")
+	ret := m.ctrl.Call(m, "WaitForAll", arg0)
 	ret0, _ := ret[0].([]error)
 	return ret0
 }
 
 // WaitForAll indicates an expected call of WaitForAll
-func (mr *MockWaiterMockRecorder) WaitForAll() *gomock.Call {
+func (mr *MockWaiterMockRecorder) WaitForAll(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForAll", reflect.TypeOf((*MockWaiter)(nil).WaitForAll))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WaitForAll", reflect.TypeOf((*MockWaiter)(nil).WaitForAll), arg0)
 }

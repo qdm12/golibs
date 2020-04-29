@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"sync"
 )
 
@@ -10,7 +11,7 @@ type Waiter interface {
 	// Adds a wait function to the waiter in its own blocking goroutine
 	Add(waitFunction func() error)
 	// WaitForAll waits for all wait functions to complete and return any eventual error from them
-	WaitForAll() (errors []error)
+	WaitForAll(ctx context.Context) (errors []error)
 }
 
 type waiter struct {
@@ -34,12 +35,17 @@ func (w *waiter) Add(waitFunction func() error) {
 	}()
 }
 
-func (w *waiter) WaitForAll() (errors []error) {
+func (w *waiter) WaitForAll(ctx context.Context) (errors []error) {
 	w.Lock()
 	for w.n > 0 {
 		w.Unlock()
-		if err := <-w.errors; err != nil {
-			errors = append(errors, err)
+		select {
+		case <-ctx.Done():
+			return errors
+		case err := <-w.errors:
+			if err != nil {
+				errors = append(errors, err)
+			}
 		}
 		w.Lock()
 		w.n--
