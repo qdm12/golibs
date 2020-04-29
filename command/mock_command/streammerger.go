@@ -5,6 +5,7 @@
 package mock_command
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	command "github.com/qdm12/golibs/command"
 	io "io"
@@ -35,32 +36,30 @@ func (m *MockStreamMerger) EXPECT() *MockStreamMergerMockRecorder {
 }
 
 // CollectLines mocks base method
-func (m *MockStreamMerger) CollectLines(arg0 func(string)) error {
+func (m *MockStreamMerger) CollectLines(arg0 context.Context, arg1 func(string), arg2 func(error)) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CollectLines", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	m.ctrl.Call(m, "CollectLines", arg0, arg1, arg2)
 }
 
 // CollectLines indicates an expected call of CollectLines
-func (mr *MockStreamMergerMockRecorder) CollectLines(arg0 interface{}) *gomock.Call {
+func (mr *MockStreamMergerMockRecorder) CollectLines(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CollectLines", reflect.TypeOf((*MockStreamMerger)(nil).CollectLines), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CollectLines", reflect.TypeOf((*MockStreamMerger)(nil).CollectLines), arg0, arg1, arg2)
 }
 
 // Merge mocks base method
-func (m *MockStreamMerger) Merge(arg0 io.ReadCloser, arg1 ...command.MergeOptionSetter) {
+func (m *MockStreamMerger) Merge(arg0 context.Context, arg1 io.ReadCloser, arg2 ...command.MergeOptionSetter) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0}
-	for _, a := range arg1 {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	m.ctrl.Call(m, "Merge", varargs...)
 }
 
 // Merge indicates an expected call of Merge
-func (mr *MockStreamMergerMockRecorder) Merge(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+func (mr *MockStreamMergerMockRecorder) Merge(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0}, arg1...)
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Merge", reflect.TypeOf((*MockStreamMerger)(nil).Merge), varargs...)
 }
