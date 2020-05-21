@@ -32,6 +32,18 @@ func JSON(payload interface{}) ResponseSetter {
 	}
 }
 
+// Bytes sets the body as the raw bytes given and sets the content type
+// header depending on the contentType variable
+func Bytes(b []byte, contentType string) ResponseSetter {
+	return func(options *responseOptions) error {
+		body := make([]byte, len(b))
+		copy(body, b)
+		options.body = body
+		options.headers["Content-Type"] = contentType
+		return nil
+	}
+}
+
 // Status sets the status code to the HTTP response
 func Status(status int) ResponseSetter {
 	return func(options *responseOptions) error {
