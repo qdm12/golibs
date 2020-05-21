@@ -1,7 +1,6 @@
 package network
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -95,14 +94,14 @@ func (c *client) GetContent(url string, setters ...GetContentSetter) (content []
 	}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", url, err)
+		return nil, status, err
 	}
 	if options.randomUserAgent {
 		req.Header.Set("User-Agent", c.userAgents[c.random.GenerateRandomInt(len(c.userAgents))])
 	}
 	status, content, err = c.DoHTTPRequest(req)
 	if err != nil {
-		return nil, status, fmt.Errorf("cannot GET content of URL %s: %w", url, err)
+		return nil, status, err
 	}
 	return content, status, nil
 }

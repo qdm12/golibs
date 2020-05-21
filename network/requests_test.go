@@ -99,13 +99,13 @@ func Test_GetContent(t *testing.T) {
 			nil,
 			nil,
 			fmt.Errorf("error"),
-			nil, 0, fmt.Errorf("cannot GET content of URL https://domain.com: error")},
+			nil, 0, fmt.Errorf("error")},
 		"bad URL error": {
 			"\n",
 			nil,
 			nil,
 			nil,
-			nil, 0, fmt.Errorf("cannot GET content of URL \n: parse \"\\n\": net/url: invalid control character in URL")},
+			nil, 0, fmt.Errorf("parse \"\\n\": net/url: invalid control character in URL")},
 		"set random user agent": {
 			"https://domain.com",
 			[]GetContentSetter{UseRandomUserAgent()},
