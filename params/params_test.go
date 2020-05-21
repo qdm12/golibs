@@ -499,9 +499,9 @@ func Test_GetNodeID(t *testing.T) {
 	}{
 		"key with value 10":                {"10", nil, 10, nil},
 		"key with invalid value":           {"bla", nil, 0, fmt.Errorf("environment variable NODE_ID value \"bla\" is not a valid integer")},
-		"key without value":                {"", nil, 0, nil},
+		"key without value":                {"", nil, 0, fmt.Errorf("environment variable NODE_ID value \"\" is not a valid integer")},
 		"key without value and default":    {"", []GetEnvSetter{Default("2")}, 2, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("environment variable \"NODE_ID\": cannot make environment variable value compulsory with a default value")},
+		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"NODE_ID\"")},
 	}
 	for name, tc := range tests {
 		tc := tc

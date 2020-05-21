@@ -396,7 +396,7 @@ func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.
 	if err != nil {
 		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
 	}
-	nodeID, err = e.GetNodeID()
+	nodeID, err = e.GetNodeID(Default("-1"))
 	if err != nil {
 		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
 	}
@@ -443,7 +443,6 @@ func (e *envParams) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level
 // GetNodeID obtains the node instance ID from the environment variable
 // NODE_ID
 func (e *envParams) GetNodeID(setters ...GetEnvSetter) (nodeID int, err error) {
-	setters = append([]GetEnvSetter{Default("0")}, setters...)
 	s, err := e.GetEnv("NODE_ID", setters...)
 	if err != nil {
 		return nodeID, err
