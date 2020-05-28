@@ -228,11 +228,14 @@ func (e *envParams) GetValueIfInside(key string, possibilities []string, setters
 		return "", err
 	}
 	for _, possibility := range possibilities {
-		if !options.caseSensitiveValue {
-			possibility = strings.ToLower(possibility)
-		}
-		if s == possibility {
-			return s, nil
+		if options.caseSensitiveValue {
+			if s == possibility {
+				return s, nil
+			}
+		} else {
+			if strings.EqualFold(s, possibility) {
+				return strings.ToLower(s), nil
+			}
 		}
 	}
 	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, strings.Join(possibilities, ", "))
