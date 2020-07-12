@@ -67,7 +67,7 @@ func (r *random) GenerateRandomBytes(n int) ([]byte, error) {
 
 // GenerateRandomInt63 returns a random 63 bit positive integer
 func (r *random) GenerateRandomInt63() int64 {
-	const int63Length = 32 // 256 bits
+	const int63Length = 8
 	b, err := r.GenerateRandomBytes(int63Length)
 	if err != nil {
 		panic(err.Error())
@@ -80,11 +80,15 @@ func (r *random) GenerateRandomInt63() int64 {
 }
 
 // GenerateRandomInt returns a random integer between 0 and n
-func (r *random) GenerateRandomInt(n int) int {
+func (r *random) GenerateRandomInt(n int) (result int) {
 	if n == 0 {
 		return 0
 	}
-	return int(r.GenerateRandomInt63()) % n
+	result = int(r.GenerateRandomInt63()) % n
+	if result < 0 {
+		result = -result
+	}
+	return result
 }
 
 // GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length
