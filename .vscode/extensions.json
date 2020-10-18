@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "shardulm94.trailing-spaces",
+        "davidanson.vscode-markdownlint",
+        "golang.go",
+    ]
+}
