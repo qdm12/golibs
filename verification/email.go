@@ -7,7 +7,7 @@ import (
 
 // ValidateEmail verifies the format and the existence of an email address with a MX lookup
 func (v *verifier) ValidateEmail(email string) error {
-	if !v.MatchEmail(email) {
+	if !v.Regex.MatchEmail(email) {
 		return fmt.Errorf("email format of email address %q is invalid", email)
 	}
 	i := strings.LastIndexByte(email, '@')

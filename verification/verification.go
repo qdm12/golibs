@@ -29,10 +29,12 @@ type Verifier interface {
 
 type verifier struct {
 	mxLookup func(name string) ([]*net.MX, error)
+	Regex
 }
 
 func NewVerifier() Verifier {
 	return &verifier{
 		mxLookup: net.LookupMX,
+		Regex:    NewRegex(),
 	}
 }

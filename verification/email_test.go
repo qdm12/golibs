@@ -40,7 +40,7 @@ func Test_ValidateEmail(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			v := &verifier{tc.mxLookup}
+			v := &verifier{mxLookup: tc.mxLookup, Regex: NewRegex()}
 			err := v.ValidateEmail(tc.email)
 			if tc.err != nil {
 				require.Error(t, err)
