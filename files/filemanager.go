@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . FileManager
+
 // FileManager contains methods to interact with files and the file system
-//go:generate mockgen -destination=mock_files/filemanager.go . FileManager
 type FileManager interface {
 	// FilepathExists returns true if the file or directory exists, false otherwise
 	FilepathExists(filePath string) (exists bool, err error)

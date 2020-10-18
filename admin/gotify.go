@@ -14,8 +14,9 @@ import (
 	"github.com/gotify/go-api-client/v2/models"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Gotify
+
 // Gotify is a Gotify client
-//go:generate mockgen -destination=mock_admin/gotify.go . Gotify
 type Gotify interface {
 	// Ping obtains silently the version from the Gotify server and returns an error on failure
 	Ping() error

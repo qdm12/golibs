@@ -6,6 +6,8 @@ import (
 	"fmt"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Random
+
 const (
 	lowercase     = "abcdefghijklmnopqrstuvwxyz"
 	uppercase     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -19,7 +21,6 @@ const (
 )
 
 // Random has methods to generate random values
-//go:generate mockgen -destination=mock_random/random.go . Random
 type Random interface {
 	// GenerateRandomBytes generates a byte slice of n random bytes
 	GenerateRandomBytes(n int) ([]byte, error)

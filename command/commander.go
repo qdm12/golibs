@@ -7,8 +7,9 @@ import (
 	"strings"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Commander
+
 // Commander contains methods to run and start shell commands
-//go:generate mockgen -destination=mock_command/commander.go . Commander
 type Commander interface {
 	// Run runs a command in a blocking manner, returning its output and an error if it failed
 	Run(ctx context.Context, name string, arg ...string) (output string, err error)
