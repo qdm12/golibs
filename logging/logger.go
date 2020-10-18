@@ -8,7 +8,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-//go:generate mockgen -destination=mock_logging/logger.go . Logger
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Logger
+
 type Logger interface {
 	// Sync synchronizes the buffer to ensure everything is printed out
 	Sync() error
@@ -16,7 +17,9 @@ type Logger interface {
 	Info(args ...interface{})
 	Warn(args ...interface{})
 	Error(args ...interface{})
-	// WithPrefix returns another logger that will use the prefix given for all logging operations
+	// SetPrefix returns another logger which uses the prefix given for all logging operations
+	SetPrefix(prefix string) Logger
+	// WithPrefix returns another logger which appends the prefix to the existing prefix and uses it for all logging operations
 	WithPrefix(prefix string) Logger
 }
 
@@ -71,6 +74,14 @@ func NewEmptyLogger() (l Logger, err error) {
 func (l *logger) WithPrefix(prefix string) Logger {
 	return &logger{
 		prefix:    l.prefix + prefix,
+		zapLogger: l.zapLogger,
+	}
+}
+
+// SetPrefix overrides the previous prefix with a new one
+func (l *logger) SetPrefix(prefix string) Logger {
+	return &logger{
+		prefix:    prefix,
 		zapLogger: l.zapLogger,
 	}
 }

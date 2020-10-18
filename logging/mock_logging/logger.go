@@ -81,6 +81,20 @@ func (mr *MockLoggerMockRecorder) Info(arg0 ...interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockLogger)(nil).Info), arg0...)
 }
 
+// SetPrefix mocks base method
+func (m *MockLogger) SetPrefix(arg0 string) logging.Logger {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetPrefix", arg0)
+	ret0, _ := ret[0].(logging.Logger)
+	return ret0
+}
+
+// SetPrefix indicates an expected call of SetPrefix
+func (mr *MockLoggerMockRecorder) SetPrefix(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPrefix", reflect.TypeOf((*MockLogger)(nil).SetPrefix), arg0)
+}
+
 // Sync mocks base method
 func (m *MockLogger) Sync() error {
 	m.ctrl.T.Helper()
