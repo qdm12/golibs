@@ -248,8 +248,8 @@ func Test_GetDuration(t *testing.T) {
 		duration time.Duration
 		err      error
 	}{
-		"key with non integer value":       {"a", nil, 0, fmt.Errorf("environment variable \"any\" duration value is malformed: time: invalid duration a")},
-		"key without unit":                 {"1", nil, 0, fmt.Errorf("environment variable \"any\" duration value is malformed: time: missing unit in duration 1")},
+		"key with non integer value":       {"a", nil, 0, fmt.Errorf(`environment variable "any" duration value is malformed: time: invalid duration "a"`)},
+		"key without unit":                 {"1", nil, 0, fmt.Errorf(`environment variable "any" duration value is malformed: time: missing unit in duration "1"`)},
 		"key with 0 integer value":         {"0", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be 0")},
 		"key with negative duration":       {"-1s", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be lower than 0")},
 		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"any\" duration value is empty")},
@@ -285,8 +285,8 @@ func Test_GetHTTPTimeout(t *testing.T) {
 		timeout  time.Duration
 		err      error
 	}{
-		"key with non integer value":       {"a", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is malformed: time: invalid duration a")},
-		"key without unit":                 {"1", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is malformed: time: missing unit in duration 1")},
+		"key with non integer value":       {"a", nil, 0, fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: invalid duration "a"`)},
+		"key without unit":                 {"1", nil, 0, fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: missing unit in duration "1"`)},
 		"key with 0 integer value":         {"0", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be 0")},
 		"key with negative duration":       {"-1s", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be lower than 0")},
 		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is empty")},
