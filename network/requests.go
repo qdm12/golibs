@@ -1,34 +1,30 @@
 package network
 
 import (
-	"io"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"time"
 
 	"github.com/qdm12/golibs/crypto/random"
+	"golang.org/x/net/context/ctxhttp"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Client
+
 // Client has methods to do HTTP requests as a client
-//go:generate mockgen -destination=mock_network/client.go . Client
 type Client interface {
-	// DoHTTPRequest runs the given request and returns an HTTP status,
+	// Do runs the given request and returns an HTTP status,
 	// the data content and an eventual error
-	DoHTTPRequest(request *http.Request) (status int, content []byte, err error)
-	// GetContent runs an HTTP GET operation at a given URL and returns the content, status and error
-	GetContent(URL string, setters ...GetContentSetter) (content []byte, status int, err error)
+	Do(ctx context.Context, request *http.Request) (content []byte, status int, err error)
+	// Get runs an HTTP GET operation at a given URL and returns the content, status and error
+	Get(ctx context.Context, URL string, setters ...GetSetter) (content []byte, status int, err error)
 	// Close closes any idle connections remaining for this client
 	Close()
 }
 
-type httpClient interface {
-	Do(r *http.Request) (*http.Response, error)
-	CloseIdleConnections()
-}
-
 type client struct {
-	httpClient httpClient
-	readBody   func(r io.Reader) ([]byte, error)
+	httpClient *http.Client
 	userAgents []string
 	random     random.Random
 }
@@ -37,7 +33,6 @@ type client struct {
 func NewClient(timeout time.Duration) Client {
 	return &client{
 		httpClient: &http.Client{Timeout: timeout},
-		readBody:   ioutil.ReadAll,
 		userAgents: []string{
 			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.146 Safari/537.36",
@@ -51,57 +46,49 @@ func NewClient(timeout time.Duration) Client {
 
 // Close terminates idle connections of the HTTP client
 func (c *client) Close() {
-	if c.httpClient != nil {
-		c.httpClient.CloseIdleConnections()
-	}
+	c.httpClient.CloseIdleConnections()
 }
 
-// DoHTTPRequest performs an HTTP request and returns the status, content and eventual error
-func (c *client) DoHTTPRequest(request *http.Request) (status int, content []byte, err error) {
-	response, err := c.httpClient.Do(request)
-	if response != nil {
-		defer response.Body.Close()
-	}
+// Do performs an HTTP request and returns the status, content and eventual error
+func (c *client) Do(ctx context.Context, request *http.Request) (content []byte, status int, err error) {
+	response, err := ctxhttp.Do(ctx, c.httpClient, request)
 	if err != nil {
-		return status, nil, err
+		return nil, 0, err
 	}
-	content, err = c.readBody(response.Body)
+	defer response.Body.Close()
+	content, err = ioutil.ReadAll(response.Body)
 	if err != nil {
-		return status, nil, err
+		return nil, response.StatusCode, err
 	}
-	return response.StatusCode, content, nil
+	return content, response.StatusCode, nil
 }
 
-type getContentOptions struct {
+type getOptions struct {
 	randomUserAgent bool
 }
 
 // GetContentSetter is a setter for options to GetContent
-type GetContentSetter func(options *getContentOptions)
+type GetSetter func(options *getOptions)
 
 // UseRandomUserAgent sets a random realistic user agent to the GetContent HTTP request
-func UseRandomUserAgent() GetContentSetter {
-	return func(options *getContentOptions) {
+func UseRandomUserAgent() GetSetter {
+	return func(options *getOptions) {
 		options.randomUserAgent = true
 	}
 }
 
 // GetContent returns the content and eventual error from an HTTP GET to a given URL
-func (c *client) GetContent(url string, setters ...GetContentSetter) (content []byte, status int, err error) {
-	var options getContentOptions
+func (c *client) Get(ctx context.Context, url string, setters ...GetSetter) (content []byte, status int, err error) {
+	var options getOptions
 	for _, setter := range setters {
 		setter(&options)
 	}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, status, err
+		return nil, 0, err
 	}
 	if options.randomUserAgent {
 		req.Header.Set("User-Agent", c.userAgents[c.random.GenerateRandomInt(len(c.userAgents))])
 	}
-	status, content, err = c.DoHTTPRequest(req)
-	if err != nil {
-		return nil, status, err
-	}
-	return content, status, nil
+	return c.Do(ctx, req)
 }

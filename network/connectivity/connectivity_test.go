@@ -1,7 +1,9 @@
 package connectivity
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -33,21 +35,22 @@ func Test_ConnectivityChecks(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			checkDNS := func(domain string) error { return tc.DNSErr }
+			ctx := context.Background()
+			checkDNS := func(ctx context.Context, domain string) error { return tc.DNSErr }
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
 			mockClient := mock_network.NewMockClient(mockCtrl)
 			for _, domain := range tc.domains {
-				mockClient.EXPECT().GetContent("http://"+domain).
-					Return(nil, 200, nil).Times(1)
-				mockClient.EXPECT().GetContent("https://"+domain).
-					Return(nil, 200, nil).Times(1)
+				mockClient.EXPECT().Get(ctx, "http://"+domain).
+					Return(nil, http.StatusOK, nil)
+				mockClient.EXPECT().Get(ctx, "https://"+domain).
+					Return(nil, http.StatusOK, nil)
 			}
 			connectivity := &connectivity{
 				checkDNS: checkDNS,
 				client:   mockClient,
 			}
-			errs := connectivity.Checks(tc.domains...)
+			errs := connectivity.Checks(ctx, tc.domains...)
 			expectedErrsString := []string{}
 			for _, err := range tc.errs {
 				expectedErrsString = append(expectedErrsString, err.Error())
@@ -79,15 +82,16 @@ func Test_connectivityCheck(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			checkDNS := func(domain string) error { return tc.DNSErr }
+			checkDNS := func(ctx context.Context, domain string) error { return tc.DNSErr }
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
+			ctx := context.Background()
 			mockClient := mock_network.NewMockClient(mockCtrl)
-			mockClient.EXPECT().GetContent("http://domain.com").
-				Return(nil, 200, tc.HTTPErr).Times(1)
-			mockClient.EXPECT().GetContent("https://domain.com").
-				Return(nil, 200, tc.HTTPSErr).Times(1)
-			errs := connectivityCheck("domain.com", checkDNS, mockClient)
+			mockClient.EXPECT().Get(ctx, "http://domain.com").
+				Return(nil, http.StatusOK, tc.HTTPErr)
+			mockClient.EXPECT().Get(ctx, "https://domain.com").
+				Return(nil, http.StatusOK, tc.HTTPSErr)
+			errs := connectivityCheck(ctx, "domain.com", checkDNS, mockClient)
 			expectedErrsString := []string{}
 			for _, err := range tc.errs {
 				expectedErrsString = append(expectedErrsString, err.Error())
@@ -108,7 +112,7 @@ func Test_httpGetCheck(t *testing.T) {
 		getContentErr    error
 		err              error
 	}{
-		"no error":   {200, nil, nil},
+		"no error":   {http.StatusOK, nil, nil},
 		"bad status": {400, nil, fmt.Errorf("HTTP GET failed for https://domain.com: HTTP Status 400")},
 		"error":      {0, fmt.Errorf("error"), fmt.Errorf("HTTP GET failed for https://domain.com: error")},
 	}
@@ -118,10 +122,11 @@ func Test_httpGetCheck(t *testing.T) {
 			t.Parallel()
 			mockCtrl := gomock.NewController(t)
 			defer mockCtrl.Finish()
+			ctx := context.Background()
 			mockClient := mock_network.NewMockClient(mockCtrl)
-			mockClient.EXPECT().GetContent("https://domain.com").
-				Return(nil, tc.getContentStatus, tc.getContentErr).Times(1)
-			err := httpGetCheck("https://domain.com", mockClient)
+			mockClient.EXPECT().Get(ctx, "https://domain.com").
+				Return(nil, tc.getContentStatus, tc.getContentErr)
+			err := httpGetCheck(ctx, "https://domain.com", mockClient)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -145,8 +150,9 @@ func Test_domainNameResolutionCheck(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			checkDNS := func(domain string) error { return tc.checkDNSErr }
-			err := domainNameResolutionCheck("domain.com", checkDNS)
+			ctx := context.Background()
+			checkDNS := func(ctx context.Context, domain string) error { return tc.checkDNSErr }
+			err := domainNameResolutionCheck(ctx, "domain.com", checkDNS)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

@@ -5,6 +5,7 @@
 package mock_network
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	network "github.com/qdm12/golibs/network"
 	http "net/http"
@@ -46,39 +47,39 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockClient)(nil).Close))
 }
 
-// DoHTTPRequest mocks base method
-func (m *MockClient) DoHTTPRequest(arg0 *http.Request) (int, []byte, error) {
+// Do mocks base method
+func (m *MockClient) Do(arg0 context.Context, arg1 *http.Request) ([]byte, int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DoHTTPRequest", arg0)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].([]byte)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// DoHTTPRequest indicates an expected call of DoHTTPRequest
-func (mr *MockClientMockRecorder) DoHTTPRequest(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DoHTTPRequest", reflect.TypeOf((*MockClient)(nil).DoHTTPRequest), arg0)
-}
-
-// GetContent mocks base method
-func (m *MockClient) GetContent(arg0 string, arg1 ...network.GetContentSetter) ([]byte, int, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0}
-	for _, a := range arg1 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetContent", varargs...)
+	ret := m.ctrl.Call(m, "Do", arg0, arg1)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// GetContent indicates an expected call of GetContent
-func (mr *MockClientMockRecorder) GetContent(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// Do indicates an expected call of Do
+func (mr *MockClientMockRecorder) Do(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetContent", reflect.TypeOf((*MockClient)(nil).GetContent), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockClient)(nil).Do), arg0, arg1)
+}
+
+// Get mocks base method
+func (m *MockClient) Get(arg0 context.Context, arg1 string, arg2 ...network.GetSetter) ([]byte, int, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Get", varargs...)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// Get indicates an expected call of Get
+func (mr *MockClientMockRecorder) Get(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockClient)(nil).Get), varargs...)
 }

@@ -1,6 +1,7 @@
 package connectivity
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,12 +10,13 @@ import (
 	"github.com/qdm12/golibs/network"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Connectivity
+
 // Connectivity has methods to check Internet connectivity
-//go:generate mockgen -destination=mock_connectivity/connectivity.go . Connectivity
 type Connectivity interface {
 	// Checks runs a DNS lookup, HTTP and HTTPs requests to all the domains given.
 	// It returns any error encountered when doing so.
-	Checks(domains ...string) (errs []error)
+	Checks(ctx context.Context, domains ...string) (errs []error)
 }
 
 type connectivity struct {
@@ -25,22 +27,22 @@ type connectivity struct {
 // NewConnectivity returns a new connectivity object
 func NewConnectivity(timeout time.Duration) Connectivity {
 	return &connectivity{
-		checkDNS: func(domain string) error {
-			_, err := net.LookupIP(domain)
+		checkDNS: func(ctx context.Context, host string) error {
+			_, err := net.DefaultResolver.LookupIP(ctx, "ip", host)
 			return err
 		},
 		client: network.NewClient(timeout),
 	}
 }
 
-type checkDNSFunc func(domain string) error
+type checkDNSFunc func(ctx context.Context, host string) error
 
 // Checks verifies the connection to the domains in terms of DNS, HTTP and HTTPS
-func (c *connectivity) Checks(domains ...string) (errs []error) {
+func (c *connectivity) Checks(ctx context.Context, domains ...string) (errs []error) {
 	chErrors := make(chan []error)
 	for _, domain := range domains {
 		go func(domain string) {
-			chErrors <- connectivityCheck(domain, c.checkDNS, c.client)
+			chErrors <- connectivityCheck(ctx, domain, c.checkDNS, c.client)
 		}(domain)
 	}
 	for range domains {
@@ -51,11 +53,11 @@ func (c *connectivity) Checks(domains ...string) (errs []error) {
 	return errs
 }
 
-func connectivityCheck(domain string, checkDNS checkDNSFunc, client network.Client) (errs []error) {
+func connectivityCheck(ctx context.Context, domain string, checkDNS checkDNSFunc, client network.Client) (errs []error) {
 	chError := make(chan error)
-	go func() { chError <- domainNameResolutionCheck(domain, checkDNS) }()
-	go func() { chError <- httpGetCheck("http://"+domain, client) }()
-	go func() { chError <- httpGetCheck("https://"+domain, client) }()
+	go func() { chError <- domainNameResolutionCheck(ctx, domain, checkDNS) }()
+	go func() { chError <- httpGetCheck(ctx, "http://"+domain, client) }()
+	go func() { chError <- httpGetCheck(ctx, "https://"+domain, client) }()
 	for i := 0; i < 3; i++ {
 		if err := <-chError; err != nil {
 			errs = append(errs, err)
@@ -65,8 +67,8 @@ func connectivityCheck(domain string, checkDNS checkDNSFunc, client network.Clie
 	return errs
 }
 
-func httpGetCheck(url string, client network.Client) error {
-	_, status, err := client.GetContent(url)
+func httpGetCheck(ctx context.Context, url string, client network.Client) error {
+	_, status, err := client.Get(ctx, url)
 	if err != nil {
 		return fmt.Errorf("HTTP GET failed for %s: %w", url, err)
 	} else if status != http.StatusOK {
@@ -75,8 +77,8 @@ func httpGetCheck(url string, client network.Client) error {
 	return nil
 }
 
-func domainNameResolutionCheck(domain string, checkDNS checkDNSFunc) error {
-	if err := checkDNS(domain); err != nil {
+func domainNameResolutionCheck(ctx context.Context, domain string, checkDNS checkDNSFunc) error {
+	if err := checkDNS(ctx, domain); err != nil {
 		return fmt.Errorf("Domain name resolution is not working for %s: %w", domain, err)
 	}
 	return nil

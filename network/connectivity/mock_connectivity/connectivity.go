@@ -5,6 +5,7 @@
 package mock_connectivity
 
 import (
+	context "context"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
@@ -33,10 +34,10 @@ func (m *MockConnectivity) EXPECT() *MockConnectivityMockRecorder {
 }
 
 // Checks mocks base method
-func (m *MockConnectivity) Checks(arg0 ...string) []error {
+func (m *MockConnectivity) Checks(arg0 context.Context, arg1 ...string) []error {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Checks", varargs...)
@@ -45,7 +46,8 @@ func (m *MockConnectivity) Checks(arg0 ...string) []error {
 }
 
 // Checks indicates an expected call of Checks
-func (mr *MockConnectivityMockRecorder) Checks(arg0 ...interface{}) *gomock.Call {
+func (mr *MockConnectivityMockRecorder) Checks(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Checks", reflect.TypeOf((*MockConnectivity)(nil).Checks), arg0...)
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Checks", reflect.TypeOf((*MockConnectivity)(nil).Checks), varargs...)
 }

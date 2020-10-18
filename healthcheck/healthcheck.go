@@ -1,6 +1,7 @@
 package healthcheck
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,9 +18,9 @@ func Mode(args []string) bool {
 
 // Query sends an HTTP request to the other instance of
 // the program, and to its internal healthcheck server.
-func Query() error {
+func Query(ctx context.Context) error {
 	client := network.NewClient(time.Second)
-	_, status, err := client.GetContent("http://127.0.0.1:9999")
+	_, status, err := client.Get(ctx, "http://127.0.0.1:9999")
 	if err != nil {
 		return err
 	} else if status != http.StatusOK {

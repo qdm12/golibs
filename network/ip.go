@@ -10,8 +10,9 @@ import (
 	"github.com/qdm12/golibs/verification"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . IPManager
+
 // IPManager contains methods to find the IP address of a client
-//go:generate mockgen -destination=mock_network/ip.go . IPManager
 type IPManager interface {
 	// GetClientIPHeaders returns IP address headers information from an HTTP request
 	GetClientIPHeaders(r *http.Request) (headers IPHeaders)

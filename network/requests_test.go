@@ -2,67 +2,116 @@ package network
 
 import (
 	"bytes"
+	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/qdm12/golibs/crypto/random"
+	"github.com/qdm12/golibs/crypto/random/mock_random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_NewClient(t *testing.T) {
 	t.Parallel()
-	c := NewClient(time.Second)
+	var c Client
+	require.NotPanics(t, func() {
+		c = NewClient(time.Second)
+	})
 	assert.NotNil(t, c)
+	_, ok := c.(*client)
+	assert.True(t, ok)
 }
 
-func Test_DoHTTPRequest(t *testing.T) {
+func Test_Close(t *testing.T) {
 	t.Parallel()
+	client := NewClient(time.Nanosecond)
+	assert.NotPanics(t, func() {
+		client.Close()
+	})
+}
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (rtf roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return rtf(r)
+}
+
+func newMockRoundTripper(t *testing.T, expectedRequest *http.Request, response *http.Response, err error) http.RoundTripper {
+	return roundTripperFunc(func(r *http.Request) (*http.Response, error) {
+		assert.Equal(t, expectedRequest.URL, r.URL)
+		return response, err
+	})
+}
+
+type errReader struct{}
+
+func (e *errReader) Read(p []byte) (n int, err error) {
+	return 0, fmt.Errorf("read error")
+}
+
+func (e *errReader) Close() error { return nil }
+
+func Test_Do(t *testing.T) {
+	t.Parallel()
+	canceledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
 	tests := map[string]struct {
+		ctx       context.Context
+		request   *http.Request
 		response  *http.Response
 		clientErr error
-		readBody  func(r io.Reader) ([]byte, error)
-		status    int
 		content   []byte
+		status    int
 		err       error
 	}{
 		"no error": {
-			&http.Response{
+			ctx:     context.Background(),
+			request: &http.Request{Method: http.MethodGet, URL: &url.URL{}},
+			response: &http.Response{
 				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: http.StatusOK}, nil, ioutil.ReadAll,
-			http.StatusOK, []byte("body"), nil},
-		"http error": {
-			nil, fmt.Errorf("error"), ioutil.ReadAll,
-			0, nil, fmt.Errorf("error")},
-		"body read error": {
-			&http.Response{
-				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: http.StatusOK},
-			nil,
-			func(r io.Reader) ([]byte, error) {
-				return nil, fmt.Errorf("error")
+				StatusCode: http.StatusOK,
 			},
-			0, nil, fmt.Errorf("error")},
+			content: []byte("body"),
+			status:  http.StatusOK,
+		},
+		"http error": {
+			ctx:       context.Background(),
+			request:   &http.Request{Method: http.MethodGet, URL: &url.URL{}},
+			clientErr: fmt.Errorf("http error"),
+			err:       fmt.Errorf(`Get "": http error`),
+		},
+		"context canceled": {
+			ctx:     canceledCtx,
+			request: &http.Request{Method: http.MethodGet, URL: &url.URL{}},
+			err:     fmt.Errorf("context canceled"),
+		},
+		"body read error": {
+			ctx:     context.Background(),
+			request: &http.Request{Method: http.MethodGet, URL: &url.URL{}},
+			response: &http.Response{
+				Body:       &errReader{},
+				StatusCode: http.StatusOK,
+			},
+			status: http.StatusOK,
+			err:    fmt.Errorf("read error"),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-			mockHTTPClient := NewMockHTTPClient(mockCtrl)
-			mockHTTPClient.EXPECT().Do(gomock.Any()).
-				Return(tc.response, tc.clientErr).Times(1)
-			c := &client{
-				httpClient: mockHTTPClient,
-				readBody:   tc.readBody,
+			httpClient := &http.Client{
+				Transport: newMockRoundTripper(t, tc.request, tc.response, tc.clientErr),
 			}
-			status, content, err := c.DoHTTPRequest(nil)
+			c := &client{
+				httpClient: httpClient,
+			}
+			content, status, err := c.Do(tc.ctx, tc.request)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -75,64 +124,113 @@ func Test_DoHTTPRequest(t *testing.T) {
 	}
 }
 
+func Test_UseRandomUserAgent(t *testing.T) {
+	t.Parallel()
+	setter := UseRandomUserAgent()
+	options := getOptions{}
+	setter(&options)
+	assert.Equal(t, getOptions{randomUserAgent: true}, options)
+}
+
 func Test_GetContent(t *testing.T) {
+	canceledCtx, cancel := context.WithCancel(context.Background())
+	cancel()
 	t.Parallel()
 	tests := map[string]struct {
-		URL       string
-		setters   []GetContentSetter
-		response  *http.Response
-		clientErr error
-		content   []byte
-		status    int
-		err       error
+		ctx             context.Context
+		URL             string
+		setters         []GetSetter
+		expectedRequest *http.Request
+		response        *http.Response
+		clientErr       error
+		content         []byte
+		status          int
+		err             error
 	}{
-		"no error": {
-			"https://domain.com",
-			nil,
-			&http.Response{
-				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: http.StatusOK},
-			nil,
-			[]byte("body"), http.StatusOK, nil},
+		"bad url": {
+			ctx: context.Background(),
+			URL: "\n",
+			err: fmt.Errorf(`parse "\n": net/url: invalid control character in URL`),
+		},
 		"http error": {
-			"https://domain.com",
-			nil,
-			nil,
-			fmt.Errorf("error"),
-			nil, 0, fmt.Errorf("error")},
-		"bad URL error": {
-			"\n",
-			nil,
-			nil,
-			nil,
-			nil, 0, fmt.Errorf("parse \"\\n\": net/url: invalid control character in URL")},
-		"set random user agent": {
-			"https://domain.com",
-			[]GetContentSetter{UseRandomUserAgent()},
-			&http.Response{
+			ctx: context.Background(),
+			URL: "https://domain.com",
+			expectedRequest: &http.Request{
+				Method: http.MethodGet,
+				URL: &url.URL{
+					Scheme: "https",
+					Host:   "domain.com",
+				},
+			},
+			clientErr: fmt.Errorf("error"),
+			err:       fmt.Errorf(`Get "https://domain.com": error`),
+		},
+		"context canceled": {
+			ctx: canceledCtx,
+			URL: "https://domain.com",
+			expectedRequest: &http.Request{
+				Method: http.MethodGet,
+				URL: &url.URL{
+					Scheme: "https",
+					Host:   "domain.com",
+				},
+			},
+			err: fmt.Errorf("context canceled"),
+		},
+		"no error": {
+			ctx: context.Background(),
+			URL: "https://domain.com",
+			expectedRequest: &http.Request{
+				Method: http.MethodGet,
+				URL: &url.URL{
+					Scheme: "https",
+					Host:   "domain.com",
+				},
+			},
+			response: &http.Response{
 				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
-				StatusCode: http.StatusOK},
-			nil,
-			[]byte("body"), http.StatusOK, nil},
+				StatusCode: http.StatusOK,
+			},
+			content: []byte("body"),
+			status:  http.StatusOK,
+		},
+		"no error with random user agent": {
+			ctx:     context.Background(),
+			URL:     "https://domain.com",
+			setters: []GetSetter{UseRandomUserAgent()},
+			expectedRequest: &http.Request{
+				Method: http.MethodGet,
+				URL: &url.URL{
+					Scheme: "https",
+					Host:   "domain.com",
+				},
+				Header: http.Header{"User-Agent": []string{"b"}},
+			},
+			response: &http.Response{
+				Body:       ioutil.NopCloser(bytes.NewBufferString("body")),
+				StatusCode: http.StatusOK,
+			},
+			content: []byte("body"),
+			status:  http.StatusOK,
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-			mockHTTPClient := NewMockHTTPClient(mockCtrl)
-			if tc.clientErr != nil || (tc.response != nil && tc.response.Body != nil) {
-				mockHTTPClient.EXPECT().Do(gomock.Any()).
-					Return(tc.response, tc.clientErr).Times(1)
+			ctrl := gomock.NewController(t)
+			random := mock_random.NewMockRandom(ctrl)
+			httpClient := &http.Client{
+				Transport: newMockRoundTripper(t, tc.expectedRequest, tc.response, tc.clientErr),
 			}
+			userAgents := []string{"a", "b", "c"}
+			random.EXPECT().GenerateRandomInt(len(userAgents)).Return(1)
 			c := &client{
-				httpClient: mockHTTPClient,
-				readBody:   ioutil.ReadAll,
-				userAgents: []string{"abc"},
-				random:     random.NewRandom(),
+				httpClient: httpClient,
+				userAgents: userAgents,
+				random:     random,
 			}
-			content, status, err := c.GetContent(tc.URL, tc.setters...)
+			content, status, err := c.Get(tc.ctx, tc.URL, tc.setters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
