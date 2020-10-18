@@ -24,6 +24,7 @@ type EnvParams interface {
 	GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err error)
 	GetOnOff(key string, setters ...GetEnvSetter) (on bool, err error)
 	GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error)
+	GetCSVInPossibilities(key string, possibilities []string, setters ...GetEnvSetter) (values []string, err error)
 	GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error)
 	GetHTTPTimeout(setters ...GetEnvSetter) (duration time.Duration, err error)
 	GetUserID() int
@@ -238,6 +239,51 @@ func (e *envParams) GetValueIfInside(key string, possibilities []string, setters
 		}
 	}
 	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, strings.Join(possibilities, ", "))
+}
+
+func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, setters ...GetEnvSetter) (values []string, err error) {
+	options := getEnvOptions{}
+	for _, setter := range setters {
+		_ = setter(&options) // error is checked in e.GetEnv
+	}
+	csv, err := e.GetEnv(key, setters...)
+	if err != nil {
+		return nil, err
+	}
+	values = strings.Split(csv, ",")
+	type valuePosition struct {
+		position int
+		value    string
+	}
+	var invalidValues []valuePosition
+	for i, value := range values {
+		found := false
+		for _, possibility := range possibilities {
+			if options.caseSensitiveValue {
+				if value == possibility {
+					found = true
+					break
+				}
+			} else {
+				if strings.EqualFold(value, possibility) {
+					values[i] = strings.ToLower(value)
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			invalidValues = append(invalidValues, valuePosition{i + 1, value})
+		}
+	}
+	if L := len(invalidValues); L > 0 {
+		invalidMessages := make([]string, L)
+		for i := range invalidValues {
+			invalidMessages[i] = fmt.Sprintf("value %q at position %d", invalidValues[i].value, invalidValues[i].position)
+		}
+		return nil, fmt.Errorf("invalid values found: %s", strings.Join(invalidMessages, ", "))
+	}
+	return values, nil
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.

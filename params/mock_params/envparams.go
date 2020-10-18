@@ -36,6 +36,26 @@ func (m *MockEnvParams) EXPECT() *MockEnvParamsMockRecorder {
 	return m.recorder
 }
 
+// GetCSVInPossibilities mocks base method
+func (m *MockEnvParams) GetCSVInPossibilities(arg0 string, arg1 []string, arg2 ...params.GetEnvSetter) ([]string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCSVInPossibilities", varargs...)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCSVInPossibilities indicates an expected call of GetCSVInPossibilities
+func (mr *MockEnvParamsMockRecorder) GetCSVInPossibilities(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCSVInPossibilities", reflect.TypeOf((*MockEnvParams)(nil).GetCSVInPossibilities), varargs...)
+}
+
 // GetDatabaseDetails mocks base method
 func (m *MockEnvParams) GetDatabaseDetails() (string, string, string, string, error) {
 	m.ctrl.T.Helper()

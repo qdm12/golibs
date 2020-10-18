@@ -240,6 +240,71 @@ func Test_GetValueIfInside(t *testing.T) {
 	}
 }
 
+func Test_GetCSVInPossibilities(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		possibilities []string
+		envValue      string
+		setters       []GetEnvSetter
+		values        []string
+		err           error
+	}{
+		"empty string": {
+			err: fmt.Errorf(`invalid values found: value "" at position 1`),
+		},
+		"single comma": {
+			envValue: ",",
+			err:      fmt.Errorf(`invalid values found: value "" at position 1, value "" at position 2`),
+		},
+		"single valid": {
+			possibilities: []string{"a", "b", "c"},
+			envValue:      "B",
+			values:        []string{"b"},
+		},
+		"single valid case sensitive": {
+			possibilities: []string{"a", "B", "c"},
+			envValue:      "B",
+			setters:       []GetEnvSetter{CaseSensitiveValue()},
+			values:        []string{"B"},
+		},
+		"invalid case sensitive": {
+			possibilities: []string{"a", "b", "c"},
+			envValue:      "B",
+			setters:       []GetEnvSetter{CaseSensitiveValue()},
+			err:           fmt.Errorf(`invalid values found: value "B" at position 1`),
+		},
+		"two valid": {
+			possibilities: []string{"a", "b", "c"},
+			envValue:      "b,a",
+			values:        []string{"b", "a"},
+		},
+		"one valid and one invalid": {
+			possibilities: []string{"a", "b", "c"},
+			envValue:      "b,d",
+			err:           fmt.Errorf(`invalid values found: value "d" at position 2`),
+		},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParams{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			values, err := e.GetCSVInPossibilities("any", tc.possibilities, tc.setters...)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.values, values)
+		})
+	}
+}
+
 func Test_GetDuration(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
