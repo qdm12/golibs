@@ -284,6 +284,9 @@ func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, se
 		}
 		return nil, fmt.Errorf("invalid values found: %s", strings.Join(invalidMessages, ", "))
 	}
+	if len(values) == 1 && len(values[0]) == 0 {
+		return nil, nil // single empty string
+	}
 	return values, nil
 }
 
