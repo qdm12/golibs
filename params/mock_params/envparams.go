@@ -241,14 +241,13 @@ func (mr *MockEnvParamsMockRecorder) GetListeningPort(arg0 ...interface{}) *gomo
 }
 
 // GetLoggerConfig mocks base method
-func (m *MockEnvParams) GetLoggerConfig() (logging.Encoding, logging.Level, int, error) {
+func (m *MockEnvParams) GetLoggerConfig() (logging.Encoding, logging.Level, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLoggerConfig")
 	ret0, _ := ret[0].(logging.Encoding)
 	ret1, _ := ret[1].(logging.Level)
-	ret2, _ := ret[2].(int)
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // GetLoggerConfig indicates an expected call of GetLoggerConfig
@@ -293,25 +292,6 @@ func (m *MockEnvParams) GetLoggerLevel(arg0 ...params.GetEnvSetter) (logging.Lev
 func (mr *MockEnvParamsMockRecorder) GetLoggerLevel(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoggerLevel", reflect.TypeOf((*MockEnvParams)(nil).GetLoggerLevel), arg0...)
-}
-
-// GetNodeID mocks base method
-func (m *MockEnvParams) GetNodeID(arg0 ...params.GetEnvSetter) (int, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetNodeID", varargs...)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetNodeID indicates an expected call of GetNodeID
-func (mr *MockEnvParamsMockRecorder) GetNodeID(arg0 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNodeID", reflect.TypeOf((*MockEnvParams)(nil).GetNodeID), arg0...)
 }
 
 // GetOnOff mocks base method

@@ -26,7 +26,7 @@ type logger struct {
 	zapLogger Zap
 }
 
-func NewLogger(encoding Encoding, level Level, nodeID int) (l Logger, err error) {
+func NewLogger(encoding Encoding, level Level) (l Logger, err error) {
 	var zapLevel zapcore.Level
 	if err := zapLevel.UnmarshalText([]byte(string(level))); err != nil {
 		return nil, err
@@ -49,9 +49,6 @@ func NewLogger(encoding Encoding, level Level, nodeID int) (l Logger, err error)
 	}.Build()
 	if err != nil {
 		return nil, fmt.Errorf("logger initialization failed: %w", err)
-	}
-	if nodeID != -1 {
-		zapLogger = zapLogger.With(zap.Int("node_id", nodeID))
 	}
 	return &logger{zapLogger: zapLogger}, nil
 }

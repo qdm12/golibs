@@ -34,10 +34,9 @@ type EnvParams interface {
 	GetRedisDetails() (hostname, port, password string, err error)
 	GetExeDir() (dir string, err error)
 	GetPath(key string, setters ...GetEnvSetter) (path string, err error)
-	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error)
+	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error)
 	GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error)
 	GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error)
-	GetNodeID(setters ...GetEnvSetter) (nodeID int, err error)
 	GetURL(key string, setters ...GetEnvSetter) (URL *liburl.URL, err error)
 	GetGotifyURL(setters ...GetEnvSetter) (URL *liburl.URL, err error)
 	GetGotifyToken(setters ...GetEnvSetter) (token string, err error)
@@ -389,21 +388,17 @@ func (e *envParams) GetPath(key string, setters ...GetEnvSetter) (path string, e
 }
 
 // GetLoggerConfig obtains configuration details for the logger
-// using the environment variables LOG_ENCODING, LOG_LEVEL and NODE_ID.
-func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error) {
+// using the environment variables LOG_ENCODING and LOG_LEVEL.
+func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error) {
 	encoding, err = e.GetLoggerEncoding()
 	if err != nil {
-		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
+		return "", "", fmt.Errorf("logger configuration error: %w", err)
 	}
 	level, err = e.GetLoggerLevel()
 	if err != nil {
-		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
+		return "", "", fmt.Errorf("logger configuration error: %w", err)
 	}
-	nodeID, err = e.GetNodeID(Default("-1"))
-	if err != nil {
-		return "", "", 0, fmt.Errorf("logger configuration error: %w", err)
-	}
-	return encoding, level, nodeID, nil
+	return encoding, level, nil
 }
 
 // GetLoggerEncoding obtains the logging encoding
@@ -441,20 +436,6 @@ func (e *envParams) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level
 	default:
 		return level, fmt.Errorf("environment variable LOG_LEVEL: logger level %q unrecognized", s)
 	}
-}
-
-// GetNodeID obtains the node instance ID from the environment variable
-// NODE_ID
-func (e *envParams) GetNodeID(setters ...GetEnvSetter) (nodeID int, err error) {
-	s, err := e.GetEnv("NODE_ID", setters...)
-	if err != nil {
-		return nodeID, err
-	}
-	nodeID, err = strconv.Atoi(s)
-	if err != nil {
-		return 0, fmt.Errorf("environment variable NODE_ID value %q is not a valid integer", s)
-	}
-	return nodeID, nil
 }
 
 // GetURL obtains the HTTP URL for the environment variable for the key given.

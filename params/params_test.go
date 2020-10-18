@@ -490,41 +490,6 @@ func Test_GetLoggerLevel(t *testing.T) {
 	}
 }
 
-func Test_GetNodeID(t *testing.T) {
-	t.Parallel()
-	tests := map[string]struct {
-		envValue string
-		setters  []GetEnvSetter
-		nodeID   int
-		err      error
-	}{
-		"key with value 10":                {"10", nil, 10, nil},
-		"key with invalid value":           {"bla", nil, 0, fmt.Errorf("environment variable NODE_ID value \"bla\" is not a valid integer")},
-		"key without value":                {"", nil, 0, fmt.Errorf("environment variable NODE_ID value \"\" is not a valid integer")},
-		"key without value and default":    {"", []GetEnvSetter{Default("2")}, 2, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"NODE_ID\"")},
-	}
-	for name, tc := range tests {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			e := &envParams{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
-			}
-			nodeID, err := e.GetNodeID(tc.setters...)
-			if tc.err != nil {
-				require.Error(t, err)
-				assert.Equal(t, tc.err.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, tc.nodeID, nodeID)
-		})
-	}
-}
-
 func Test_GetURL(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
