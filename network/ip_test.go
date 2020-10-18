@@ -38,9 +38,15 @@ func Test_IPHeaders_String(t *testing.T) {
 		headers *IPHeaders
 		s       string
 	}{
-		"nil headers":       {nil, "remoteAddr= | xRealIP= | xForwardedFor="},
-		"empty headers":     {&IPHeaders{}, "remoteAddr=\"\" | xRealIP=\"\" | xForwardedFor=\"\""},
-		"non empty headers": {&IPHeaders{RemoteAddress: "a", XRealIP: "bvc e"}, "remoteAddr=\"a\" | xRealIP=\"bvc e\" | xForwardedFor=\"\""},
+		"nil headers": {s: "remoteAddr= | xRealIP= | xForwardedFor="},
+		"empty headers": {
+			headers: &IPHeaders{},
+			s:       `remoteAddr="" | xRealIP="" | xForwardedFor=""`,
+		},
+		"non empty headers": {
+			headers: &IPHeaders{RemoteAddress: "a", XRealIP: "bvc e"},
+			s:       `remoteAddr="a" | xRealIP="bvc e" | xForwardedFor=""`,
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -93,49 +99,61 @@ func Test_GetClientIP(t *testing.T) {
 		IP      string
 		err     error
 	}{
-		"nil request":                     {nil, "", fmt.Errorf("no IP address found in client request")},
-		"empty request":                   {&http.Request{}, "", fmt.Errorf("no IP address found in client request")},
-		"request with remote address":     {&http.Request{RemoteAddr: "54.54.54.54:8888"}, "54.54.54.54", nil},
-		"request with bad remote address": {&http.Request{RemoteAddr: "54.54.54.300:8888"}, "", fmt.Errorf("IP address \"54.54.54.300\" is not valid")},
+		"nil request": {
+			err: fmt.Errorf("no IP address found in client request"),
+		},
+		"empty request": {
+			request: &http.Request{},
+			err:     fmt.Errorf("no IP address found in client request"),
+		},
+		"request with remote address": {
+			request: &http.Request{RemoteAddr: "54.54.54.54:8888"},
+			IP:      "54.54.54.54",
+		},
+		"request with bad remote address": {
+			request: &http.Request{RemoteAddr: "54.54.54.300:8888"},
+			err:     fmt.Errorf(`IP address "54.54.54.300" is not valid`),
+		},
 		"request with remote address and 1 xRealIP": {
-			&http.Request{
+			request: &http.Request{
 				RemoteAddr: "54.54.54.54:8888",
 				Header:     http.Header{"X-Real-Ip": []string{"55.55.55.55"}, "X-Forwarded-For": []string{""}},
 			},
-			"55.55.55.55",
-			nil,
+			IP: "55.55.55.55",
 		},
 		"request with remote address, 1 xRealIP and 2 XForwardedFor": {
-			&http.Request{
+			request: &http.Request{
 				RemoteAddr: "54.54.54.54:8888",
-				Header:     http.Header{"X-Real-Ip": []string{"55.55.55.55"}, "X-Forwarded-For": []string{"192.168.1.10 , 10.0.0.1"}},
+				Header: http.Header{
+					"X-Real-Ip":       []string{"55.55.55.55"},
+					"X-Forwarded-For": []string{"192.168.1.10 , 10.0.0.1"},
+				},
 			},
-			"55.55.55.55",
-			nil,
+			IP: "55.55.55.55",
 		},
 		"request with remote address and 2 xForwardedFor": {
-			&http.Request{
+			request: &http.Request{
 				RemoteAddr: "54.54.54.54:8888",
 				Header:     http.Header{"X-Real-Ip": []string{""}, "X-Forwarded-For": []string{"192.168.1.10 , 10.0.0.1"}},
 			},
-			"10.0.0.1",
-			nil,
+			IP: "10.0.0.1",
 		},
 		"request with remote address, 1 XRealIP and 3 XForwardedFor": {
-			&http.Request{
+			request: &http.Request{
 				RemoteAddr: "54.54.54.54:8888",
-				Header:     http.Header{"X-Real-Ip": []string{"55.55.55.55"}, "X-Forwarded-For": []string{"192.168.1.10 , 10.0.0.1, 56.56.56.56"}},
+				Header: http.Header{
+					"X-Real-Ip":       []string{"55.55.55.55"},
+					"X-Forwarded-For": []string{"192.168.1.10 , 10.0.0.1, 56.56.56.56"},
+				},
 			},
-			"56.56.56.56",
-			nil,
+			IP: "56.56.56.56",
 		},
 		"request with remote address, and bad XForwardedFor": {
-			&http.Request{
+			request: &http.Request{
 				RemoteAddr: "54.54.54.54:8888",
 				Header:     http.Header{"X-Forwarded-For": []string{"x"}},
 			},
-			"54.54.54.54",
-			nil,
+			IP: "54.54.54.54",
 		},
 	}
 	for name, tc := range tests {
@@ -208,16 +226,49 @@ func Test_splitHostPort(t *testing.T) {
 		port    string
 		err     error
 	}{
-		"address with port only":                                     {":8000", "", "8000", nil},
-		"address with IPv4 address and empty port":                   {"192.165.100.100:", "192.165.100.100", "", nil},
-		"address with IPv4 address and port":                         {"192.165.100.100:8000", "192.165.100.100", "8000", nil},
-		"address with IPv4 address and too many colons":              {"192.165.100.100:8000:500", "", "", fmt.Errorf("address 192.165.100.100:8000:500: too many colons in address")},
-		"address with IPv6 address and empty port":                   {"2001:db8::8a2e:370:7334:", "2001:db8::8a2e:370:7334", "", nil},
-		"address with IPv6 address and port":                         {"2001:db8::8a2e:370:7334:8000", "2001:db8::8a2e:370:7334", "8000", nil},
-		"address with IPv6 address and too many colons":              {"2001:db8::8a2e:370:511:32:250:7334:8000", "", "", fmt.Errorf("address 2001:db8::8a2e:370:511:32:250:7334:8000: too many colons in address")},
-		"address with [IPv6 address] and empty port":                 {"[2001:db8::8a2e:370:7334]:", "2001:db8::8a2e:370:7334", "", nil},
-		"address with [IPv6 address] and port":                       {"[2001:db8::8a2e:370:7334]:8000", "2001:db8::8a2e:370:7334", "8000", nil},
-		"address with [IPv6 address] and too many colons after port": {"[2001:db8::8a2e:370:7334]:8000:500", "", "", fmt.Errorf("address [2001:db8::8a2e:370:7334]:8000:500: too many colons in address")},
+		"address with port only": {
+			address: ":8000",
+			port:    "8000",
+		},
+		"address with IPv4 address and empty port": {
+			address: "192.165.100.100:",
+			IP:      "192.165.100.100",
+		},
+		"address with IPv4 address and port": {
+			address: "192.165.100.100:8000",
+			IP:      "192.165.100.100",
+			port:    "8000",
+		},
+		"address with IPv4 address and too many colons": {
+			address: "192.165.100.100:8000:500",
+			err:     fmt.Errorf("address 192.165.100.100:8000:500: too many colons in address"),
+		},
+		"address with IPv6 address and empty port": {
+			address: "2001:db8::8a2e:370:7334:",
+			IP:      "2001:db8::8a2e:370:7334",
+		},
+		"address with IPv6 address and port": {
+			address: "2001:db8::8a2e:370:7334:8000",
+			IP:      "2001:db8::8a2e:370:7334",
+			port:    "8000",
+		},
+		"address with IPv6 address and too many colons": {
+			address: "2001:db8::8a2e:370:511:32:250:7334:8000",
+			err:     fmt.Errorf("address 2001:db8::8a2e:370:511:32:250:7334:8000: too many colons in address"),
+		},
+		"address with [IPv6 address] and empty port": {
+			address: "[2001:db8::8a2e:370:7334]:",
+			IP:      "2001:db8::8a2e:370:7334",
+		},
+		"address with [IPv6 address] and port": {
+			address: "[2001:db8::8a2e:370:7334]:8000",
+			IP:      "2001:db8::8a2e:370:7334",
+			port:    "8000",
+		},
+		"address with [IPv6 address] and too many colons after port": {
+			address: "[2001:db8::8a2e:370:7334]:8000:500",
+			err:     fmt.Errorf("address [2001:db8::8a2e:370:7334]:8000:500: too many colons in address"),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -244,18 +295,54 @@ func Test_getRemoteIP(t *testing.T) {
 		IP         string
 		err        error
 	}{
-		"address with invalid IPv4 address and no port":                 {"192.165.300.100", "", fmt.Errorf("IP address \"192.165.300.100\" is not valid")},
-		"address with invalid IPv4 address and valid port":              {"192.165.300.100:8000", "", fmt.Errorf("IP address \"192.165.300.100\" is not valid")},
-		"address with valid IPv4 address and invalid port":              {"192.165.200.100:70000", "", fmt.Errorf("remote address \"192.165.200.100:70000\" is invalid: port 70000 cannot be higher than 65535")},
-		"address with too many colons":                                  {"192.165.200.100:8000:500", "", fmt.Errorf("address 192.165.200.100:8000:500: too many colons in address")},
-		"address with valid IPv4 address and no port":                   {"192.165.168.100", "192.165.168.100", nil},
-		"address with valid IPv4 address and empty port":                {"192.165.168.100:", "192.165.168.100", nil},
-		"address with valid IPv4 address and valid port":                {"192.165.168.100:8000", "192.165.168.100", nil},
-		"address with valid IPv4 address and invalid port with letters": {"192.165.168.100:80a0b", "", fmt.Errorf("remote address \"192.165.168.100:80a0b\" is invalid: port \"80a0b\" is not a valid integer")},
-		"address with valid IPv6 address and no port":                   {"2001:db8::8a2e:370:7334", "2001:db8::8a2e:370", nil},
-		"address with valid IPv6 address and empty port":                {"2001:db8::8a2e:370:7334:", "2001:db8::8a2e:370:7334", nil},
-		"address with valid IPv6 address and valid port":                {"2001:db8::8a2e:370:7334:8000", "2001:db8::8a2e:370:7334", nil},
-		"address with [valid IPv6 address] and valid port":              {"[2001:db8::8a2e:370:7334]:8000", "2001:db8::8a2e:370:7334", nil},
+		"address with invalid IPv4 address and no port": {
+			remoteAddr: "192.165.300.100",
+			err:        fmt.Errorf(`IP address "192.165.300.100" is not valid`),
+		},
+		"address with invalid IPv4 address and valid port": {
+			remoteAddr: "192.165.300.100:8000",
+			err:        fmt.Errorf(`IP address "192.165.300.100" is not valid`),
+		},
+		"address with valid IPv4 address and invalid port": {
+			remoteAddr: "192.165.200.100:70000",
+			err:        fmt.Errorf(`remote address "192.165.200.100:70000" is invalid: port 70000 cannot be higher than 65535`),
+		},
+		"address with too many colons": {
+			remoteAddr: "192.165.200.100:8000:500",
+			err:        fmt.Errorf("address 192.165.200.100:8000:500: too many colons in address"),
+		},
+		"address with valid IPv4 address and no port": {
+			remoteAddr: "192.165.168.100",
+			IP:         "192.165.168.100",
+		},
+		"address with valid IPv4 address and empty port": {
+			remoteAddr: "192.165.168.100:",
+			IP:         "192.165.168.100",
+		},
+		"address with valid IPv4 address and valid port": {
+			remoteAddr: "192.165.168.100:8000",
+			IP:         "192.165.168.100",
+		},
+		"address with valid IPv4 address and invalid port with letters": {
+			remoteAddr: "192.165.168.100:80a0b",
+			err:        fmt.Errorf(`remote address "192.165.168.100:80a0b" is invalid: port "80a0b" is not a valid integer`),
+		},
+		"address with valid IPv6 address and no port": {
+			remoteAddr: "2001:db8::8a2e:370:7334",
+			IP:         "2001:db8::8a2e:370",
+		},
+		"address with valid IPv6 address and empty port": {
+			remoteAddr: "2001:db8::8a2e:370:7334:",
+			IP:         "2001:db8::8a2e:370:7334",
+		},
+		"address with valid IPv6 address and valid port": {
+			remoteAddr: "2001:db8::8a2e:370:7334:8000",
+			IP:         "2001:db8::8a2e:370:7334",
+		},
+		"address with [valid IPv6 address] and valid port": {
+			remoteAddr: "[2001:db8::8a2e:370:7334]:8000",
+			IP:         "2001:db8::8a2e:370:7334",
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -280,11 +367,22 @@ func Test_extractPublicIPs(t *testing.T) {
 		publicIPs []string
 		warnings  []string
 	}{
-		"no IPs":                       {[]string{}, nil, nil},
-		"2 private IPv4":               {[]string{"127.0.0.3", "192.168.178.5"}, nil, nil},
-		"2 private and 1 invalid IPv4": {[]string{"127.0.0.3", "192.168.178.5", "58"}, nil, []string{`IP address "58" is not valid`}},
-		"2 private and 1 public IPv4":  {[]string{"127.0.0.3", "192.168.178.5", "58.58.58.58"}, []string{"58.58.58.58"}, nil},
-		"1 private and 1 public IPv6":  {[]string{"fd8d:8d72:b629:0f87:0000:0000:0000:0000", "2001:db8::8a2e:370:7334"}, []string{"2001:db8::8a2e:370:7334"}, nil},
+		"no IPs": {IPs: []string{}},
+		"2 private IPv4": {
+			IPs: []string{"127.0.0.3", "192.168.178.5"},
+		},
+		"2 private and 1 invalid IPv4": {
+			IPs:      []string{"127.0.0.3", "192.168.178.5", "58"},
+			warnings: []string{`IP address "58" is not valid`},
+		},
+		"2 private and 1 public IPv4": {
+			IPs:       []string{"127.0.0.3", "192.168.178.5", "58.58.58.58"},
+			publicIPs: []string{"58.58.58.58"},
+		},
+		"1 private and 1 public IPv6": {
+			IPs:       []string{"fd8d:8d72:b629:0f87:0000:0000:0000:0000", "2001:db8::8a2e:370:7334"},
+			publicIPs: []string{"2001:db8::8a2e:370:7334"},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -304,10 +402,20 @@ func Test_getXForwardedIPs(t *testing.T) {
 		IPs           []string
 		warnings      []string
 	}{
-		"no XForwardedFor": {"", nil, nil},
-		"3 IPv4":           {"192.99.99.58, 54.54.55.56,54.54.55.100", []string{"192.99.99.58", "54.54.55.56", "54.54.55.100"}, nil},
-		"2 IPv4 and 1 invalid with multiple spaces": {"192.99.99.58,  54.54.55.56,99.99.87", []string{"192.99.99.58", "54.54.55.56"}, []string{`IP address "99.99.87" is not valid`}},
-		"1 IPv4 and 1 IPv6 with \\t":                {" 192.99.99.58, \t2001:db8::8a2e:370:7334", []string{"192.99.99.58", "2001:db8::8a2e:370:7334"}, nil},
+		"no XForwardedFor": {},
+		"3 IPv4": {
+			XForwardedFor: "192.99.99.58, 54.54.55.56,54.54.55.100",
+			IPs:           []string{"192.99.99.58", "54.54.55.56", "54.54.55.100"},
+		},
+		"2 IPv4 and 1 invalid with multiple spaces": {
+			XForwardedFor: "192.99.99.58,  54.54.55.56,99.99.87",
+			IPs:           []string{"192.99.99.58", "54.54.55.56"},
+			warnings:      []string{`IP address "99.99.87" is not valid`},
+		},
+		"1 IPv4 and 1 IPv6 with \\t": {
+			XForwardedFor: " 192.99.99.58, \t2001:db8::8a2e:370:7334",
+			IPs:           []string{"192.99.99.58", "2001:db8::8a2e:370:7334"},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc

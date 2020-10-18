@@ -51,7 +51,7 @@ func MergeColor(color color.Color) MergeOptionSetter {
 	}
 }
 
-// Merge merges the given stream with the given name to the CollectLines method, and should be run in a goroutine
+// Merge merges the given stream with the given name to the CollectLines method, and should be run in a goroutine.
 func (s *streamMerger) Merge(ctx context.Context, stream io.ReadCloser, setters ...MergeOptionSetter) {
 	options := &mergeOptions{}
 	for _, setter := range setters {
@@ -85,7 +85,7 @@ func (s *streamMerger) Merge(ctx context.Context, stream io.ReadCloser, setters 
 	}
 }
 
-// CollectLines collects lines received from each stream merged in the streammerger and runs onNewLine on each line
+// CollectLines collects lines received from each stream merged in the streammerger and runs onNewLine on each line.
 func (s *streamMerger) CollectLines(ctx context.Context, onNewLine func(line string), onError func(err error)) {
 	for {
 		select {

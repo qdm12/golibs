@@ -33,13 +33,13 @@ func (f *fileManager) DirectoryExists(filePath string) (exists bool, err error) 
 	return f.IsDirectory(filePath)
 }
 
-// IsFile returns true if the path points to a file
+// IsFile returns true if the path points to a file.
 func (f *fileManager) IsFile(filePath string) (bool, error) {
 	isDir, err := f.IsDirectory(filePath)
 	return !isDir, err
 }
 
-// IsDirectory returns true if the path points to a directory
+// IsDirectory returns true if the path points to a directory.
 func (f *fileManager) IsDirectory(filePath string) (bool, error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {

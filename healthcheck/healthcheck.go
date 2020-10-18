@@ -11,7 +11,7 @@ import (
 
 // Mode checks if the program is launched to run the
 // internal healthcheck against another instance of the
-// program on the same machine
+// program on the same machine.
 func Mode(args []string) bool {
 	return len(args) > 1 && args[1] == "healthcheck"
 }
@@ -29,7 +29,7 @@ func Query(ctx context.Context) error {
 	return nil
 }
 
-// GetHandler returns a handler function to handle healthcheck queries locally
+// GetHandler returns a handler function to handle healthcheck queries locally.
 func GetHandler(isHealthy func() error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := isHealthy()

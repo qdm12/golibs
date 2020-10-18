@@ -37,11 +37,21 @@ func Test_SearchIPv6(t *testing.T) {
 		s     string
 		finds []string
 	}{
-		"Find nothing in empty string": {"", nil},
-		"Find nothing":                 {"dsadsa 232.323 s", nil},
-		"Find nothing in IPv4 address": {"192.168.1.5", nil},
-		"Find exactly ::1":             {"::1", []string{"::1"}},
-		"Find multiple in text":        {"2001:0db8:85a3:0000:0000:8a2e:0370:7334 sdas ::1", []string{"2001:0db8:85a3:0000:0000:8a2e:0370:7334", "::1"}},
+		"Find nothing in empty string": {},
+		"Find nothing": {
+			s: "dsadsa 232.323 s",
+		},
+		"Find nothing in IPv4 address": {
+			s: "192.168.1.5",
+		},
+		"Find exactly ::1": {
+			s:     "::1",
+			finds: []string{"::1"},
+		},
+		"Find multiple in text": {
+			s:     "2001:0db8:85a3:0000:0000:8a2e:0370:7334 sdas ::1",
+			finds: []string{"2001:0db8:85a3:0000:0000:8a2e:0370:7334", "::1"},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -60,9 +70,17 @@ func Test_SearchEmail(t *testing.T) {
 		s     string
 		finds []string
 	}{
-		"Find nothing in empty string": {"", nil},
-		"Find single email in text":    {"bla bla bla@bla bla@bla.co.uk bla.com", []string{"bla@bla.co.uk"}},
-		"Find two emails in text":      {"bla@aa.aa bla bla@bla bla@bla.co.uk bla.com", []string{"bla@aa.aa", "bla@bla.co.uk"}},
+		"Find nothing in empty string": {
+			s: "",
+		},
+		"Find single email in text": {
+			s:     "bla bla bla@bla bla@bla.co.uk bla.com",
+			finds: []string{"bla@bla.co.uk"},
+		},
+		"Find two emails in text": {
+			s:     "bla@aa.aa bla bla@bla bla@bla.co.uk bla.com",
+			finds: []string{"bla@aa.aa", "bla@bla.co.uk"},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -81,13 +99,30 @@ func Test_SearchPhone(t *testing.T) {
 		s     string
 		finds []string
 	}{
-		"Find nothing in empty string":                                      {"", nil},
-		"Find nothing in text":                                              {"aa", nil},
-		"Find international number without + sign":                          {"35226440600", []string{"35226440600"}},
-		"Find international number with + sign":                             {"+35226440600", []string{"+35226440600"}},
-		"Find international number with + sign and 1 space":                 {"+352 26440600", []string{"+352 26440600"}},
-		"Find international number with + sign and multiple spaces in text": {"bla +1 3474 50256 2 blaaa 234", []string{"+1 3474 50256 2"}},
-		"Complex case": {"b +1 3474 50256 2 fdfd 332 23d 45787e 35226440600", []string{"+1 3474 50256 2", "35226440600"}},
+		"Find nothing in empty string": {},
+		"Find nothing in text": {
+			s: "aa",
+		},
+		"Find international number without + sign": {
+			s:     "35226440600",
+			finds: []string{"35226440600"},
+		},
+		"Find international number with + sign": {
+			s:     "+35226440600",
+			finds: []string{"+35226440600"},
+		},
+		"Find international number with + sign and 1 space": {
+			s:     "+352 26440600",
+			finds: []string{"+352 26440600"},
+		},
+		"Find international number with + sign and multiple spaces in text": {
+			s:     "bla +1 3474 50256 2 blaaa 234",
+			finds: []string{"+1 3474 50256 2"},
+		},
+		"Complex case": {
+			s:     "b +1 3474 50256 2 fdfd 332 23d 45787e 35226440600",
+			finds: []string{"+1 3474 50256 2", "35226440600"},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc

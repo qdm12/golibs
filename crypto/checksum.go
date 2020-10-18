@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Checksumize adds a Shake 256 checksum to some data
+// Checksumize adds a Shake 256 checksum to some data.
 func (c *crypto) Checksumize(data []byte) (checksumedData []byte, err error) {
 	digest, err := c.ShakeSum256(data)
 	if err != nil {
@@ -15,7 +15,7 @@ func (c *crypto) Checksumize(data []byte) (checksumedData []byte, err error) {
 	return append(data, checksum...), nil
 }
 
-// Dechecksumize verifies the Shake 256 checksum of some data
+// Dechecksumize verifies the Shake 256 checksum of some data.
 func (c *crypto) Dechecksumize(checksumData []byte) (data []byte, err error) {
 	L := len(checksumData)
 	if L < checksumLength {

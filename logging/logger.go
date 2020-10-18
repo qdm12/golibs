@@ -19,7 +19,8 @@ type Logger interface {
 	Error(args ...interface{})
 	// SetPrefix returns another logger which uses the prefix given for all logging operations
 	SetPrefix(prefix string) Logger
-	// WithPrefix returns another logger which appends the prefix to the existing prefix and uses it for all logging operations
+	// WithPrefix returns another logger which appends the prefix to the
+	// existing prefix and uses it for all logging operations
 	WithPrefix(prefix string) Logger
 }
 
@@ -60,7 +61,7 @@ func (l *logger) Sync() error {
 	return l.zapLogger.Sync()
 }
 
-// NewEmptyLogger returns a logging that does not print anything
+// NewEmptyLogger returns a logging that does not print anything.
 func NewEmptyLogger() (l Logger, err error) {
 	loggerConfig := zap.NewDevelopmentConfig()
 	loggerConfig.OutputPaths, loggerConfig.ErrorOutputPaths = nil, nil
@@ -78,7 +79,7 @@ func (l *logger) WithPrefix(prefix string) Logger {
 	}
 }
 
-// SetPrefix overrides the previous prefix with a new one
+// SetPrefix overrides the previous prefix with a new one.
 func (l *logger) SetPrefix(prefix string) Logger {
 	return &logger{
 		prefix:    prefix,

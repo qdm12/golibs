@@ -8,7 +8,7 @@ import (
 	"syscall"
 )
 
-// CopyDirectory copies all files, directories and symlinks recursively to another path
+// CopyDirectory copies all files, directories and symlinks recursively to another path.
 func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
 	errPrefix := fmt.Sprintf("cannot copy directory from %q to %q", fromPath, toPath)
 	entries, err := f.readDir(fromPath)
@@ -26,9 +26,10 @@ func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
 		if !ok {
 			return fmt.Errorf("%s: cannot get stats information for %q", errPrefix, subFromPath)
 		}
-		switch fileInfo.Mode() & os.ModeType {
+		switch fileInfo.Mode() & os.ModeType { //nolint:exhaustive
 		case os.ModeDir:
-			if err := f.CreateDir(subToPath, Permissions(0700)); err != nil {
+			const defaultPermissions os.FileMode = 0700
+			if err := f.CreateDir(subToPath, Permissions(defaultPermissions)); err != nil {
 				return fmt.Errorf("%s: %w", errPrefix, err)
 			}
 			if err := f.CopyDirectory(subFromPath, subToPath); err != nil {
@@ -55,7 +56,7 @@ func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
 	return nil
 }
 
-// CopyFile copies a file from a path to another path
+// CopyFile copies a file from a path to another path.
 func (f *fileManager) CopyFile(fromPath, toPath string) (err error) {
 	errPrefix := fmt.Sprintf("cannot copy file from %q to %q", fromPath, toPath)
 	out, err := f.create(toPath)
@@ -88,7 +89,7 @@ func (f *fileManager) CopyFile(fromPath, toPath string) (err error) {
 	return nil
 }
 
-// CopySymLink copies a symlink to another path
+// CopySymLink copies a symlink to another path.
 func (f *fileManager) CopySymLink(fromPath, toPath string) error {
 	link, err := f.readlink(fromPath)
 	if err != nil {

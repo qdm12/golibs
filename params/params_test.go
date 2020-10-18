@@ -5,11 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/verification"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_NewEnvParams(t *testing.T) {
@@ -26,12 +25,31 @@ func Test_GetEnv(t *testing.T) {
 		value    string
 		err      error
 	}{
-		"key with value":                   {"value", nil, "value", nil},
-		"key with uppercase value":         {"VALUE", nil, "value", nil},
-		"key with case sensitive value":    {"VALUE", []GetEnvSetter{CaseSensitiveValue()}, "VALUE", nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("default")}, "default", nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
-		"bad options":                      {"", []GetEnvSetter{Compulsory(), Default("a")}, "", fmt.Errorf("environment variable \"any\": cannot set default value for environment variable value which is compulsory")},
+		"key with value": {
+			envValue: "value",
+			value:    "value",
+		},
+		"key with uppercase value": {
+			envValue: "VALUE",
+			value:    "value",
+		},
+		"key with case sensitive value": {
+			envValue: "VALUE",
+			setters:  []GetEnvSetter{CaseSensitiveValue()},
+			value:    "VALUE",
+		},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("default")},
+			value:   "default",
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`),
+		},
+		"bad options": {
+			setters: []GetEnvSetter{Compulsory(), Default("a")},
+			err:     fmt.Errorf(`environment variable "any": cannot set default value for environment variable value which is compulsory`), //nolint:lll
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -62,11 +80,22 @@ func Test_GetEnvInt(t *testing.T) {
 		n        int
 		err      error
 	}{
-		"key with int value":               {"0", nil, 0, nil},
-		"key with float value":             {"0.00", nil, 0, fmt.Errorf("environment variable \"any\" value \"0.00\" is not a valid integer")},
-		"key with string value":            {"a", nil, 0, fmt.Errorf("environment variable \"any\" value \"a\" is not a valid integer")},
-		"key without value and default":    {"", []GetEnvSetter{Default("1")}, 1, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"any\"")},
+		"key with int value": {envValue: "0"},
+		"key with float value": {
+			envValue: "0.00",
+			err:      fmt.Errorf(`environment variable "any" value "0.00" is not a valid integer`),
+		},
+		"key with string value": {
+			envValue: "a",
+			err:      fmt.Errorf(`environment variable "any" value "a" is not a valid integer`),
+		},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("1")},
+			n:       1,
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`)},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -99,13 +128,45 @@ func Test_GetEnvIntRange(t *testing.T) {
 		n        int
 		err      error
 	}{
-		"key with int value":                       {"0", 0, 1, nil, 0, nil},
-		"key with string value":                    {"a", 0, 1, nil, 0, fmt.Errorf("environment variable \"any\" value \"a\" is not a valid integer")},
-		"key with int value below lower":           {"0", 1, 2, nil, 0, fmt.Errorf("environment variable \"any\" value 0 is not between 1 and 2")},
-		"key with int value above upper":           {"2", 0, 1, nil, 0, fmt.Errorf("environment variable \"any\" value 2 is not between 0 and 1")},
-		"key without value and default":            {"", 0, 1, []GetEnvSetter{Default("1")}, 1, nil},
-		"key without value and over limit default": {"", 0, 1, []GetEnvSetter{Default("2")}, 0, fmt.Errorf("environment variable \"any\" value 2 is not between 0 and 1")},
-		"key without value and compulsory":         {"", 0, 1, []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"any\"")},
+		"key with int value": {
+			envValue: "0",
+			lower:    0,
+			upper:    1,
+		},
+		"key with string value": {
+			envValue: "a",
+			lower:    0,
+			upper:    1,
+			err:      fmt.Errorf(`environment variable "any" value "a" is not a valid integer`),
+		},
+		"key with int value below lower": {
+			envValue: "0",
+			lower:    1,
+			upper:    2,
+			err:      fmt.Errorf(`environment variable "any" value 0 is not between 1 and 2`),
+		},
+		"key with int value above upper": {
+			envValue: "2",
+			lower:    0,
+			upper:    1,
+			err:      fmt.Errorf(`environment variable "any" value 2 is not between 0 and 1`),
+		},
+		"key without value and default": {
+			lower:   0,
+			upper:   1,
+			setters: []GetEnvSetter{Default("1")},
+			n:       1,
+		},
+		"key without value and over limit default": {
+			lower:   0,
+			upper:   1,
+			setters: []GetEnvSetter{Default("2")},
+			err:     fmt.Errorf(`environment variable "any" value 2 is not between 0 and 1`)},
+		"key without value and compulsory": {
+			lower:   0,
+			upper:   1,
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`)},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -136,12 +197,27 @@ func Test_GetYesNo(t *testing.T) { //nolint:dupl
 		yes      bool
 		err      error
 	}{
-		"key with yes value":               {"yes", nil, true, nil},
-		"key with no value":                {"no", nil, false, nil},
-		"key without value":                {"", nil, false, fmt.Errorf("environment variable \"any\" value is \"\" and can only be \"yes\" or \"no\"")},
-		"key without value and default":    {"", []GetEnvSetter{Default("yes")}, true, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, false, fmt.Errorf("no value found for environment variable \"any\"")},
-		"key with invalid value":           {"a", nil, false, fmt.Errorf("environment variable \"any\" value is \"a\" and can only be \"yes\" or \"no\"")},
+		"key with yes value": {
+			envValue: "yes",
+			yes:      true,
+		},
+		"key with no value": {
+			envValue: "no",
+		},
+		"key without value": {
+			err: fmt.Errorf(`environment variable "any" value is "" and can only be "yes" or "no"`)},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("yes")},
+			yes:     true,
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`),
+		},
+		"key with invalid value": {
+			envValue: "a",
+			err:      fmt.Errorf(`environment variable "any" value is "a" and can only be "yes" or "no"`),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -172,12 +248,27 @@ func Test_GetOnOff(t *testing.T) { //nolint:dupl
 		on       bool
 		err      error
 	}{
-		"key with on value":                {"on", nil, true, nil},
-		"key with off value":               {"off", nil, false, nil},
-		"key without value":                {"", nil, false, fmt.Errorf("environment variable \"any\" value is \"\" and can only be \"on\" or \"off\"")},
-		"key without value and default":    {"", []GetEnvSetter{Default("on")}, true, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, false, fmt.Errorf("no value found for environment variable \"any\"")},
-		"key with invalid value":           {"a", nil, false, fmt.Errorf("environment variable \"any\" value is \"a\" and can only be \"on\" or \"off\"")},
+		"key with on value": {
+			envValue: "on", on: true,
+		},
+		"key with off value": {
+			envValue: "off",
+		},
+		"key without value": {
+			err: fmt.Errorf(`environment variable "any" value is "" and can only be "on" or "off"`),
+		},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("on")},
+			on:      true,
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`),
+		},
+		"key with invalid value": {
+			envValue: "a",
+			err:      fmt.Errorf(`environment variable "any" value is "a" and can only be "on" or "off"`),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -209,15 +300,52 @@ func Test_GetValueIfInside(t *testing.T) {
 		value         string
 		err           error
 	}{
-		"key with value in possibilities":                    {[]string{"a", "b"}, "a", nil, "a", nil},
-		"key with value in possibilities and case sensitive": {[]string{"a", "b"}, "a", []GetEnvSetter{CaseSensitiveValue()}, "a", nil},
-		"key with value in uppercase possibilities":          {[]string{"A", "b"}, "a", nil, "a", nil},
-		"key with uppercase value in possibilities":          {[]string{"a", "b"}, "A", nil, "a", nil},
-		"key with case sensitive value in possibilities":     {[]string{"A", "b"}, "a", []GetEnvSetter{CaseSensitiveValue()}, "", fmt.Errorf("environment variable \"any\" value is \"a\" and can only be one of: A, b")},
-		"key with value not in possibilities":                {[]string{"a", "b"}, "c", nil, "", fmt.Errorf("environment variable \"any\" value is \"c\" and can only be one of: a, b")},
-		"key without value":                                  {[]string{"a", "b"}, "", nil, "", fmt.Errorf("environment variable \"any\" value is \"\" and can only be one of: a, b")},
-		"key without value and default":                      {[]string{"a", "b"}, "", []GetEnvSetter{Default("a")}, "a", nil},
-		"key without value and compulsory":                   {[]string{"a", "b"}, "", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
+		"key with value in possibilities": {
+			possibilities: []string{"a", "b"},
+			envValue:      "a",
+			value:         "a",
+		},
+		"key with value in possibilities and case sensitive": {
+			possibilities: []string{"a", "b"},
+			envValue:      "a",
+			setters:       []GetEnvSetter{CaseSensitiveValue()},
+			value:         "a",
+		},
+		"key with value in uppercase possibilities": {
+			possibilities: []string{"A", "b"},
+			envValue:      "a",
+			value:         "a",
+		},
+		"key with uppercase value in possibilities": {
+			possibilities: []string{"a", "b"},
+			envValue:      "A",
+			value:         "a",
+		},
+		"key with case sensitive value in possibilities": {
+			possibilities: []string{"A", "b"},
+			envValue:      "a",
+			setters:       []GetEnvSetter{CaseSensitiveValue()},
+			err:           fmt.Errorf(`environment variable "any" value is "a" and can only be one of: A, b`),
+		},
+		"key with value not in possibilities": {
+			possibilities: []string{"a", "b"},
+			envValue:      "c",
+			err:           fmt.Errorf(`environment variable "any" value is "c" and can only be one of: a, b`),
+		},
+		"key without value": {
+			possibilities: []string{"a", "b"},
+			err:           fmt.Errorf(`environment variable "any" value is "" and can only be one of: a, b`),
+		},
+		"key without value and default": {
+			possibilities: []string{"a", "b"},
+			setters:       []GetEnvSetter{Default("a")},
+			value:         "a",
+		},
+		"key without value and compulsory": {
+			possibilities: []string{"a", "b"},
+			setters:       []GetEnvSetter{Compulsory()},
+			err:           fmt.Errorf(`no value found for environment variable "any"`),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -313,13 +441,33 @@ func Test_GetDuration(t *testing.T) {
 		duration time.Duration
 		err      error
 	}{
-		"key with non integer value":       {"a", nil, 0, fmt.Errorf(`environment variable "any" duration value is malformed: time: invalid duration "a"`)},
-		"key without unit":                 {"1", nil, 0, fmt.Errorf(`environment variable "any" duration value is malformed: time: missing unit in duration "1"`)},
-		"key with 0 integer value":         {"0", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be 0")},
-		"key with negative duration":       {"-1s", nil, 0, fmt.Errorf("environment variable \"any\" duration value cannot be lower than 0")},
-		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"any\" duration value is empty")},
-		"key without value and default":    {"", []GetEnvSetter{Default("1s")}, time.Second, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"any\"")},
+		"key with non integer value": {
+			envValue: "a",
+			err:      fmt.Errorf(`environment variable "any" duration value is malformed: time: invalid duration "a"`),
+		},
+		"key without unit": {
+			envValue: "1",
+			err:      fmt.Errorf(`environment variable "any" duration value is malformed: time: missing unit in duration "1"`),
+		},
+		"key with 0 integer value": {
+			envValue: "0",
+			err:      fmt.Errorf(`environment variable "any" duration value cannot be 0`),
+		},
+		"key with negative duration": {
+			envValue: "-1s",
+			err:      fmt.Errorf(`environment variable "any" duration value cannot be lower than 0`),
+		},
+		"key without value": {
+			err: fmt.Errorf(`environment variable "any" duration value is empty`),
+		},
+		"key without value and default": {
+			setters:  []GetEnvSetter{Default("1s")},
+			duration: time.Second,
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -350,13 +498,34 @@ func Test_GetHTTPTimeout(t *testing.T) {
 		timeout  time.Duration
 		err      error
 	}{
-		"key with non integer value":       {"a", nil, 0, fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: invalid duration "a"`)},
-		"key without unit":                 {"1", nil, 0, fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: missing unit in duration "1"`)},
-		"key with 0 integer value":         {"0", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be 0")},
-		"key with negative duration":       {"-1s", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value cannot be lower than 0")},
-		"key without value":                {"", nil, 0, fmt.Errorf("environment variable \"HTTP_TIMEOUT\" duration value is empty")},
-		"key without value and default":    {"", []GetEnvSetter{Default("1s")}, time.Second, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, 0, fmt.Errorf("no value found for environment variable \"HTTP_TIMEOUT\"")},
+		"key with non integer value": {
+			envValue: "a",
+			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: invalid duration "a"`),
+		},
+		"key without unit": {
+			envValue: "1",
+			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: missing unit in duration "1"`), //nolint:lll
+		},
+		"key with 0 integer value": {
+			envValue: "0",
+			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value cannot be 0`),
+		},
+		"key with negative duration": {
+			envValue: "-1s",
+			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value cannot be lower than 0`),
+		},
+		"key without value": {
+			err: fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is empty`),
+		},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("1s")},
+			timeout: time.Second,
+		},
+		"key without value and compulsory": {
+			envValue: "",
+			setters:  []GetEnvSetter{Compulsory()},
+			err:      fmt.Errorf(`no value found for environment variable "HTTP_TIMEOUT"`),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -412,11 +581,27 @@ func Test_GetListeningPort(t *testing.T) {
 		warning       string
 		err           error
 	}{
-		"key with valid value":             {"9000", nil, "9000", "", nil},
-		"key with valid warning value":     {"60000", nil, "60000", "listening port 60000 is in the dynamic/private ports range (above 49151)", nil},
-		"key without value":                {"", nil, "8000", "", nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("9000")}, "9000", "", nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", "", fmt.Errorf("environment variable \"LISTENING_PORT\": cannot make environment variable value compulsory with a default value")},
+		"key with valid value": {
+			envValue:      "9000",
+			listeningPort: "9000",
+		},
+		"key with valid warning value": {
+			envValue:      "60000",
+			listeningPort: "60000",
+			warning:       "listening port 60000 is in the dynamic/private ports range (above 49151)",
+		},
+		"key without value": {
+			envValue:      "",
+			listeningPort: "8000",
+		},
+		"key without value and default": {
+			setters:       []GetEnvSetter{Default("9000")},
+			listeningPort: "9000",
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`environment variable "LISTENING_PORT": cannot make environment variable value compulsory with a default value`), //nolint:lll
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -453,12 +638,27 @@ func Test_GetRootURL(t *testing.T) {
 		rootURL  string
 		err      error
 	}{
-		"key with valid value":             {"/a", nil, "/a", nil},
-		"key with valid value and trail /": {"/a/", nil, "/a", nil},
-		"key with invalid value":           {"/a?", nil, "", fmt.Errorf("environment variable ROOT_URL value \"/a?\" is not valid")},
-		"key without value":                {"", nil, "", nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("/a")}, "/a", nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"ROOT_URL\": cannot make environment variable value compulsory with a default value")},
+		"key with valid value": {
+			envValue: "/a",
+			rootURL:  "/a",
+		},
+		"key with valid value and trail /": {
+			envValue: "/a/",
+			rootURL:  "/a",
+		},
+		"key with invalid value": {
+			envValue: "/a?",
+			err:      fmt.Errorf(`environment variable ROOT_URL value "/a?" is not valid`),
+		},
+		"key without value": {},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("/a")},
+			rootURL: "/a",
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`environment variable "ROOT_URL": cannot make environment variable value compulsory with a default value`), //nolint:lll
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -490,12 +690,29 @@ func Test_GetLoggerEncoding(t *testing.T) {
 		encoding logging.Encoding
 		err      error
 	}{
-		"key with json value":              {"json", nil, logging.JSONEncoding, nil},
-		"key with console value":           {"console", nil, logging.ConsoleEncoding, nil},
-		"key with invalid value":           {"bla", nil, "", fmt.Errorf("environment variable LOG_ENCODING: logger encoding \"bla\" unrecognized")},
-		"key without value":                {"", nil, logging.JSONEncoding, nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("console")}, logging.ConsoleEncoding, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("environment variable \"LOG_ENCODING\": cannot make environment variable value compulsory with a default value")},
+		"key with json value": {
+			envValue: "json",
+			encoding: logging.JSONEncoding,
+		},
+		"key with console value": {
+			envValue: "console",
+			encoding: logging.ConsoleEncoding,
+		},
+		"key with invalid value": {
+			envValue: "bla",
+			err:      fmt.Errorf(`environment variable LOG_ENCODING: logger encoding "bla" unrecognized`),
+		},
+		"key without value": {
+			encoding: logging.JSONEncoding,
+		},
+		"key without value and default": {
+			setters:  []GetEnvSetter{Default("console")},
+			encoding: logging.ConsoleEncoding,
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`environment variable "LOG_ENCODING": cannot make environment variable value compulsory with a default value`), //nolint:lll
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -526,13 +743,35 @@ func Test_GetLoggerLevel(t *testing.T) {
 		level    logging.Level
 		err      error
 	}{
-		"key with info value":              {"info", nil, logging.InfoLevel, nil},
-		"key with warning value":           {"warning", nil, logging.WarnLevel, nil},
-		"key with error value":             {"error", nil, logging.ErrorLevel, nil},
-		"key with invalid value":           {"bla", nil, logging.InfoLevel, fmt.Errorf("environment variable LOG_LEVEL: logger level \"bla\" unrecognized")},
-		"key without value":                {"", nil, logging.InfoLevel, nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("warning")}, logging.WarnLevel, nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, logging.InfoLevel, fmt.Errorf("environment variable \"LOG_LEVEL\": cannot make environment variable value compulsory with a default value")},
+		"key with info value": {
+			envValue: "info",
+			level:    logging.InfoLevel,
+		},
+		"key with warning value": {
+			envValue: "warning",
+			level:    logging.WarnLevel,
+		},
+		"key with error value": {
+			envValue: "error",
+			level:    logging.ErrorLevel,
+		},
+		"key with invalid value": {
+			envValue: "bla",
+			level:    logging.InfoLevel,
+			err:      fmt.Errorf(`environment variable LOG_LEVEL: logger level "bla" unrecognized`),
+		},
+		"key without value": {
+			level: logging.InfoLevel,
+		},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("warning")},
+			level:   logging.WarnLevel,
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			level:   logging.InfoLevel,
+			err:     fmt.Errorf(`environment variable "LOG_LEVEL": cannot make environment variable value compulsory with a default value`), //nolint:lll
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -565,10 +804,19 @@ func Test_GetURL(t *testing.T) {
 	}{
 		"key with URL value": {"https://google.com", nil, "https://google.com", nil},
 		// "key with invalid value":           {"please help finding me", nil, "", fmt.Errorf("")},
-		"key with non HTTP value":          {"google.com", nil, "", fmt.Errorf("environment variable \"any\" URL value \"google.com\" is not HTTP(s)")},
-		"key without value":                {"", nil, "", nil},
-		"key without value and default":    {"", []GetEnvSetter{Default("https://google.com")}, "https://google.com", nil},
-		"key without value and compulsory": {"", []GetEnvSetter{Compulsory()}, "", fmt.Errorf("no value found for environment variable \"any\"")},
+		"key with non HTTP value": {
+			envValue: "google.com",
+			err:      fmt.Errorf(`environment variable "any" URL value "google.com" is not HTTP(s)`),
+		},
+		"key without value": {},
+		"key without value and default": {
+			setters: []GetEnvSetter{Default("https://google.com")},
+			URL:     "https://google.com",
+		},
+		"key without value and compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`),
+		},
 	}
 	for name, tc := range tests {
 		tc := tc

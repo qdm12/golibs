@@ -1,10 +1,10 @@
 package params
 
 import (
-	"github.com/qdm12/golibs/verification"
-
 	"fmt"
 	"strconv"
+
+	"github.com/qdm12/golibs/verification"
 )
 
 func verifyListeningPort(verifier verification.Verifier, listeningPort string, uid int) (warning string, err error) {
@@ -18,11 +18,11 @@ func verifyListeningPort(verifier verification.Verifier, listeningPort string, u
 	case value <= maxPrivilegedPort:
 		switch uid {
 		case 0:
-			return fmt.Sprintf("listening port %s allowed to be in the reserved system ports range as you are running as root", listeningPort), nil
+			return fmt.Sprintf("listening port %s allowed to be in the reserved system ports range as you are running as root", listeningPort), nil //nolint:lll
 		case -1:
-			return fmt.Sprintf("listening port %s allowed to be in the reserved system ports range as you are running in Windows", listeningPort), nil
+			return fmt.Sprintf("listening port %s allowed to be in the reserved system ports range as you are running in Windows", listeningPort), nil //nolint:lll
 		default:
-			return "", fmt.Errorf("listening port %s cannot be in the reserved system ports range (1 to 1023) when running without root", listeningPort)
+			return "", fmt.Errorf("listening port %s cannot be in the reserved system ports range (1 to 1023) when running without root", listeningPort) //nolint:lll
 		}
 	case value > minDynamicPort:
 		// dynamic and/or private ports.

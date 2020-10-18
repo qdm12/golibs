@@ -9,7 +9,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/qdm12/golibs/network/mock_network"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -27,9 +26,20 @@ func Test_ConnectivityChecks(t *testing.T) {
 		DNSErr  error
 		errs    []error
 	}{
-		"no error":     {nil, nil, nil},
-		"error for 1":  {[]string{"domain.com"}, fmt.Errorf("error"), []error{fmt.Errorf("Domain name resolution is not working for domain.com: error")}},
-		"errors for 2": {[]string{"domain.com", "domain2.com"}, fmt.Errorf("error"), []error{fmt.Errorf("Domain name resolution is not working for domain.com: error"), fmt.Errorf("Domain name resolution is not working for domain2.com: error")}},
+		"no error": {},
+		"error for 1": {
+			domains: []string{"domain.com"},
+			DNSErr:  fmt.Errorf("error"),
+			errs:    []error{fmt.Errorf("Domain name resolution is not working for domain.com: error")},
+		},
+		"errors for 2": {
+			domains: []string{"domain.com", "domain2.com"},
+			DNSErr:  fmt.Errorf("error"),
+			errs: []error{
+				fmt.Errorf("Domain name resolution is not working for domain.com: error"),
+				fmt.Errorf("Domain name resolution is not working for domain2.com: error"),
+			},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -72,11 +82,34 @@ func Test_connectivityCheck(t *testing.T) {
 		HTTPSErr error
 		errs     []error
 	}{
-		"no error":     {nil, nil, nil, nil},
-		"DNS error":    {fmt.Errorf("error"), nil, nil, []error{fmt.Errorf("Domain name resolution is not working for domain.com: error")}},
-		"HTTP error":   {nil, fmt.Errorf("error"), nil, []error{fmt.Errorf("HTTP GET failed for http://domain.com: error")}},
-		"HTTPS error":  {nil, nil, fmt.Errorf("error"), []error{fmt.Errorf("HTTP GET failed for https://domain.com: error")}},
-		"Mixed errors": {fmt.Errorf("error"), nil, fmt.Errorf("error"), []error{fmt.Errorf("Domain name resolution is not working for domain.com: error"), fmt.Errorf("HTTP GET failed for https://domain.com: error")}},
+		"no error": {},
+		"DNS error": {
+			DNSErr:   fmt.Errorf("error"),
+			HTTPErr:  nil,
+			HTTPSErr: nil,
+			errs:     []error{fmt.Errorf("Domain name resolution is not working for domain.com: error")},
+		},
+		"HTTP error": {
+			DNSErr:   nil,
+			HTTPErr:  fmt.Errorf("error"),
+			HTTPSErr: nil,
+			errs:     []error{fmt.Errorf("HTTP GET failed for http://domain.com: error")},
+		},
+		"HTTPS error": {
+			DNSErr:   nil,
+			HTTPErr:  nil,
+			HTTPSErr: fmt.Errorf("error"),
+			errs:     []error{fmt.Errorf("HTTP GET failed for https://domain.com: error")},
+		},
+		"Mixed errors": {
+			DNSErr:   fmt.Errorf("error"),
+			HTTPErr:  nil,
+			HTTPSErr: fmt.Errorf("error"),
+			errs: []error{
+				fmt.Errorf("Domain name resolution is not working for domain.com: error"),
+				fmt.Errorf("HTTP GET failed for https://domain.com: error"),
+			},
+		},
 	}
 	for name, tc := range tests {
 		tc := tc

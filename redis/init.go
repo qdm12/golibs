@@ -7,12 +7,12 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// DB represents a pool of connections to Redis
+// DB represents a pool of connections to Redis.
 type DB struct {
 	*redis.Pool
 }
 
-// NewDB creates a pool of connections to Redis and pings Redis
+// NewDB creates a pool of connections to Redis and pings Redis.
 func NewDB(hostname, port, password string) (db *DB, err error) {
 	pool := newPool(hostname, port, password)
 	db = &DB{pool}
@@ -27,7 +27,8 @@ func newPool(hostname, port, password string) *redis.Pool {
 	pool := new(redis.Pool)
 	pool.MaxIdle = 7
 	pool.MaxActive = 29 // max number of connections
-	pool.IdleTimeout = 3 * time.Second
+	const idleTimeout = 3 * time.Second
+	pool.IdleTimeout = idleTimeout
 	pool.Wait = true
 	pool.MaxConnLifetime = 0 // never close connection based on age
 	pool.Dial = func() (redis.Conn, error) {
@@ -52,7 +53,7 @@ func newPool(hostname, port, password string) *redis.Pool {
 	return pool
 }
 
-// Ping pings the Redis database and returns an error if it fails
+// Ping pings the Redis database and returns an error if it fails.
 func (db *DB) Ping() error {
 	c := db.Get()
 	defer c.Close()

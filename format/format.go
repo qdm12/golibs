@@ -7,7 +7,7 @@ import (
 	"github.com/mr-tron/base58"
 )
 
-// ArgsToString converts arguments to a single string, using the first argument as a format if possible
+// ArgsToString converts arguments to a single string, using the first argument as a format if possible.
 func ArgsToString(args ...interface{}) (s string) {
 	switch {
 	case len(args) == 0:

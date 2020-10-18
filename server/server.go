@@ -61,7 +61,8 @@ func serve(name, addr string, handler http.Handler, chStop <-chan struct{}, chDo
 	server := http.Server{Addr: addr, Handler: handler}
 	go func() {
 		<-chStop
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		const shutdownGraceDuration = 5 * time.Second
+		ctx, cancel := context.WithTimeout(context.Background(), shutdownGraceDuration)
 		defer cancel()
 		if err := server.Shutdown(ctx); err != nil {
 			chShutdownErr <- fmt.Errorf("server %q failed shutting down: %w", name, err)

@@ -22,7 +22,8 @@ func (f *fileManager) IsExecutable(filePath string, uid, gid int) (bool, error) 
 	return f.isAccessible(filePath, uid, gid, executable)
 }
 
-func (f *fileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (accessible bool, err error) {
+func (f *fileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (
+	accessible bool, err error) {
 	errPrefix := fmt.Sprintf("%s is not %s for user with uid %d and gid %d", filePath, accessibility, uid, gid)
 	ownerUID, ownerGID, err := f.GetOwnership(filePath)
 	if err != nil {

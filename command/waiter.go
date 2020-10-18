@@ -7,7 +7,7 @@ import (
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Waiter
 
-// Waiter waits for multiple wait functions to finish
+// Waiter waits for multiple wait functions to finish.
 type Waiter interface {
 	// Adds a wait function to the waiter in its own blocking goroutine
 	Add(waitFunction func() error)

@@ -12,7 +12,7 @@ import (
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Connectivity
 
-// Connectivity has methods to check Internet connectivity
+// Connectivity has methods to check Internet connectivity.
 type Connectivity interface {
 	// Checks runs a DNS lookup, HTTP and HTTPs requests to all the domains given.
 	// It returns any error encountered when doing so.
@@ -24,7 +24,7 @@ type connectivity struct {
 	client   network.Client
 }
 
-// NewConnectivity returns a new connectivity object
+// NewConnectivity returns a new connectivity object.
 func NewConnectivity(timeout time.Duration) Connectivity {
 	return &connectivity{
 		checkDNS: func(ctx context.Context, host string) error {
@@ -37,7 +37,7 @@ func NewConnectivity(timeout time.Duration) Connectivity {
 
 type checkDNSFunc func(ctx context.Context, host string) error
 
-// Checks verifies the connection to the domains in terms of DNS, HTTP and HTTPS
+// Checks verifies the connection to the domains in terms of DNS, HTTP and HTTPS.
 func (c *connectivity) Checks(ctx context.Context, domains ...string) (errs []error) {
 	chErrors := make(chan []error)
 	for _, domain := range domains {
@@ -53,7 +53,8 @@ func (c *connectivity) Checks(ctx context.Context, domains ...string) (errs []er
 	return errs
 }
 
-func connectivityCheck(ctx context.Context, domain string, checkDNS checkDNSFunc, client network.Client) (errs []error) {
+func connectivityCheck(ctx context.Context, domain string,
+	checkDNS checkDNSFunc, client network.Client) (errs []error) {
 	chError := make(chan error)
 	go func() { chError <- domainNameResolutionCheck(ctx, domain, checkDNS) }()
 	go func() { chError <- httpGetCheck(ctx, "http://"+domain, client) }()

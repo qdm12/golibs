@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// Run with go test -race
+// Run with `go test -race`.
 func Test_Concurrency(t *testing.T) {
 	l, err := NewEmptyLogger()
 	require.NoError(t, err)

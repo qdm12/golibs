@@ -1,15 +1,14 @@
 package crypto
 
 import (
+	"github.com/qdm12/golibs/crypto/random"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/sha3"
-
-	"github.com/qdm12/golibs/crypto/random"
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Crypto
 
-// Crypto contains methods to run cryptographic operations
+// Crypto contains methods to run cryptographic operations.
 type Crypto interface {
 	// EncryptAES256 uses the AES algorithm with a 256 bits key to encrypt a plaintext and returns a ciphertext
 	EncryptAES256(plaintext []byte, key [32]byte) (ciphertext []byte, err error)

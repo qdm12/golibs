@@ -16,10 +16,10 @@ func newResponseOptions() *responseOptions {
 	return &responseOptions{headers: make(map[string]string)}
 }
 
-// ResponseSetter is a setter for options to Respond
+// ResponseSetter is a setter for options to Respond.
 type ResponseSetter func(options *responseOptions) error
 
-// JSON sets the body as the JSON encoding of a payload
+// JSON sets the body as the JSON encoding of a payload.
 func JSON(payload interface{}) ResponseSetter {
 	return func(options *responseOptions) error {
 		body, err := json.Marshal(payload)
@@ -33,7 +33,7 @@ func JSON(payload interface{}) ResponseSetter {
 }
 
 // Bytes sets the body as the raw bytes given and sets the content type
-// header depending on the contentType variable
+// header depending on the contentType variable.
 func Bytes(b []byte, contentType string) ResponseSetter {
 	return func(options *responseOptions) error {
 		body := make([]byte, len(b))
@@ -44,7 +44,7 @@ func Bytes(b []byte, contentType string) ResponseSetter {
 	}
 }
 
-// Status sets the status code to the HTTP response
+// Status sets the status code to the HTTP response.
 func Status(status int) ResponseSetter {
 	return func(options *responseOptions) error {
 		options.status = status

@@ -12,7 +12,7 @@ import (
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . IPManager
 
-// IPManager contains methods to find the IP address of a client
+// IPManager contains methods to find the IP address of a client.
 type IPManager interface {
 	// GetClientIPHeaders returns IP address headers information from an HTTP request
 	GetClientIPHeaders(r *http.Request) (headers IPHeaders)
@@ -30,7 +30,7 @@ func NewIPManager(logger logging.Logger) IPManager {
 		logger, verification.NewVerifier()}
 }
 
-// IPHeaders contains all the raw IP headers of an HTTP request
+// IPHeaders contains all the raw IP headers of an HTTP request.
 type IPHeaders struct {
 	RemoteAddress string
 	XRealIP       string
@@ -51,7 +51,7 @@ func (headers *IPHeaders) isVoid() bool {
 		headers.XForwardedFor == "")
 }
 
-// GetClientIPHeaders returns the IP related HTTP headers from a request
+// GetClientIPHeaders returns the IP related HTTP headers from a request.
 func (m *ipManager) GetClientIPHeaders(r *http.Request) (headers IPHeaders) {
 	if r == nil {
 		return headers
@@ -62,7 +62,7 @@ func (m *ipManager) GetClientIPHeaders(r *http.Request) (headers IPHeaders) {
 	return headers
 }
 
-// GetClientIP returns one single client IP address
+// GetClientIP returns one single client IP address.
 func (m *ipManager) GetClientIP(r *http.Request) (ip string, err error) {
 	headers := m.GetClientIPHeaders(r)
 	if headers.isVoid() {

@@ -9,12 +9,13 @@ import (
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Commander
 
-// Commander contains methods to run and start shell commands
+// Commander contains methods to run and start shell commands.
 type Commander interface {
 	// Run runs a command in a blocking manner, returning its output and an error if it failed
 	Run(ctx context.Context, name string, arg ...string) (output string, err error)
 	// Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function
-	Start(ctx context.Context, name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)
+	Start(ctx context.Context, name string, arg ...string) (
+		stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error)
 }
 
 type commander struct {
@@ -27,7 +28,7 @@ func NewCommander() Commander {
 	}
 }
 
-// Run runs a command in a blocking manner, returning its output and an error if it failed
+// Run runs a command in a blocking manner, returning its output and an error if it failed.
 func (c *commander) Run(ctx context.Context, name string, arg ...string) (output string, err error) {
 	cmd := c.execCommand(ctx, name, arg...)
 	stdout, err := cmd.CombinedOutput()
@@ -42,8 +43,9 @@ func (c *commander) Run(ctx context.Context, name string, arg ...string) (output
 	return output, err
 }
 
-// Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function
-func (c *commander) Start(ctx context.Context, name string, arg ...string) (stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error) {
+// Start launches a command asynchronously and returns streams for stdout, stderr as well as a wait function.
+func (c *commander) Start(ctx context.Context, name string, arg ...string) (
+	stdoutPipe, stderrPipe io.ReadCloser, waitFn func() error, err error) {
 	cmd := c.execCommand(ctx, name, arg...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

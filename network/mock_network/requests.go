@@ -48,9 +48,9 @@ func (mr *MockClientMockRecorder) Close() *gomock.Call {
 }
 
 // Do mocks base method
-func (m *MockClient) Do(arg0 context.Context, arg1 *http.Request) ([]byte, int, error) {
+func (m *MockClient) Do(arg0 *http.Request) ([]byte, int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Do", arg0, arg1)
+	ret := m.ctrl.Call(m, "Do", arg0)
 	ret0, _ := ret[0].([]byte)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
@@ -58,9 +58,9 @@ func (m *MockClient) Do(arg0 context.Context, arg1 *http.Request) ([]byte, int, 
 }
 
 // Do indicates an expected call of Do
-func (mr *MockClientMockRecorder) Do(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockClientMockRecorder) Do(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockClient)(nil).Do), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Do", reflect.TypeOf((*MockClient)(nil).Do), arg0)
 }
 
 // Get mocks base method

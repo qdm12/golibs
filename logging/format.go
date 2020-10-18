@@ -5,22 +5,22 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Debug formats and logs with the Debug level
+// Debug formats and logs with the Debug level.
 func (l *logger) Debug(args ...interface{}) {
 	l.log(l.zapLogger.Debug, args...)
 }
 
-// Info formats and logs with the Info level
+// Info formats and logs with the Info level.
 func (l *logger) Info(args ...interface{}) {
 	l.log(l.zapLogger.Info, args...)
 }
 
-// Warnf formats and logs with the Warning level
+// Warnf formats and logs with the Warning level.
 func (l *logger) Warn(args ...interface{}) {
 	l.log(l.zapLogger.Warn, args...)
 }
 
-// Error formats and logs with the Error level
+// Error formats and logs with the Error level.
 func (l *logger) Error(args ...interface{}) {
 	l.log(l.zapLogger.Error, args...)
 }

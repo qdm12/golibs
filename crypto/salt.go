@@ -1,7 +1,8 @@
 package crypto
 
 func (c *crypto) NewSalt() (salt [saltSize]byte, err error) {
-	saltSlice, err := c.random.GenerateRandomBytes(32)
+	const nBytes = 32
+	saltSlice, err := c.random.GenerateRandomBytes(nBytes)
 	if err != nil {
 		return salt, err
 	}

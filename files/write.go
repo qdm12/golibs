@@ -2,6 +2,7 @@ package files
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -22,7 +23,8 @@ func (f *fileManager) Touch(filePath string, options ...WriteOptionSetter) error
 }
 
 func (f *fileManager) CreateDir(filePath string, setters ...WriteOptionSetter) error {
-	options := newWriteOptions(0700)
+	const defaultPermissions os.FileMode = 0700
+	options := newWriteOptions(defaultPermissions)
 	for _, setter := range setters {
 		setter(&options)
 	}
@@ -30,7 +32,8 @@ func (f *fileManager) CreateDir(filePath string, setters ...WriteOptionSetter) e
 	exists, err := f.FilepathExists(filePath)
 	if err != nil {
 		return fmt.Errorf("%s%w", errPrefix, err)
-	} else if exists {
+	}
+	if exists {
 		isFile, err := f.IsFile(filePath)
 		if err != nil {
 			return fmt.Errorf("%s%w", errPrefix, err)
@@ -54,7 +57,8 @@ func (f *fileManager) CreateDir(filePath string, setters ...WriteOptionSetter) e
 // WriteToFile writes data bytes to a file, and creates any
 // directory not existing in the file path if necessary.
 func (f *fileManager) WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error {
-	options := newWriteOptions(0600)
+	const defaultPermissions os.FileMode = 0600
+	options := newWriteOptions(defaultPermissions)
 	for _, setter := range setters {
 		setter(&options)
 	}

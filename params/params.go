@@ -1,6 +1,7 @@
 package params
 
 import (
+	"fmt"
 	liburl "net/url"
 	"os"
 	"path"
@@ -9,15 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"fmt"
-
 	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/verification"
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . EnvParams
 
-// EnvParams has functions to obtain values from environment variables
+// EnvParams has functions to obtain values from environment variables.
 type EnvParams interface {
 	GetEnv(key string, setters ...GetEnvSetter) (value string, err error)
 	GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error)
@@ -53,7 +52,7 @@ type envParams struct {
 	unset      func(k string) error
 }
 
-// NewEnvParams returns a new EnvParams object
+// NewEnvParams returns a new EnvParams object.
 func NewEnvParams() EnvParams {
 	return &envParams{
 		getenv:     os.Getenv,
@@ -72,10 +71,10 @@ type getEnvOptions struct {
 	defaultValue       string
 }
 
-// GetEnvSetter is a setter for options to GetEnv functions
+// GetEnvSetter is a setter for options to GetEnv functions.
 type GetEnvSetter func(options *getEnvOptions) error
 
-// Compulsory forces the environment variable to contain a value
+// Compulsory forces the environment variable to contain a value.
 func Compulsory() GetEnvSetter {
 	return func(options *getEnvOptions) error {
 		if len(options.defaultValue) > 0 {
@@ -86,7 +85,7 @@ func Compulsory() GetEnvSetter {
 	}
 }
 
-// Default sets a default string value for the environment variable if no value is found
+// Default sets a default string value for the environment variable if no value is found.
 func Default(defaultValue string) GetEnvSetter {
 	return func(options *getEnvOptions) error {
 		if options.compulsory {
@@ -97,7 +96,7 @@ func Default(defaultValue string) GetEnvSetter {
 	}
 }
 
-// CaseSensitiveValue makes the value processing case sensitive
+// CaseSensitiveValue makes the value processing case sensitive.
 func CaseSensitiveValue() GetEnvSetter {
 	return func(options *getEnvOptions) error {
 		options.caseSensitiveValue = true
@@ -105,7 +104,7 @@ func CaseSensitiveValue() GetEnvSetter {
 	}
 }
 
-// Unset unsets the environment variable after it has been read
+// Unset unsets the environment variable after it has been read.
 func Unset() GetEnvSetter {
 	return func(options *getEnvOptions) error {
 		options.unset = true
@@ -114,7 +113,7 @@ func Unset() GetEnvSetter {
 }
 
 // GetEnv returns the value stored for a named environment variable,
-// and a default if no value is found
+// and a default if no value is found.
 func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range setters {
@@ -193,7 +192,7 @@ func (e *envParams) GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err
 	case "no":
 		return false, nil
 	default:
-		return false, fmt.Errorf("environment variable %q value is %q and can only be \"yes\" or \"no\"", key, s)
+		return false, fmt.Errorf(`environment variable %q value is %q and can only be "yes" or "no"`, key, s)
 	}
 }
 
@@ -213,13 +212,14 @@ func (e *envParams) GetOnOff(key string, setters ...GetEnvSetter) (on bool, err 
 	case "off":
 		return false, nil
 	default:
-		return false, fmt.Errorf("environment variable %q value is %q and can only be \"on\" or \"off\"", key, s)
+		return false, fmt.Errorf(`environment variable %q value is %q and can only be "on" or "off"`, key, s)
 	}
 }
 
 // GetValueIfInside obtains the value stored for a named environment variable if it is part of a
-// list of possible values. You can optionally specify a defaultValue
-func (e *envParams) GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error) {
+// list of possible values. You can optionally specify a defaultValue.
+func (e *envParams) GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (
+	value string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range setters {
 		_ = setter(&options) // error is checked in e.GetEnv
@@ -239,10 +239,12 @@ func (e *envParams) GetValueIfInside(key string, possibilities []string, setters
 			}
 		}
 	}
-	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, strings.Join(possibilities, ", "))
+	csvPossibilities := strings.Join(possibilities, ", ")
+	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, csvPossibilities)
 }
 
-func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, setters ...GetEnvSetter) (values []string, err error) {
+func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, setters ...GetEnvSetter) (
+	values []string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range setters {
 		_ = setter(&options) // error is checked in e.GetEnv
@@ -312,23 +314,23 @@ func (e *envParams) GetDuration(key string, setters ...GetEnvSetter) (duration t
 }
 
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
-// from the environment variable HTTP_TIMEOUT
+// from the environment variable HTTP_TIMEOUT.
 func (e *envParams) GetHTTPTimeout(setters ...GetEnvSetter) (timeout time.Duration, err error) {
 	return e.GetDuration("HTTP_TIMEOUT", setters...)
 }
 
-// GetUserID obtains the user ID running the program
+// GetUserID obtains the user ID running the program.
 func (e *envParams) GetUserID() int {
 	return e.getuid()
 }
 
-// GetGroupID obtains the user ID running the program
+// GetGroupID obtains the user ID running the program.
 func (e *envParams) GetGroupID() int {
 	return e.getgid()
 }
 
 // GetListeningPort obtains and checks the listening port
-// from the environment variable LISTENING_PORT
+// from the environment variable LISTENING_PORT.
 func (e *envParams) GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error) {
 	setters = append([]GetEnvSetter{Default("8000")}, setters...)
 	listeningPort, err = e.GetEnv("LISTENING_PORT", setters...)
@@ -341,7 +343,7 @@ func (e *envParams) GetListeningPort(setters ...GetEnvSetter) (listeningPort str
 }
 
 // GetRootURL obtains and checks the root URL
-// from the environment variable ROOT_URL
+// from the environment variable ROOT_URL.
 func (e *envParams) GetRootURL(setters ...GetEnvSetter) (rootURL string, err error) {
 	setters = append([]GetEnvSetter{Default("/")}, setters...)
 	rootURL, err = e.GetEnv("ROOT_URL", setters...)
@@ -357,7 +359,7 @@ func (e *envParams) GetRootURL(setters ...GetEnvSetter) (rootURL string, err err
 }
 
 // GetDatabaseDetails obtains the SQL database details from the
-// environment variables SQL_USER, SQL_PASSWORD and SQL_DBNAME
+// environment variables SQL_USER, SQL_PASSWORD and SQL_DBNAME.
 func (e *envParams) GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
 	hostname, err = e.GetEnv("SQL_HOST", Default("postgres"))
 	if err != nil {
@@ -384,7 +386,7 @@ func (e *envParams) GetDatabaseDetails() (hostname, user, password, dbName strin
 }
 
 // GetRedisDetails obtains the Redis details from the
-// environment variables REDIS_HOST, REDIS_PORT and REDIS_PASSWORD
+// environment variables REDIS_HOST, REDIS_PORT and REDIS_PASSWORD.
 func (e *envParams) GetRedisDetails() (hostname, port, password string, err error) {
 	hostname, err = e.GetEnv("REDIS_HOST", Default("redis"))
 	if err != nil {
@@ -392,7 +394,7 @@ func (e *envParams) GetRedisDetails() (hostname, port, password string, err erro
 	}
 	if !e.verifier.MatchHostname(hostname) {
 		return hostname, port, password,
-			fmt.Errorf("environment variable \"REDIS_HOST\" value %q is not valid", hostname)
+			fmt.Errorf(`environment variable "REDIS_HOST" value %q is not valid`, hostname)
 	}
 	port, err = e.GetEnv("REDIS_PORT", Default("6379"))
 	if err != nil {
@@ -409,7 +411,7 @@ func (e *envParams) GetRedisDetails() (hostname, port, password string, err erro
 	return hostname, port, password, nil
 }
 
-// GetExeDir obtains the executable directory
+// GetExeDir obtains the executable directory.
 func (e *envParams) GetExeDir() (dir string, err error) {
 	ex, err := e.executable()
 	if err != nil {
@@ -422,7 +424,7 @@ func (e *envParams) GetExeDir() (dir string, err error) {
 // GetPath obtains a path from the environment variable corresponding
 // to key, and verifies it is valid. If it is a relative path,
 // it prepends it with the executable path to obtain an absolute path.
-// It uses defaultValue if no value is found
+// It uses defaultValue if no value is found.
 func (e *envParams) GetPath(key string, setters ...GetEnvSetter) (path string, err error) {
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
@@ -452,7 +454,7 @@ func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.
 }
 
 // GetLoggerEncoding obtains the logging encoding
-// from the environment variable LOG_ENCODING
+// from the environment variable LOG_ENCODING.
 func (e *envParams) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error) {
 	setters = append([]GetEnvSetter{Default("json")}, setters...)
 	s, err := e.GetEnv("LOG_ENCODING", setters...)
@@ -469,7 +471,7 @@ func (e *envParams) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging
 }
 
 // GetLoggerLevel obtains the logging level
-// from the environment variable LOG_LEVEL
+// from the environment variable LOG_LEVEL.
 func (e *envParams) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error) {
 	setters = append([]GetEnvSetter{Default("info")}, setters...)
 	s, err := e.GetEnv("LOG_LEVEL", setters...)

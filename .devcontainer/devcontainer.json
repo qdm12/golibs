@@ -87,8 +87,6 @@
             "--enable",
             "godot",
             "--enable",
-            "goerr113",
-            "--enable",
             "goheader",
             "--enable",
             "goimports",

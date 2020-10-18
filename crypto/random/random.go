@@ -20,7 +20,7 @@ const (
 	maxInt63      = 9223372036854775807
 )
 
-// Random has methods to generate random values
+// Random has methods to generate random values.
 type Random interface {
 	// GenerateRandomBytes generates a byte slice of n random bytes
 	GenerateRandomBytes(n int) ([]byte, error)
@@ -34,12 +34,12 @@ type Random interface {
 	GenerateRandomNum(n uint64) string
 }
 
-// random implements Random
+// random implements Random.
 type random struct {
 	randReader func(b []byte) error
 }
 
-// NewRandom returns a new Random object
+// NewRandom returns a new Random object.
 func NewRandom() Random {
 	return &random{
 		randReader: randReader,
@@ -57,7 +57,7 @@ func randReader(b []byte) error {
 	return nil
 }
 
-// GenerateRandomBytes generates n random bytes
+// GenerateRandomBytes generates n random bytes.
 func (r *random) GenerateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	if err := r.randReader(b); err != nil {
@@ -66,7 +66,7 @@ func (r *random) GenerateRandomBytes(n int) ([]byte, error) {
 	return b, nil
 }
 
-// GenerateRandomInt63 returns a random 63 bit positive integer
+// GenerateRandomInt63 returns a random 63 bit positive integer.
 func (r *random) GenerateRandomInt63() int64 {
 	const int63Length = 8
 	b, err := r.GenerateRandomBytes(int63Length)
@@ -80,7 +80,7 @@ func (r *random) GenerateRandomInt63() int64 {
 	return v
 }
 
-// GenerateRandomInt returns a random integer between 0 and n
+// GenerateRandomInt returns a random integer between 0 and n.
 func (r *random) GenerateRandomInt(n int) (result int) {
 	if n == 0 {
 		return 0
@@ -92,7 +92,7 @@ func (r *random) GenerateRandomInt(n int) (result int) {
 	return result
 }
 
-// GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length
+// GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length.
 func (r *random) GenerateRandomAlphaNum(length uint64) string {
 	if length >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
@@ -114,7 +114,7 @@ func (r *random) GenerateRandomAlphaNum(length uint64) string {
 	return string(b)
 }
 
-// GenerateRandomNum returns a string of random numeric characters of a specified length
+// GenerateRandomNum returns a string of random numeric characters of a specified length.
 func (r *random) GenerateRandomNum(n uint64) string {
 	if n >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")

@@ -1,6 +1,6 @@
 package logging
 
-// Level is the level of the logger (info warn error)
+// Level is the level of the logger (info warn error).
 type Level string
 
 const (
