@@ -25,7 +25,9 @@ func (l *logger) Error(args ...interface{}) {
 	l.log(l.zapLogger.Error, args...)
 }
 
-func (l *logger) log(logFn func(s string, fields ...zapcore.Field), args ...interface{}) {
+type zapLogFn func(s string, fields ...zapcore.Field)
+
+func (l *logger) log(logFn zapLogFn, args ...interface{}) {
 	s := l.prefix + format.ArgsToString(args...)
 	if l.color != nil {
 		s = l.color.Sprintf(s)

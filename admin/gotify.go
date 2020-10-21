@@ -11,6 +11,7 @@ import (
 	gotifylib "github.com/gotify/go-api-client/v2/gotify"
 	"github.com/gotify/go-api-client/v2/models"
 	"github.com/qdm12/golibs/format"
+	"github.com/qdm12/golibs/logging"
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Gotify
@@ -21,6 +22,7 @@ type Gotify interface {
 	Ping() error
 	// Notify formats and sends a message to the Gotify server
 	Notify(title string, priority int, args ...interface{}) error
+	NotifyAndLog(title string, level logging.Level, logger logging.Logger, args ...interface{})
 }
 
 type gotify struct {
@@ -42,9 +44,13 @@ func (g *gotify) Ping() error {
 	return nil
 }
 
-// Notify formats and sends a message to the Gotify server.
-func (g *gotify) Notify(title string, priority int, args ...interface{}) error {
-	content := format.ArgsToString(args...)
+func (g *gotify) notify(title, content string, priority int) error {
+	if g == nil {
+		return nil
+	}
+	if content == "" {
+		content = " " // content is required
+	}
 	params := message.NewCreateMessageParams()
 	params.Body = &models.MessageExternal{
 		Title:    title,
@@ -56,4 +62,35 @@ func (g *gotify) Notify(title string, priority int, args ...interface{}) error {
 		return fmt.Errorf("cannot send message to Gotify: %w", err)
 	}
 	return nil
+}
+
+// Notify formats and sends a message to the Gotify server.
+// TODO custom HTTP request with context.
+func (g *gotify) Notify(title string, priority int, args ...interface{}) error {
+	s := format.ArgsToString(args...)
+	return g.notify(title, s, priority)
+}
+
+func (g *gotify) NotifyAndLog(title string, level logging.Level, logger logging.Logger, args ...interface{}) {
+	s := format.ArgsToString(args...)
+	toLog := fmt.Sprintf("%s: %s", title, s)
+	var priority int
+	switch level {
+	case logging.DebugLevel:
+		logger.Debug(toLog)
+	case logging.InfoLevel:
+		priority = 1
+		logger.Info(toLog)
+	case logging.WarnLevel:
+		priority = 2
+		logger.Warn(toLog)
+	case logging.ErrorLevel:
+		priority = 3
+		logger.Error(toLog)
+	default:
+		logger.Debug(toLog)
+	}
+	if err := g.notify(title, s, priority); err != nil {
+		logger.Error(err)
+	}
 }

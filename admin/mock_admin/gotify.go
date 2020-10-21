@@ -6,6 +6,7 @@ package mock_admin
 
 import (
 	gomock "github.com/golang/mock/gomock"
+	logging "github.com/qdm12/golibs/logging"
 	reflect "reflect"
 )
 
@@ -49,6 +50,23 @@ func (mr *MockGotifyMockRecorder) Notify(arg0, arg1 interface{}, arg2 ...interfa
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Notify", reflect.TypeOf((*MockGotify)(nil).Notify), varargs...)
+}
+
+// NotifyAndLog mocks base method
+func (m *MockGotify) NotifyAndLog(arg0 string, arg1 logging.Level, arg2 logging.Logger, arg3 ...interface{}) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1, arg2}
+	for _, a := range arg3 {
+		varargs = append(varargs, a)
+	}
+	m.ctrl.Call(m, "NotifyAndLog", varargs...)
+}
+
+// NotifyAndLog indicates an expected call of NotifyAndLog
+func (mr *MockGotifyMockRecorder) NotifyAndLog(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotifyAndLog", reflect.TypeOf((*MockGotify)(nil).NotifyAndLog), varargs...)
 }
 
 // Ping mocks base method
