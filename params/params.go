@@ -227,16 +227,14 @@ func (e *envParams) GetValueIfInside(key string, possibilities []string, setters
 	s, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return "", err
+	} else if len(s) == 0 && !options.compulsory {
+		return "", nil
 	}
 	for _, possibility := range possibilities {
-		if options.caseSensitiveValue {
-			if s == possibility {
-				return s, nil
-			}
-		} else {
-			if strings.EqualFold(s, possibility) {
-				return strings.ToLower(s), nil
-			}
+		if options.caseSensitiveValue && s == possibility {
+			return s, nil
+		} else if !options.caseSensitiveValue && strings.EqualFold(s, possibility) {
+			return strings.ToLower(s), nil
 		}
 	}
 	csvPossibilities := strings.Join(possibilities, ", ")
@@ -252,6 +250,9 @@ func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, se
 	csv, err := e.GetEnv(key, setters...)
 	if err != nil {
 		return nil, err
+	}
+	if !options.compulsory && len(csv) == 0 {
+		return nil, nil
 	}
 	values = strings.Split(csv, ",")
 	type valuePosition struct {
@@ -284,10 +285,7 @@ func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, se
 		for i := range invalidValues {
 			invalidMessages[i] = fmt.Sprintf("value %q at position %d", invalidValues[i].value, invalidValues[i].position)
 		}
-		return nil, fmt.Errorf("invalid values found: %s", strings.Join(invalidMessages, ", "))
-	}
-	if len(values) == 1 && len(values[0]) == 0 {
-		return nil, nil // single empty string
+		return nil, fmt.Errorf("environment variable %q: invalid values found: %s", key, strings.Join(invalidMessages, ", "))
 	}
 	return values, nil
 }

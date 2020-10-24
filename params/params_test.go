@@ -334,7 +334,12 @@ func Test_GetValueIfInside(t *testing.T) {
 		},
 		"key without value": {
 			possibilities: []string{"a", "b"},
-			err:           fmt.Errorf(`environment variable "any" value is "" and can only be one of: a, b`),
+			value:         "",
+		},
+		"key without value compulsory": {
+			possibilities: []string{"a", "b"},
+			setters:       []GetEnvSetter{Compulsory()},
+			err:           fmt.Errorf(`no value found for environment variable "any"`),
 		},
 		"key without value and default": {
 			possibilities: []string{"a", "b"},
@@ -377,12 +382,15 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 		values        []string
 		err           error
 	}{
-		"empty string": {
-			err: fmt.Errorf(`invalid values found: value "" at position 1`),
+		"empty string": {},
+		"empty string compulsory": {
+			setters: []GetEnvSetter{Compulsory()},
+			err:     fmt.Errorf(`no value found for environment variable "any"`),
 		},
 		"single comma": {
 			envValue: ",",
-			err:      fmt.Errorf(`invalid values found: value "" at position 1, value "" at position 2`),
+			err: fmt.Errorf(
+				`environment variable "any": invalid values found: value "" at position 1, value "" at position 2`),
 		},
 		"single valid": {
 			possibilities: []string{"a", "b", "c"},
@@ -399,7 +407,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 			possibilities: []string{"a", "b", "c"},
 			envValue:      "B",
 			setters:       []GetEnvSetter{CaseSensitiveValue()},
-			err:           fmt.Errorf(`invalid values found: value "B" at position 1`),
+			err:           fmt.Errorf(`environment variable "any": invalid values found: value "B" at position 1`),
 		},
 		"two valid": {
 			possibilities: []string{"a", "b", "c"},
@@ -409,7 +417,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 		"one valid and one invalid": {
 			possibilities: []string{"a", "b", "c"},
 			envValue:      "b,d",
-			err:           fmt.Errorf(`invalid values found: value "d" at position 2`),
+			err:           fmt.Errorf(`environment variable "any": invalid values found: value "d" at position 2`),
 		},
 	}
 	for name, tc := range tests {
