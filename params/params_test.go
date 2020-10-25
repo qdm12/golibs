@@ -427,7 +427,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 		"single comma": {
 			envValue: ",",
 			err: fmt.Errorf(
-				`environment variable "any": invalid values found: value "" at position 1, value "" at position 2`),
+				`environment variable "any": invalid values found: value "" at position 1, value "" at position 2: possible values are: `), //nolint:lll
 		},
 		"single valid": {
 			possibilities: []string{"a", "b", "c"},
@@ -444,7 +444,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 			possibilities: []string{"a", "b", "c"},
 			envValue:      "B",
 			setters:       []GetEnvSetter{CaseSensitiveValue()},
-			err:           fmt.Errorf(`environment variable "any": invalid values found: value "B" at position 1`),
+			err:           fmt.Errorf(`environment variable "any": invalid values found: value "B" at position 1: possible values are: a, b, c`), //nolint:lll
 		},
 		"two valid": {
 			possibilities: []string{"a", "b", "c"},
@@ -454,7 +454,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 		"one valid and one invalid": {
 			possibilities: []string{"a", "b", "c"},
 			envValue:      "b,d",
-			err:           fmt.Errorf(`environment variable "any": invalid values found: value "d" at position 2`),
+			err:           fmt.Errorf(`environment variable "any": invalid values found: value "d" at position 2: possible values are: a, b, c`), //nolint:lll
 		},
 	}
 	for name, tc := range tests {

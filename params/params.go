@@ -307,7 +307,9 @@ func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, se
 		for i := range invalidValues {
 			invalidMessages[i] = fmt.Sprintf("value %q at position %d", invalidValues[i].value, invalidValues[i].position)
 		}
-		return nil, fmt.Errorf("environment variable %q: invalid values found: %s", key, strings.Join(invalidMessages, ", "))
+		csvPossibilities := strings.Join(possibilities, ", ")
+		return nil, fmt.Errorf("environment variable %q: invalid values found: %s: possible values are: %s",
+			key, strings.Join(invalidMessages, ", "), csvPossibilities)
 	}
 	return values, nil
 }
