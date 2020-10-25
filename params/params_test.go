@@ -622,30 +622,31 @@ func Test_GetListeningPort(t *testing.T) {
 	tests := map[string]struct {
 		envValue      string
 		setters       []GetEnvSetter
-		listeningPort string
+		listeningPort uint16
 		warning       string
 		err           error
 	}{
 		"key with valid value": {
 			envValue:      "9000",
-			listeningPort: "9000",
+			listeningPort: 9000,
 		},
 		"key with valid warning value": {
 			envValue:      "60000",
-			listeningPort: "60000",
+			listeningPort: 60000,
 			warning:       "listening port 60000 is in the dynamic/private ports range (above 49151)",
 		},
 		"key without value": {
 			envValue:      "",
-			listeningPort: "8000",
+			listeningPort: 0,
+			err:           fmt.Errorf(`port "" is not a valid integer`),
 		},
 		"key without value and default": {
 			setters:       []GetEnvSetter{Default("9000")},
-			listeningPort: "9000",
+			listeningPort: 9000,
 		},
 		"key without value and compulsory": {
 			setters: []GetEnvSetter{Compulsory()},
-			err:     fmt.Errorf(`environment variable "LISTENING_PORT": cannot make environment variable value compulsory with a default value`), //nolint:lll
+			err:     fmt.Errorf(`no value found for environment variable "LISTENING_PORT"`), //nolint:lll
 		},
 	}
 	for name, tc := range tests {
@@ -662,7 +663,7 @@ func Test_GetListeningPort(t *testing.T) {
 				},
 				verifier: verification.NewVerifier(),
 			}
-			listeningPort, warning, err := e.GetListeningPort(tc.setters...)
+			listeningPort, warning, err := e.GetListeningPort("LISTENING_PORT", tc.setters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

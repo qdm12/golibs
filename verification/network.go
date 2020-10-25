@@ -6,22 +6,24 @@ import (
 )
 
 func (v *verifier) VerifyPort(port string) error {
-	return VerifyPort(port)
+	_, err := ParsePort(port)
+	return err
 }
 
-// VerifyPort verifies a port number string is valid.
-func VerifyPort(port string) error {
+// ParsePort verifies a port number string is valid and
+// returns the port as an uint16.
+func ParsePort(s string) (port uint16, err error) {
 	const minPort = 1
 	const maxPort = 65535
-	value, err := strconv.Atoi(port)
+	portInt, err := strconv.Atoi(s)
 	switch {
 	case err != nil:
-		return fmt.Errorf("port %q is not a valid integer", port)
-	case value < minPort:
-		return fmt.Errorf("port %s cannot be lower than 1", port)
-	case value > maxPort:
-		return fmt.Errorf("port %s cannot be higher than 65535", port)
+		return 0, fmt.Errorf("port %q is not a valid integer", s)
+	case portInt < minPort:
+		return 0, fmt.Errorf("port %s cannot be lower than 1", s)
+	case portInt > maxPort:
+		return 0, fmt.Errorf("port %s cannot be higher than 65535", s)
 	default:
-		return nil
+		return uint16(portInt), nil
 	}
 }

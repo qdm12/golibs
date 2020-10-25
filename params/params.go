@@ -29,7 +29,8 @@ type EnvParams interface {
 	GetHTTPTimeout(setters ...GetEnvSetter) (duration time.Duration, err error)
 	GetUserID() int
 	GetGroupID() int
-	GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error)
+	GetPort(key string, setters ...GetEnvSetter) (port uint16, err error)
+	GetListeningPort(key string, setters ...GetEnvSetter) (port uint16, warning string, err error)
 	GetRootURL(setters ...GetEnvSetter) (rootURL string, err error)
 	GetDatabaseDetails() (hostname, user, password, dbName string, err error)
 	GetRedisDetails() (hostname, port, password string, err error)
@@ -333,6 +334,16 @@ func (e *envParams) GetDuration(key string, setters ...GetEnvSetter) (duration t
 	}
 }
 
+// GetPort obtains and checks a port number from the
+// environment variable corresponding to the key provided.
+func (e *envParams) GetPort(key string, setters ...GetEnvSetter) (port uint16, err error) {
+	s, err := e.GetEnv(key, setters...)
+	if err != nil {
+		return 0, err
+	}
+	return verification.ParsePort(s)
+}
+
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
 // from the environment variable HTTP_TIMEOUT.
 func (e *envParams) GetHTTPTimeout(setters ...GetEnvSetter) (timeout time.Duration, err error) {
@@ -349,17 +360,31 @@ func (e *envParams) GetGroupID() int {
 	return e.getgid()
 }
 
-// GetListeningPort obtains and checks the listening port
-// from the environment variable LISTENING_PORT.
-func (e *envParams) GetListeningPort(setters ...GetEnvSetter) (listeningPort string, warning string, err error) {
-	setters = append([]GetEnvSetter{Default("8000")}, setters...)
-	listeningPort, err = e.GetEnv("LISTENING_PORT", setters...)
+// GetListeningPort obtains and checks a port from an environment variable
+// and returns a warning associated with the user ID and the port found.
+func (e *envParams) GetListeningPort(key string, setters ...GetEnvSetter) (port uint16, warning string, err error) {
+	port, err = e.GetPort(key, setters...)
 	if err != nil {
-		return "", "", err
+		return 0, "", err
 	}
-	uid := e.getuid()
-	warning, err = verifyListeningPort(e.verifier, listeningPort, uid)
-	return listeningPort, warning, err
+	const (
+		maxPrivilegedPort = 1023
+		minDynamicPort    = 49151
+	)
+	if port <= maxPrivilegedPort {
+		switch e.getuid() {
+		case 0:
+			warning = fmt.Sprintf("listening port %d allowed to be in the reserved system ports range as you are running as root", port) //nolint:lll
+		case -1:
+			warning = fmt.Sprintf("listening port %d allowed to be in the reserved system ports range as you are running in Windows", port) //nolint:lll
+		default:
+			return 0, "", fmt.Errorf("listening port %d cannot be in the reserved system ports range (1 to 1023) when running without root", port) //nolint:lll
+		}
+	} else if port > minDynamicPort {
+		// dynamic and/or private ports.
+		warning = fmt.Sprintf("listening port %d is in the dynamic/private ports range (above 49151)", port)
+	}
+	return port, warning, err
 }
 
 // GetRootURL obtains and checks the root URL
