@@ -150,6 +150,7 @@ func Test_MatchEmail(t *testing.T) {
 		"no match for email made of numbers only": {"125@125.12", false},
 		"match for email with numbers except tld": {"125@125.aa", true},
 		"match for complex email":                 {"aaabc@aaabc.co.uk", true},
+		"match for email with plus sign":          {"a+b@aaabc.co.uk", true},
 	}
 	for name, tc := range tests {
 		tc := tc
