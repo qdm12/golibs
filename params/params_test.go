@@ -20,23 +20,23 @@ func Test_NewEnvParams(t *testing.T) {
 func Test_GetEnv(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
-		envValue string
-		setters  []GetEnvSetter
-		value    string
-		err      error
+		env     map[string]string
+		setters []GetEnvSetter
+		value   string
+		err     error
 	}{
 		"key with value": {
-			envValue: "value",
-			value:    "value",
+			env:   map[string]string{"key": "value"},
+			value: "value",
 		},
 		"key with uppercase value": {
-			envValue: "VALUE",
-			value:    "value",
+			env:   map[string]string{"key": "VALUE"},
+			value: "value",
 		},
 		"key with case sensitive value": {
-			envValue: "VALUE",
-			setters:  []GetEnvSetter{CaseSensitiveValue()},
-			value:    "VALUE",
+			env:     map[string]string{"key": "VALUE"},
+			setters: []GetEnvSetter{CaseSensitiveValue()},
+			value:   "VALUE",
 		},
 		"key without value and default": {
 			setters: []GetEnvSetter{Default("default")},
@@ -44,23 +44,60 @@ func Test_GetEnv(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			setters: []GetEnvSetter{Compulsory()},
-			err:     fmt.Errorf(`no value found for environment variable "any"`),
+			err:     fmt.Errorf(`no value found for environment variable "key"`),
 		},
 		"bad options": {
 			setters: []GetEnvSetter{Compulsory(), Default("a")},
-			err:     fmt.Errorf(`environment variable "any": cannot set default value for environment variable value which is compulsory`), //nolint:lll
+			err:     fmt.Errorf(`environment variable "key": cannot set default value for environment variable value which is compulsory`), //nolint:lll
+		},
+		"retro key used": {
+			env: map[string]string{
+				"key":    "",
+				"retro1": "",
+				"retro2": "value2",
+				"retro3": "value3",
+			},
+			setters: []GetEnvSetter{RetroKeys(
+				[]string{"retro1", "retro2", "retro3"},
+				func(oldKey string, newKey string) {
+					assert.Equal(t, "retro2", oldKey)
+					assert.Equal(t, "key", newKey)
+				},
+			)},
+			value: "value2",
+		},
+		"retro key unused": {
+			env: map[string]string{
+				"key":    "value",
+				"retro1": "value1",
+			},
+			setters: []GetEnvSetter{RetroKeys(
+				[]string{"retro1"},
+				func(oldKey string, newKey string) {},
+			)},
+			value: "value",
+		},
+		"not found with retro key": {
+			env: map[string]string{
+				"key":    "",
+				"retro1": "",
+			},
+			setters: []GetEnvSetter{RetroKeys(
+				[]string{"retro1"},
+				func(oldKey string, newKey string) {},
+			), Compulsory()},
+			err: fmt.Errorf(`no value found for environment variable "key"`),
 		},
 	}
 	for name, tc := range tests {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+			const keyArg = "key"
 			e := &envParams{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				getenv: func(key string) string { return tc.env[key] },
 			}
-			value, err := e.GetEnv("any", tc.setters...)
+			value, err := e.GetEnv(keyArg, tc.setters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

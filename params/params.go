@@ -69,6 +69,8 @@ type getEnvOptions struct {
 	caseSensitiveValue bool
 	unset              bool
 	defaultValue       string
+	retroKeys          []string
+	onRetro            func(oldKey, newKey string)
 }
 
 // GetEnvSetter is a setter for options to GetEnv functions.
@@ -112,6 +114,17 @@ func Unset() GetEnvSetter {
 	}
 }
 
+// RetroKeys tries to read from retroactive environment variable keys
+// and runs the function onRetro if any retro environment variable is not
+// empty. RetroKeys overrides previous RetroKeys setters passed.
+func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) GetEnvSetter {
+	return func(options *getEnvOptions) error {
+		options.retroKeys = keys
+		options.onRetro = onRetro
+		return nil
+	}
+}
+
 // GetEnv returns the value stored for a named environment variable,
 // and a default if no value is found.
 func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
@@ -125,6 +138,15 @@ func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, e
 		}
 	}
 	value = e.getenv(key)
+	if len(value) == 0 {
+		for _, retroKey := range options.retroKeys {
+			value = e.getenv(retroKey)
+			if len(value) > 0 {
+				options.onRetro(retroKey, key)
+				break
+			}
+		}
+	}
 	if len(value) == 0 {
 		if options.compulsory {
 			if options.unset {
