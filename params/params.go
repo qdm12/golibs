@@ -130,11 +130,16 @@ func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) GetEnvSetter 
 // and a default if no value is found.
 func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
 	options := getEnvOptions{}
+	defer func() {
+		if options.unset {
+			_ = e.unset(key)
+			for _, retroKey := range options.retroKeys {
+				_ = e.unset(retroKey)
+			}
+		}
+	}()
 	for _, setter := range setters {
 		if err := setter(&options); err != nil {
-			if options.unset {
-				_ = e.unset(key)
-			}
 			return "", fmt.Errorf("environment variable %q: %w", key, err)
 		}
 	}
@@ -150,18 +155,12 @@ func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, e
 	}
 	if len(value) == 0 {
 		if options.compulsory {
-			if options.unset {
-				_ = e.unset(key)
-			}
 			return "", fmt.Errorf("no value found for environment variable %q", key)
 		}
 		value = options.defaultValue
 	}
 	if !options.caseSensitiveValue {
 		value = strings.ToLower(value)
-	}
-	if options.unset {
-		return value, e.unset(key)
 	}
 	return value, nil
 }
