@@ -69,16 +69,17 @@ func (s *streamMerger) Merge(ctx context.Context, stream io.ReadCloser, setters 
 			return options.color.Sprintf(prefix + s)
 		}
 	}
-	go func() { // Read lines infinitely
+	go func(ctx context.Context) { // Read lines infinitely
 		scanner := bufio.NewScanner(stream)
 		for scanner.Scan() {
 			line := string(scanner.Bytes())
 			s.chLine <- lineWrapper(line)
 		}
-		if err := scanner.Err(); err != nil {
+		err := scanner.Err()
+		if ctx.Err() == nil && err != nil {
 			s.chErr <- fmt.Errorf("%sstream error: %w", prefix, err)
 		}
-	}()
+	}(ctx)
 	<-ctx.Done()
 	if err := stream.Close(); err != nil {
 		s.chErr <- err
