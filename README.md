@@ -14,15 +14,14 @@
 Simply import one of the following libraries in your Go code:
 
 - `"github.com/qdm12/golibs/admin"` for supervising your application, it contains a Gotify client
-- `"github.com/qdm12/golibs/database"` for basic initialization of a postgreSQL database pool of connections
-- `"github.com/qdm12/golibs/healthcheck"` for server and client functions to provide a healthcheck
+- `"github.com/qdm12/golibs/command"` for interacting the shell command line
+- `"github.com/qdm12/golibs/crypto"` for encryption, randomness and checksum functions
+- `"github.com/qdm12/golibs/files"` to interact with the filesystem
+- `"github.com/qdm12/golibs/format"` to format things to strings
 - `"github.com/qdm12/golibs/logging"` for logging functions with a global Zap logger
 - `"github.com/qdm12/golibs/network"` for HTTP requests, IP address processing and connectivity checks
 - `"github.com/qdm12/golibs/params"` for parsing and verifying parameters from environment variables
 - `"github.com/qdm12/golibs/redis"` for basic initialization of a Redis database pool of connections
-- `"github.com/qdm12/golibs/security"` for encryption, randomness and checksum functions
-- `"github.com/qdm12/golibs/server"` for HTTP server functions
-- `"github.com/qdm12/golibs/signals"` for termination signal catching for a graceful shutdown of the application
 - `"github.com/qdm12/golibs/verification"` for verification functions such as email checking or regex based checking.
 
 For each package, some mocks are generated using [mockgen](https://github.com/golang/mock#running-mockgen) and can be imported with, for example
