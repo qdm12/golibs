@@ -68,7 +68,7 @@ func matchRegex(regex string) *regexp.Regexp {
 }
 
 func (r *regex) MatchEmail(s string) bool {
-	return r.searchEmail.MatchString(s)
+	return r.matchEmail.MatchString(s)
 }
 func (r *regex) MatchPhoneIntl(s string) bool {
 	return r.matchPhoneIntl.MatchString(s)
