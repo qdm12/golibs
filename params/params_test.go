@@ -646,7 +646,7 @@ func Test_GetListeningPort(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			setters: []GetEnvSetter{Compulsory()},
-			err:     fmt.Errorf(`no value found for environment variable "LISTENING_PORT"`), //nolint:lll
+			err:     fmt.Errorf(`no value found for environment variable "LISTENING_PORT"`),
 		},
 	}
 	for name, tc := range tests {
