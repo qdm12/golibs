@@ -53,6 +53,13 @@ linters:
     - varcheck
     - whitespace
 
+issues:
+  exclude-rules:
+    - path: os/alias\.go
+      linters:
+        - gochecknoglobals
+      text: IsNotExist is a global variable
+
 run:
   skip-dirs:
     - .devcontainer
