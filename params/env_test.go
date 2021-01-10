@@ -535,64 +535,6 @@ func Test_Duration(t *testing.T) {
 	}
 }
 
-func Test_HTTPTimeout(t *testing.T) {
-	t.Parallel()
-	tests := map[string]struct {
-		envValue      string
-		optionSetters []OptionSetter
-		timeout       time.Duration
-		err           error
-	}{
-		"key with non integer value": {
-			envValue: "a",
-			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: invalid duration "a"`),
-		},
-		"key without unit": {
-			envValue: "1",
-			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is malformed: time: missing unit in duration "1"`), //nolint:lll
-		},
-		"key with 0 integer value": {
-			envValue: "0",
-			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value cannot be 0`),
-		},
-		"key with negative duration": {
-			envValue: "-1s",
-			err:      fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value cannot be lower than 0`),
-		},
-		"key without value": {
-			err: fmt.Errorf(`environment variable "HTTP_TIMEOUT" duration value is empty`),
-		},
-		"key without value and default": {
-			optionSetters: []OptionSetter{Default("1s")},
-			timeout:       time.Second,
-		},
-		"key without value and compulsory": {
-			envValue:      "",
-			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "HTTP_TIMEOUT"`),
-		},
-	}
-	for name, tc := range tests {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			e := &envParams{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
-			}
-			timeout, err := e.HTTPTimeout(tc.optionSetters...)
-			if tc.err != nil {
-				require.Error(t, err)
-				assert.Equal(t, tc.err.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, tc.timeout, timeout)
-		})
-	}
-}
-
 func Test_ListeningPort(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
@@ -692,7 +634,7 @@ func Test_RootURL(t *testing.T) {
 				},
 				verifier: verification.NewVerifier(),
 			}
-			rootURL, err := e.RootURL(tc.optionSetters...)
+			rootURL, err := e.RootURL("ROOT_URL", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -863,30 +805,4 @@ func Test_URL(t *testing.T) {
 			}
 		})
 	}
-}
-
-func Test_GotifyURLL(t *testing.T) {
-	t.Parallel()
-	e := &envParams{
-		getenv: func(key string) string {
-			return "https://google.com"
-		},
-	}
-	URL, err := e.GotifyURL()
-	require.NoError(t, err)
-	require.NotNil(t, URL)
-	assert.Equal(t, "https://google.com", URL.String())
-}
-
-func Test_GotifyToken(t *testing.T) {
-	t.Parallel()
-	e := &envParams{
-		getenv: func(key string) string {
-			return "x"
-		},
-		unset: func(k string) error { return nil },
-	}
-	token, err := e.GotifyToken()
-	require.NoError(t, err)
-	assert.Equal(t, "x", token)
 }

@@ -56,24 +56,6 @@ func (mr *MockEnvMockRecorder) CSVInside(arg0, arg1 interface{}, arg2 ...interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CSVInside", reflect.TypeOf((*MockEnv)(nil).CSVInside), varargs...)
 }
 
-// DatabaseDetails mocks base method
-func (m *MockEnv) DatabaseDetails() (string, string, string, string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DatabaseDetails")
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(string)
-	ret3, _ := ret[3].(string)
-	ret4, _ := ret[4].(error)
-	return ret0, ret1, ret2, ret3, ret4
-}
-
-// DatabaseDetails indicates an expected call of DatabaseDetails
-func (mr *MockEnvMockRecorder) DatabaseDetails() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatabaseDetails", reflect.TypeOf((*MockEnv)(nil).DatabaseDetails))
-}
-
 // Duration mocks base method
 func (m *MockEnv) Duration(arg0 string, arg1 ...params.OptionSetter) (time.Duration, error) {
 	m.ctrl.T.Helper()
@@ -112,63 +94,6 @@ func (mr *MockEnvMockRecorder) Get(arg0 interface{}, arg1 ...interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockEnv)(nil).Get), varargs...)
-}
-
-// GotifyToken mocks base method
-func (m *MockEnv) GotifyToken(arg0 ...params.OptionSetter) (string, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GotifyToken", varargs...)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GotifyToken indicates an expected call of GotifyToken
-func (mr *MockEnvMockRecorder) GotifyToken(arg0 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GotifyToken", reflect.TypeOf((*MockEnv)(nil).GotifyToken), arg0...)
-}
-
-// GotifyURL mocks base method
-func (m *MockEnv) GotifyURL(arg0 ...params.OptionSetter) (*url.URL, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GotifyURL", varargs...)
-	ret0, _ := ret[0].(*url.URL)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GotifyURL indicates an expected call of GotifyURL
-func (mr *MockEnvMockRecorder) GotifyURL(arg0 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GotifyURL", reflect.TypeOf((*MockEnv)(nil).GotifyURL), arg0...)
-}
-
-// HTTPTimeout mocks base method
-func (m *MockEnv) HTTPTimeout(arg0 ...params.OptionSetter) (time.Duration, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "HTTPTimeout", varargs...)
-	ret0, _ := ret[0].(time.Duration)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// HTTPTimeout indicates an expected call of HTTPTimeout
-func (mr *MockEnvMockRecorder) HTTPTimeout(arg0 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HTTPTimeout", reflect.TypeOf((*MockEnv)(nil).HTTPTimeout), arg0...)
 }
 
 // Inside mocks base method
@@ -250,22 +175,6 @@ func (mr *MockEnvMockRecorder) ListeningPort(arg0 interface{}, arg1 ...interface
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListeningPort", reflect.TypeOf((*MockEnv)(nil).ListeningPort), varargs...)
-}
-
-// LoggerConfig mocks base method
-func (m *MockEnv) LoggerConfig() (logging.Encoding, logging.Level, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoggerConfig")
-	ret0, _ := ret[0].(logging.Encoding)
-	ret1, _ := ret[1].(logging.Level)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// LoggerConfig indicates an expected call of LoggerConfig
-func (mr *MockEnvMockRecorder) LoggerConfig() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoggerConfig", reflect.TypeOf((*MockEnv)(nil).LoggerConfig))
 }
 
 // LoggerEncoding mocks base method
@@ -366,28 +275,11 @@ func (mr *MockEnvMockRecorder) Port(arg0 interface{}, arg1 ...interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Port", reflect.TypeOf((*MockEnv)(nil).Port), varargs...)
 }
 
-// RedisDetails mocks base method
-func (m *MockEnv) RedisDetails() (string, string, string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RedisDetails")
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(string)
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
-}
-
-// RedisDetails indicates an expected call of RedisDetails
-func (mr *MockEnvMockRecorder) RedisDetails() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RedisDetails", reflect.TypeOf((*MockEnv)(nil).RedisDetails))
-}
-
 // RootURL mocks base method
-func (m *MockEnv) RootURL(arg0 ...params.OptionSetter) (string, error) {
+func (m *MockEnv) RootURL(arg0 string, arg1 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "RootURL", varargs...)
@@ -397,9 +289,10 @@ func (m *MockEnv) RootURL(arg0 ...params.OptionSetter) (string, error) {
 }
 
 // RootURL indicates an expected call of RootURL
-func (mr *MockEnvMockRecorder) RootURL(arg0 ...interface{}) *gomock.Call {
+func (mr *MockEnvMockRecorder) RootURL(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RootURL", reflect.TypeOf((*MockEnv)(nil).RootURL), arg0...)
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RootURL", reflect.TypeOf((*MockEnv)(nil).RootURL), varargs...)
 }
 
 // URL mocks base method
