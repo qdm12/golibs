@@ -22,6 +22,7 @@ func Test_Get(t *testing.T) {
 	tests := map[string]struct {
 		env           map[string]string
 		optionSetters []OptionSetter
+		unsetCalls    []string
 		value         string
 		err           error
 	}{
@@ -41,6 +42,18 @@ func Test_Get(t *testing.T) {
 		"key without value and default": {
 			optionSetters: []OptionSetter{Default("default")},
 			value:         "default",
+		},
+		"key without value and unset": {
+			env: map[string]string{"key": "VALUE"},
+			optionSetters: []OptionSetter{
+				Unset(),
+				RetroKeys(
+					[]string{"retro"},
+					func(oldKey string, newKey string) {},
+				),
+			},
+			unsetCalls: []string{"key", "retro"},
+			value:      "value",
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
@@ -94,8 +107,19 @@ func Test_Get(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			const keyArg = "key"
+
+			getenv := func(key string) string { return tc.env[key] }
+
+			unsetIndex := 0
+			unset := func(key string) error {
+				assert.Equal(t, tc.unsetCalls[unsetIndex], key)
+				unsetIndex++
+				return nil
+			}
+
 			e := &envParams{
-				getenv: func(key string) string { return tc.env[key] },
+				getenv: getenv,
+				unset:  unset,
 			}
 			value, err := e.Get(keyArg, tc.optionSetters...)
 			if tc.err != nil {
