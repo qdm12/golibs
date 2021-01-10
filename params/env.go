@@ -33,8 +33,8 @@ type Env interface {
 	ListeningAddress(key string, optionSetters ...OptionSetter) (address, warning string, err error)
 	RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error)
 	Path(key string, optionSetters ...OptionSetter) (path string, err error)
-	LoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
-	LoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error)
+	LogEncoding(key string, optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
+	LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error)
 	URL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
 }
 
@@ -436,11 +436,11 @@ func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string
 	return path, nil
 }
 
-// LoggerEncoding obtains the logging encoding
-// from the environment variable LOG_ENCODING.
-func (e *envParams) LoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error) {
-	optionSetters = append([]OptionSetter{Default("json")}, optionSetters...)
-	s, err := e.Get("LOG_ENCODING", optionSetters...)
+var ErrUnknownLogEncoding = errors.New("unknown log encoding")
+
+// LogEncoding obtains the log encoding from an environment variable.
+func (e *envParams) LogEncoding(key string, optionSetters ...OptionSetter) (encoding logging.Encoding, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return "", err
 	}
@@ -449,15 +449,15 @@ func (e *envParams) LoggerEncoding(optionSetters ...OptionSetter) (encoding logg
 	case "json", "console":
 		return logging.Encoding(s), nil
 	default:
-		return "", fmt.Errorf("environment variable LOG_ENCODING: logger encoding %q unrecognized", s)
+		return "", fmt.Errorf("environment variable %s: %w: %q", key, ErrUnknownLogEncoding, s)
 	}
 }
 
-// LoggerLevel obtains the logging level
-// from the environment variable LOG_LEVEL.
-func (e *envParams) LoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error) {
-	optionSetters = append([]OptionSetter{Default("info")}, optionSetters...)
-	s, err := e.Get("LOG_LEVEL", optionSetters...)
+var ErrUnknownLogLevel = errors.New("unknown log level")
+
+// LogLevel obtains the log level from an environment variable.
+func (e *envParams) LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return level, err
 	}
@@ -469,7 +469,7 @@ func (e *envParams) LoggerLevel(optionSetters ...OptionSetter) (level logging.Le
 	case "error":
 		return logging.ErrorLevel, nil
 	default:
-		return level, fmt.Errorf("environment variable LOG_LEVEL: logger level %q unrecognized", s)
+		return level, fmt.Errorf("environment variable %s: %w: %q", key, ErrUnknownLogLevel, s)
 	}
 }
 

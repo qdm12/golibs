@@ -831,7 +831,7 @@ func Test_Path(t *testing.T) {
 	}
 }
 
-func Test_LoggerEncoding(t *testing.T) {
+func Test_LogEncoding(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -839,28 +839,21 @@ func Test_LoggerEncoding(t *testing.T) {
 		encoding      logging.Encoding
 		err           error
 	}{
-		"key with json value": {
+		"json": {
 			envValue: "json",
 			encoding: logging.JSONEncoding,
 		},
-		"key with console value": {
+		"console": {
 			envValue: "console",
 			encoding: logging.ConsoleEncoding,
 		},
-		"key with invalid value": {
-			envValue: "bla",
-			err:      fmt.Errorf(`environment variable LOG_ENCODING: logger encoding "bla" unrecognized`),
-		},
-		"key without value": {
-			encoding: logging.JSONEncoding,
-		},
-		"key without value and default": {
-			optionSetters: []OptionSetter{Default("console")},
-			encoding:      logging.ConsoleEncoding,
-		},
-		"key without value and compulsory": {
+		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`environment variable "LOG_ENCODING": cannot make environment variable value compulsory with a default value`), //nolint:lll
+			err:           fmt.Errorf(`no value found for environment variable "LOG_ENCODING"`),
+		},
+		"invalid value": {
+			envValue: "bla",
+			err:      fmt.Errorf(`environment variable LOG_ENCODING: unknown log encoding: "bla"`),
 		},
 	}
 	for name, tc := range tests {
@@ -872,7 +865,7 @@ func Test_LoggerEncoding(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			encoding, err := e.LoggerEncoding(tc.optionSetters...)
+			encoding, err := e.LogEncoding("LOG_ENCODING", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -884,7 +877,7 @@ func Test_LoggerEncoding(t *testing.T) {
 	}
 }
 
-func Test_LoggerLevel(t *testing.T) {
+func Test_LogLevel(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -892,34 +885,27 @@ func Test_LoggerLevel(t *testing.T) {
 		level         logging.Level
 		err           error
 	}{
-		"key with info value": {
+		"info": {
 			envValue: "info",
 			level:    logging.InfoLevel,
 		},
-		"key with warning value": {
+		"warning": {
 			envValue: "warning",
 			level:    logging.WarnLevel,
 		},
-		"key with error value": {
+		"error": {
 			envValue: "error",
 			level:    logging.ErrorLevel,
 		},
-		"key with invalid value": {
-			envValue: "bla",
-			level:    logging.InfoLevel,
-			err:      fmt.Errorf(`environment variable LOG_LEVEL: logger level "bla" unrecognized`),
-		},
-		"key without value": {
-			level: logging.InfoLevel,
-		},
-		"key without value and default": {
-			optionSetters: []OptionSetter{Default("warning")},
-			level:         logging.WarnLevel,
-		},
-		"key without value and compulsory": {
+		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
 			level:         logging.InfoLevel,
-			err:           fmt.Errorf(`environment variable "LOG_LEVEL": cannot make environment variable value compulsory with a default value`), //nolint:lll
+			err:           errors.New(`no value found for environment variable "LOG_LEVEL"`),
+		},
+		"invalid value": {
+			envValue: "bla",
+			level:    logging.InfoLevel,
+			err:      errors.New(`environment variable LOG_LEVEL: unknown log level: "bla"`),
 		},
 	}
 	for name, tc := range tests {
@@ -931,7 +917,7 @@ func Test_LoggerLevel(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			level, err := e.LoggerLevel(tc.optionSetters...)
+			level, err := e.LogLevel("LOG_LEVEL", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
