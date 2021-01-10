@@ -18,30 +18,30 @@ import (
 
 // Env has functions to obtain values from environment variables.
 type Env interface {
-	GetEnv(key string, setters ...GetEnvSetter) (value string, err error)
-	GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error)
-	GetEnvIntRange(key string, lower, upper int, setters ...GetEnvSetter) (n int, err error)
-	GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err error)
-	GetOnOff(key string, setters ...GetEnvSetter) (on bool, err error)
-	GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (value string, err error)
-	GetCSVInPossibilities(key string, possibilities []string, setters ...GetEnvSetter) (values []string, err error)
-	GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error)
-	GetHTTPTimeout(setters ...GetEnvSetter) (duration time.Duration, err error)
+	GetEnv(key string, optionSetters ...OptionSetter) (value string, err error)
+	GetEnvInt(key string, optionSetters ...OptionSetter) (n int, err error)
+	GetEnvIntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error)
+	GetYesNo(key string, optionSetters ...OptionSetter) (yes bool, err error)
+	GetOnOff(key string, optionSetters ...OptionSetter) (on bool, err error)
+	GetValueIfInside(key string, possibilities []string, optionSetters ...OptionSetter) (value string, err error)
+	GetCSVInPossibilities(key string, possibilities []string, optionSetters ...OptionSetter) (values []string, err error)
+	GetDuration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
+	GetHTTPTimeout(optionSetters ...OptionSetter) (duration time.Duration, err error)
 	GetUserID() int
 	GetGroupID() int
-	GetPort(key string, setters ...GetEnvSetter) (port uint16, err error)
-	GetListeningPort(key string, setters ...GetEnvSetter) (port uint16, warning string, err error)
-	GetRootURL(setters ...GetEnvSetter) (rootURL string, err error)
+	GetPort(key string, optionSetters ...OptionSetter) (port uint16, err error)
+	GetListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error)
+	GetRootURL(optionSetters ...OptionSetter) (rootURL string, err error)
 	GetDatabaseDetails() (hostname, user, password, dbName string, err error)
 	GetRedisDetails() (hostname, port, password string, err error)
 	GetExeDir() (dir string, err error)
-	GetPath(key string, setters ...GetEnvSetter) (path string, err error)
+	GetPath(key string, optionSetters ...OptionSetter) (path string, err error)
 	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error)
-	GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error)
-	GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error)
-	GetURL(key string, setters ...GetEnvSetter) (URL *liburl.URL, err error)
-	GetGotifyURL(setters ...GetEnvSetter) (URL *liburl.URL, err error)
-	GetGotifyToken(setters ...GetEnvSetter) (token string, err error)
+	GetLoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
+	GetLoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error)
+	GetURL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
+	GetGotifyURL(optionSetters ...OptionSetter) (URL *liburl.URL, err error)
+	GetGotifyToken(optionSetters ...OptionSetter) (token string, err error)
 }
 
 type envParams struct {
@@ -74,11 +74,11 @@ type getEnvOptions struct {
 	onRetro            func(oldKey, newKey string)
 }
 
-// GetEnvSetter is a setter for options to GetEnv functions.
-type GetEnvSetter func(options *getEnvOptions) error
+// OptionSetter is a setter for options to GetEnv functions.
+type OptionSetter func(options *getEnvOptions) error
 
 // Compulsory forces the environment variable to contain a value.
-func Compulsory() GetEnvSetter {
+func Compulsory() OptionSetter {
 	return func(options *getEnvOptions) error {
 		if len(options.defaultValue) > 0 {
 			return fmt.Errorf("cannot make environment variable value compulsory with a default value")
@@ -89,7 +89,7 @@ func Compulsory() GetEnvSetter {
 }
 
 // Default sets a default string value for the environment variable if no value is found.
-func Default(defaultValue string) GetEnvSetter {
+func Default(defaultValue string) OptionSetter {
 	return func(options *getEnvOptions) error {
 		if options.compulsory {
 			return fmt.Errorf("cannot set default value for environment variable value which is compulsory")
@@ -100,7 +100,7 @@ func Default(defaultValue string) GetEnvSetter {
 }
 
 // CaseSensitiveValue makes the value processing case sensitive.
-func CaseSensitiveValue() GetEnvSetter {
+func CaseSensitiveValue() OptionSetter {
 	return func(options *getEnvOptions) error {
 		options.caseSensitiveValue = true
 		return nil
@@ -108,7 +108,7 @@ func CaseSensitiveValue() GetEnvSetter {
 }
 
 // Unset unsets the environment variable after it has been read.
-func Unset() GetEnvSetter {
+func Unset() OptionSetter {
 	return func(options *getEnvOptions) error {
 		options.unset = true
 		return nil
@@ -117,8 +117,8 @@ func Unset() GetEnvSetter {
 
 // RetroKeys tries to read from retroactive environment variable keys
 // and runs the function onRetro if any retro environment variable is not
-// empty. RetroKeys overrides previous RetroKeys setters passed.
-func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) GetEnvSetter {
+// empty. RetroKeys overrides previous RetroKeys optionSetters passed.
+func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) OptionSetter {
 	return func(options *getEnvOptions) error {
 		options.retroKeys = keys
 		options.onRetro = onRetro
@@ -128,7 +128,7 @@ func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) GetEnvSetter 
 
 // GetEnv returns the value stored for a named environment variable,
 // and a default if no value is found.
-func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, err error) {
+func (e *envParams) GetEnv(key string, optionSetters ...OptionSetter) (value string, err error) {
 	options := getEnvOptions{}
 	defer func() {
 		if options.unset {
@@ -138,7 +138,7 @@ func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, e
 			}
 		}
 	}()
-	for _, setter := range setters {
+	for _, setter := range optionSetters {
 		if err := setter(&options); err != nil {
 			return "", fmt.Errorf("environment variable %q: %w", key, err)
 		}
@@ -168,8 +168,8 @@ func (e *envParams) GetEnv(key string, setters ...GetEnvSetter) (value string, e
 // GetEnvInt returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer, an error is returned.
-func (e *envParams) GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetEnvInt(key string, optionSetters ...OptionSetter) (n int, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return n, err
 	}
@@ -183,8 +183,8 @@ func (e *envParams) GetEnvInt(key string, setters ...GetEnvSetter) (n int, err e
 // GetEnvIntRange returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer in the range specified, an error is returned.
-func (e *envParams) GetEnvIntRange(key string, lower, upper int, setters ...GetEnvSetter) (n int, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetEnvIntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return n, err
 	}
@@ -203,8 +203,8 @@ func (e *envParams) GetEnvIntRange(key string, lower, upper int, setters ...GetE
 // if the value is 'no', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParams) GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetYesNo(key string, optionSetters ...OptionSetter) (yes bool, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return false, err
 	}
@@ -223,8 +223,8 @@ func (e *envParams) GetYesNo(key string, setters ...GetEnvSetter) (yes bool, err
 // if the value is 'off', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParams) GetOnOff(key string, setters ...GetEnvSetter) (on bool, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetOnOff(key string, optionSetters ...OptionSetter) (on bool, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return false, err
 	}
@@ -240,13 +240,13 @@ func (e *envParams) GetOnOff(key string, setters ...GetEnvSetter) (on bool, err 
 
 // GetValueIfInside obtains the value stored for a named environment variable if it is part of a
 // list of possible values. You can optionally specify a defaultValue.
-func (e *envParams) GetValueIfInside(key string, possibilities []string, setters ...GetEnvSetter) (
+func (e *envParams) GetValueIfInside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	value string, err error) {
 	options := getEnvOptions{}
-	for _, setter := range setters {
+	for _, setter := range optionSetters {
 		_ = setter(&options) // error is checked in e.GetEnv
 	}
-	s, err := e.GetEnv(key, setters...)
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return "", err
 	} else if len(s) == 0 && !options.compulsory {
@@ -263,13 +263,13 @@ func (e *envParams) GetValueIfInside(key string, possibilities []string, setters
 	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, csvPossibilities)
 }
 
-func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, setters ...GetEnvSetter) (
+func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, optionSetters ...OptionSetter) (
 	values []string, err error) {
 	options := getEnvOptions{}
-	for _, setter := range setters {
+	for _, setter := range optionSetters {
 		_ = setter(&options) // error is checked in e.GetEnv
 	}
-	csv, err := e.GetEnv(key, setters...)
+	csv, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return nil, err
 	}
@@ -315,8 +315,8 @@ func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, se
 }
 
 // GetDuration gets the duration from the environment variable corresponding to the key provided.
-func (e *envParams) GetDuration(key string, setters ...GetEnvSetter) (duration time.Duration, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetDuration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return 0, err
 	} else if len(s) == 0 {
@@ -337,8 +337,8 @@ func (e *envParams) GetDuration(key string, setters ...GetEnvSetter) (duration t
 
 // GetPort obtains and checks a port number from the
 // environment variable corresponding to the key provided.
-func (e *envParams) GetPort(key string, setters ...GetEnvSetter) (port uint16, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetPort(key string, optionSetters ...OptionSetter) (port uint16, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return 0, err
 	}
@@ -347,8 +347,8 @@ func (e *envParams) GetPort(key string, setters ...GetEnvSetter) (port uint16, e
 
 // GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
 // from the environment variable HTTP_TIMEOUT.
-func (e *envParams) GetHTTPTimeout(setters ...GetEnvSetter) (timeout time.Duration, err error) {
-	return e.GetDuration("HTTP_TIMEOUT", setters...)
+func (e *envParams) GetHTTPTimeout(optionSetters ...OptionSetter) (timeout time.Duration, err error) {
+	return e.GetDuration("HTTP_TIMEOUT", optionSetters...)
 }
 
 // GetUserID obtains the user ID running the program.
@@ -363,8 +363,8 @@ func (e *envParams) GetGroupID() int {
 
 // GetListeningPort obtains and checks a port from an environment variable
 // and returns a warning associated with the user ID and the port found.
-func (e *envParams) GetListeningPort(key string, setters ...GetEnvSetter) (port uint16, warning string, err error) {
-	port, err = e.GetPort(key, setters...)
+func (e *envParams) GetListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error) {
+	port, err = e.GetPort(key, optionSetters...)
 	if err != nil {
 		return 0, "", err
 	}
@@ -389,9 +389,9 @@ func (e *envParams) GetListeningPort(key string, setters ...GetEnvSetter) (port 
 }
 
 // GetRootURL obtains and checks the root URL from the environment variable specified by envKey.
-func (e *envParams) GetRootURL(setters ...GetEnvSetter) (rootURL string, err error) {
-	setters = append([]GetEnvSetter{Default("/")}, setters...)
-	rootURL, err = e.GetEnv("ROOT_URL", setters...)
+func (e *envParams) GetRootURL(optionSetters ...OptionSetter) (rootURL string, err error) {
+	optionSetters = append([]OptionSetter{Default("/")}, optionSetters...)
+	rootURL, err = e.GetEnv("ROOT_URL", optionSetters...)
 	if err != nil {
 		return rootURL, err
 	}
@@ -470,8 +470,8 @@ func (e *envParams) GetExeDir() (dir string, err error) {
 // to key, and verifies it is valid. If it is a relative path,
 // it prepends it with the executable path to obtain an absolute path.
 // It uses defaultValue if no value is found.
-func (e *envParams) GetPath(key string, setters ...GetEnvSetter) (path string, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetPath(key string, optionSetters ...OptionSetter) (path string, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return "", err
 	} else if !filepath.IsAbs(s) {
@@ -500,9 +500,9 @@ func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.
 
 // GetLoggerEncoding obtains the logging encoding
 // from the environment variable LOG_ENCODING.
-func (e *envParams) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging.Encoding, err error) {
-	setters = append([]GetEnvSetter{Default("json")}, setters...)
-	s, err := e.GetEnv("LOG_ENCODING", setters...)
+func (e *envParams) GetLoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error) {
+	optionSetters = append([]OptionSetter{Default("json")}, optionSetters...)
+	s, err := e.GetEnv("LOG_ENCODING", optionSetters...)
 	if err != nil {
 		return "", err
 	}
@@ -517,9 +517,9 @@ func (e *envParams) GetLoggerEncoding(setters ...GetEnvSetter) (encoding logging
 
 // GetLoggerLevel obtains the logging level
 // from the environment variable LOG_LEVEL.
-func (e *envParams) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level, err error) {
-	setters = append([]GetEnvSetter{Default("info")}, setters...)
-	s, err := e.GetEnv("LOG_LEVEL", setters...)
+func (e *envParams) GetLoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error) {
+	optionSetters = append([]OptionSetter{Default("info")}, optionSetters...)
+	s, err := e.GetEnv("LOG_LEVEL", optionSetters...)
 	if err != nil {
 		return level, err
 	}
@@ -538,8 +538,8 @@ func (e *envParams) GetLoggerLevel(setters ...GetEnvSetter) (level logging.Level
 // GetURL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
-func (e *envParams) GetURL(key string, setters ...GetEnvSetter) (url *liburl.URL, err error) {
-	s, err := e.GetEnv(key, setters...)
+func (e *envParams) GetURL(key string, optionSetters ...OptionSetter) (url *liburl.URL, err error) {
+	s, err := e.GetEnv(key, optionSetters...)
 	if err != nil {
 		return nil, err
 	} else if s == "" {
@@ -558,13 +558,13 @@ func (e *envParams) GetURL(key string, setters ...GetEnvSetter) (url *liburl.URL
 // GetGotifyURL obtains the URL for Gotify server
 // from the environment variable GOTIFY_URL.
 // It returns a nil URL if no value is found.
-func (e *envParams) GetGotifyURL(setters ...GetEnvSetter) (url *liburl.URL, err error) {
-	return e.GetURL("GOTIFY_URL", setters...)
+func (e *envParams) GetGotifyURL(optionSetters ...OptionSetter) (url *liburl.URL, err error) {
+	return e.GetURL("GOTIFY_URL", optionSetters...)
 }
 
 // GetGotifyToken obtains the token for the app on the Gotify server
 // from the environment variable GOTIFY_TOKEN.
-func (e *envParams) GetGotifyToken(setters ...GetEnvSetter) (token string, err error) {
-	setters = append(setters, CaseSensitiveValue(), Unset())
-	return e.GetEnv("GOTIFY_TOKEN", setters...)
+func (e *envParams) GetGotifyToken(optionSetters ...OptionSetter) (token string, err error) {
+	optionSetters = append(optionSetters, CaseSensitiveValue(), Unset())
+	return e.GetEnv("GOTIFY_TOKEN", optionSetters...)
 }

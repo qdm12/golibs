@@ -37,7 +37,7 @@ func (m *MockEnv) EXPECT() *MockEnvMockRecorder {
 }
 
 // GetCSVInPossibilities mocks base method
-func (m *MockEnv) GetCSVInPossibilities(arg0 string, arg1 []string, arg2 ...params.GetEnvSetter) ([]string, error) {
+func (m *MockEnv) GetCSVInPossibilities(arg0 string, arg1 []string, arg2 ...params.OptionSetter) ([]string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -75,7 +75,7 @@ func (mr *MockEnvMockRecorder) GetDatabaseDetails() *gomock.Call {
 }
 
 // GetDuration mocks base method
-func (m *MockEnv) GetDuration(arg0 string, arg1 ...params.GetEnvSetter) (time.Duration, error) {
+func (m *MockEnv) GetDuration(arg0 string, arg1 ...params.OptionSetter) (time.Duration, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -95,7 +95,7 @@ func (mr *MockEnvMockRecorder) GetDuration(arg0 interface{}, arg1 ...interface{}
 }
 
 // GetEnv mocks base method
-func (m *MockEnv) GetEnv(arg0 string, arg1 ...params.GetEnvSetter) (string, error) {
+func (m *MockEnv) GetEnv(arg0 string, arg1 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -115,7 +115,7 @@ func (mr *MockEnvMockRecorder) GetEnv(arg0 interface{}, arg1 ...interface{}) *go
 }
 
 // GetEnvInt mocks base method
-func (m *MockEnv) GetEnvInt(arg0 string, arg1 ...params.GetEnvSetter) (int, error) {
+func (m *MockEnv) GetEnvInt(arg0 string, arg1 ...params.OptionSetter) (int, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -135,7 +135,7 @@ func (mr *MockEnvMockRecorder) GetEnvInt(arg0 interface{}, arg1 ...interface{}) 
 }
 
 // GetEnvIntRange mocks base method
-func (m *MockEnv) GetEnvIntRange(arg0 string, arg1, arg2 int, arg3 ...params.GetEnvSetter) (int, error) {
+func (m *MockEnv) GetEnvIntRange(arg0 string, arg1, arg2 int, arg3 ...params.OptionSetter) (int, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1, arg2}
 	for _, a := range arg3 {
@@ -170,7 +170,7 @@ func (mr *MockEnvMockRecorder) GetExeDir() *gomock.Call {
 }
 
 // GetGotifyToken mocks base method
-func (m *MockEnv) GetGotifyToken(arg0 ...params.GetEnvSetter) (string, error) {
+func (m *MockEnv) GetGotifyToken(arg0 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
@@ -189,7 +189,7 @@ func (mr *MockEnvMockRecorder) GetGotifyToken(arg0 ...interface{}) *gomock.Call 
 }
 
 // GetGotifyURL mocks base method
-func (m *MockEnv) GetGotifyURL(arg0 ...params.GetEnvSetter) (*url.URL, error) {
+func (m *MockEnv) GetGotifyURL(arg0 ...params.OptionSetter) (*url.URL, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
@@ -222,7 +222,7 @@ func (mr *MockEnvMockRecorder) GetGroupID() *gomock.Call {
 }
 
 // GetHTTPTimeout mocks base method
-func (m *MockEnv) GetHTTPTimeout(arg0 ...params.GetEnvSetter) (time.Duration, error) {
+func (m *MockEnv) GetHTTPTimeout(arg0 ...params.OptionSetter) (time.Duration, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
@@ -241,7 +241,7 @@ func (mr *MockEnvMockRecorder) GetHTTPTimeout(arg0 ...interface{}) *gomock.Call 
 }
 
 // GetListeningPort mocks base method
-func (m *MockEnv) GetListeningPort(arg0 string, arg1 ...params.GetEnvSetter) (uint16, string, error) {
+func (m *MockEnv) GetListeningPort(arg0 string, arg1 ...params.OptionSetter) (uint16, string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -278,7 +278,7 @@ func (mr *MockEnvMockRecorder) GetLoggerConfig() *gomock.Call {
 }
 
 // GetLoggerEncoding mocks base method
-func (m *MockEnv) GetLoggerEncoding(arg0 ...params.GetEnvSetter) (logging.Encoding, error) {
+func (m *MockEnv) GetLoggerEncoding(arg0 ...params.OptionSetter) (logging.Encoding, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
@@ -297,7 +297,7 @@ func (mr *MockEnvMockRecorder) GetLoggerEncoding(arg0 ...interface{}) *gomock.Ca
 }
 
 // GetLoggerLevel mocks base method
-func (m *MockEnv) GetLoggerLevel(arg0 ...params.GetEnvSetter) (logging.Level, error) {
+func (m *MockEnv) GetLoggerLevel(arg0 ...params.OptionSetter) (logging.Level, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
@@ -316,7 +316,7 @@ func (mr *MockEnvMockRecorder) GetLoggerLevel(arg0 ...interface{}) *gomock.Call 
 }
 
 // GetOnOff mocks base method
-func (m *MockEnv) GetOnOff(arg0 string, arg1 ...params.GetEnvSetter) (bool, error) {
+func (m *MockEnv) GetOnOff(arg0 string, arg1 ...params.OptionSetter) (bool, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -336,7 +336,7 @@ func (mr *MockEnvMockRecorder) GetOnOff(arg0 interface{}, arg1 ...interface{}) *
 }
 
 // GetPath mocks base method
-func (m *MockEnv) GetPath(arg0 string, arg1 ...params.GetEnvSetter) (string, error) {
+func (m *MockEnv) GetPath(arg0 string, arg1 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -356,7 +356,7 @@ func (mr *MockEnvMockRecorder) GetPath(arg0 interface{}, arg1 ...interface{}) *g
 }
 
 // GetPort mocks base method
-func (m *MockEnv) GetPort(arg0 string, arg1 ...params.GetEnvSetter) (uint16, error) {
+func (m *MockEnv) GetPort(arg0 string, arg1 ...params.OptionSetter) (uint16, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -393,7 +393,7 @@ func (mr *MockEnvMockRecorder) GetRedisDetails() *gomock.Call {
 }
 
 // GetRootURL mocks base method
-func (m *MockEnv) GetRootURL(arg0 ...params.GetEnvSetter) (string, error) {
+func (m *MockEnv) GetRootURL(arg0 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
@@ -412,7 +412,7 @@ func (mr *MockEnvMockRecorder) GetRootURL(arg0 ...interface{}) *gomock.Call {
 }
 
 // GetURL mocks base method
-func (m *MockEnv) GetURL(arg0 string, arg1 ...params.GetEnvSetter) (*url.URL, error) {
+func (m *MockEnv) GetURL(arg0 string, arg1 ...params.OptionSetter) (*url.URL, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
@@ -446,7 +446,7 @@ func (mr *MockEnvMockRecorder) GetUserID() *gomock.Call {
 }
 
 // GetValueIfInside mocks base method
-func (m *MockEnv) GetValueIfInside(arg0 string, arg1 []string, arg2 ...params.GetEnvSetter) (string, error) {
+func (m *MockEnv) GetValueIfInside(arg0 string, arg1 []string, arg2 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -466,7 +466,7 @@ func (mr *MockEnvMockRecorder) GetValueIfInside(arg0, arg1 interface{}, arg2 ...
 }
 
 // GetYesNo mocks base method
-func (m *MockEnv) GetYesNo(arg0 string, arg1 ...params.GetEnvSetter) (bool, error) {
+func (m *MockEnv) GetYesNo(arg0 string, arg1 ...params.OptionSetter) (bool, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
