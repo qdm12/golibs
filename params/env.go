@@ -58,7 +58,7 @@ func NewEnv() Env {
 	}
 }
 
-type getEnvOptions struct {
+type envOptions struct {
 	compulsory         bool
 	caseSensitiveValue bool
 	unset              bool
@@ -68,11 +68,11 @@ type getEnvOptions struct {
 }
 
 // OptionSetter is a setter for options to Get functions.
-type OptionSetter func(options *getEnvOptions) error
+type OptionSetter func(options *envOptions) error
 
 // Compulsory forces the environment variable to contain a value.
 func Compulsory() OptionSetter {
-	return func(options *getEnvOptions) error {
+	return func(options *envOptions) error {
 		if len(options.defaultValue) > 0 {
 			return fmt.Errorf("cannot make environment variable value compulsory with a default value")
 		}
@@ -83,7 +83,7 @@ func Compulsory() OptionSetter {
 
 // Default sets a default string value for the environment variable if no value is found.
 func Default(defaultValue string) OptionSetter {
-	return func(options *getEnvOptions) error {
+	return func(options *envOptions) error {
 		if options.compulsory {
 			return fmt.Errorf("cannot set default value for environment variable value which is compulsory")
 		}
@@ -94,7 +94,7 @@ func Default(defaultValue string) OptionSetter {
 
 // CaseSensitiveValue makes the value processing case sensitive.
 func CaseSensitiveValue() OptionSetter {
-	return func(options *getEnvOptions) error {
+	return func(options *envOptions) error {
 		options.caseSensitiveValue = true
 		return nil
 	}
@@ -102,7 +102,7 @@ func CaseSensitiveValue() OptionSetter {
 
 // Unset unsets the environment variable after it has been read.
 func Unset() OptionSetter {
-	return func(options *getEnvOptions) error {
+	return func(options *envOptions) error {
 		options.unset = true
 		return nil
 	}
@@ -112,7 +112,7 @@ func Unset() OptionSetter {
 // and runs the function onRetro if any retro environment variable is not
 // empty. RetroKeys overrides previous RetroKeys optionSetters passed.
 func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) OptionSetter {
-	return func(options *getEnvOptions) error {
+	return func(options *envOptions) error {
 		options.retroKeys = keys
 		options.onRetro = onRetro
 		return nil
@@ -122,7 +122,7 @@ func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) OptionSetter 
 // Get returns the value stored for a named environment variable,
 // and a default if no value is found.
 func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string, err error) {
-	options := getEnvOptions{}
+	options := envOptions{}
 	defer func() {
 		if options.unset {
 			_ = e.unset(key)
@@ -235,7 +235,7 @@ func (e *envParams) OnOff(key string, optionSetters ...OptionSetter) (on bool, e
 // list of possible values. You can optionally specify a defaultValue.
 func (e *envParams) Inside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	value string, err error) {
-	options := getEnvOptions{}
+	options := envOptions{}
 	for _, setter := range optionSetters {
 		_ = setter(&options) // error is checked in e.Get
 	}
@@ -258,7 +258,7 @@ func (e *envParams) Inside(key string, possibilities []string, optionSetters ...
 
 func (e *envParams) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	values []string, err error) {
-	options := getEnvOptions{}
+	options := envOptions{}
 	for _, setter := range optionSetters {
 		_ = setter(&options) // error is checked in e.Get
 	}
