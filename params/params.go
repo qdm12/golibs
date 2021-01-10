@@ -14,10 +14,10 @@ import (
 	"github.com/qdm12/golibs/verification"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . EnvParams
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Env
 
-// EnvParams has functions to obtain values from environment variables.
-type EnvParams interface {
+// Env has functions to obtain values from environment variables.
+type Env interface {
 	GetEnv(key string, setters ...GetEnvSetter) (value string, err error)
 	GetEnvInt(key string, setters ...GetEnvSetter) (n int, err error)
 	GetEnvIntRange(key string, lower, upper int, setters ...GetEnvSetter) (n int, err error)
@@ -53,8 +53,8 @@ type envParams struct {
 	unset      func(k string) error
 }
 
-// NewEnvParams returns a new EnvParams object.
-func NewEnvParams() EnvParams {
+// NewEnv returns a new Env object.
+func NewEnv() Env {
 	return &envParams{
 		getenv:     os.Getenv,
 		getuid:     os.Getuid,
@@ -388,8 +388,7 @@ func (e *envParams) GetListeningPort(key string, setters ...GetEnvSetter) (port 
 	return port, warning, err
 }
 
-// GetRootURL obtains and checks the root URL
-// from the environment variable ROOT_URL.
+// GetRootURL obtains and checks the root URL from the environment variable specified by envKey.
 func (e *envParams) GetRootURL(setters ...GetEnvSetter) (rootURL string, err error) {
 	setters = append([]GetEnvSetter{Default("/")}, setters...)
 	rootURL, err = e.GetEnv("ROOT_URL", setters...)

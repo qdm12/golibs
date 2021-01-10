@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_NewEnvParams(t *testing.T) {
+func Test_NewEnv(t *testing.T) {
 	t.Parallel()
-	e := NewEnvParams()
+	e := NewEnv()
 	assert.NotNil(t, e)
 }
 
