@@ -603,7 +603,6 @@ func Test_ListeningPort(t *testing.T) {
 				getuid: func() int {
 					return expectedUID
 				},
-				regex: verification.NewRegex(),
 			}
 			listeningPort, warning, err := e.ListeningPort("LISTENING_PORT", tc.optionSetters...)
 			if tc.err != nil {
@@ -614,6 +613,58 @@ func Test_ListeningPort(t *testing.T) {
 			}
 			assert.Equal(t, tc.warning, warning)
 			assert.Equal(t, tc.listeningPort, listeningPort)
+		})
+	}
+}
+
+func Test_checkListeningPort(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		port    uint16
+		uid     int
+		warning string
+		err     error
+	}{
+		"valid port": {
+			port: 9000,
+		},
+		"dynamic range": {
+			port:    60000,
+			warning: "listening port 60000 is in the dynamic/private ports range (above 49151)",
+		},
+		"privileged as root": {
+			port:    100,
+			warning: "listening port 100 allowed to be in the reserved system ports range as you are running as root",
+		},
+		"privileged as windows": {
+			uid:     -1,
+			port:    100,
+			warning: "listening port 100 allowed to be in the reserved system ports range as you are running in Windows",
+		},
+		"privileged as non root": {
+			uid:  1000,
+			port: 100,
+			err:  fmt.Errorf("%w: port 100", ErrReservedListeningPort),
+		},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			e := &envParams{
+				getuid: func() int {
+					return tc.uid
+				},
+			}
+			warning, err := e.checkListeningPort(tc.port)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.warning, warning)
 		})
 	}
 }
