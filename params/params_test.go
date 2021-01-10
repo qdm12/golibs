@@ -17,7 +17,7 @@ func Test_NewEnv(t *testing.T) {
 	assert.NotNil(t, e)
 }
 
-func Test_GetEnv(t *testing.T) {
+func Test_Get(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		env           map[string]string
@@ -97,7 +97,7 @@ func Test_GetEnv(t *testing.T) {
 			e := &envParams{
 				getenv: func(key string) string { return tc.env[key] },
 			}
-			value, err := e.GetEnv(keyArg, tc.optionSetters...)
+			value, err := e.Get(keyArg, tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -109,7 +109,7 @@ func Test_GetEnv(t *testing.T) {
 	}
 }
 
-func Test_GetEnvInt(t *testing.T) {
+func Test_GetInt(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -143,7 +143,7 @@ func Test_GetEnvInt(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			n, err := e.GetEnvInt("any", tc.optionSetters...)
+			n, err := e.Int("any", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -155,7 +155,7 @@ func Test_GetEnvInt(t *testing.T) {
 	}
 }
 
-func Test_GetEnvIntRange(t *testing.T) {
+func Test_GetIntRange(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -214,7 +214,7 @@ func Test_GetEnvIntRange(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			n, err := e.GetEnvIntRange("any", tc.lower, tc.upper, tc.optionSetters...)
+			n, err := e.IntRange("any", tc.lower, tc.upper, tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -226,7 +226,7 @@ func Test_GetEnvIntRange(t *testing.T) {
 	}
 }
 
-func Test_GetYesNo(t *testing.T) { //nolint:dupl
+func Test_YesNo(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -265,7 +265,7 @@ func Test_GetYesNo(t *testing.T) { //nolint:dupl
 					return tc.envValue
 				},
 			}
-			yes, err := e.GetYesNo("any", tc.optionSetters...)
+			yes, err := e.YesNo("any", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -277,7 +277,7 @@ func Test_GetYesNo(t *testing.T) { //nolint:dupl
 	}
 }
 
-func Test_GetOnOff(t *testing.T) { //nolint:dupl
+func Test_OnOff(t *testing.T) { //nolint:dupl
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -316,7 +316,7 @@ func Test_GetOnOff(t *testing.T) { //nolint:dupl
 					return tc.envValue
 				},
 			}
-			on, err := e.GetOnOff("any", tc.optionSetters...)
+			on, err := e.OnOff("any", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -328,7 +328,7 @@ func Test_GetOnOff(t *testing.T) { //nolint:dupl
 	}
 }
 
-func Test_GetValueIfInside(t *testing.T) {
+func Test_Inside(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		possibilities []string
@@ -398,7 +398,7 @@ func Test_GetValueIfInside(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			value, err := e.GetValueIfInside("any", tc.possibilities, tc.optionSetters...)
+			value, err := e.Inside("any", tc.possibilities, tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -410,7 +410,7 @@ func Test_GetValueIfInside(t *testing.T) {
 	}
 }
 
-func Test_GetCSVInPossibilities(t *testing.T) {
+func Test_CSVInside(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		possibilities []string
@@ -466,7 +466,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			values, err := e.GetCSVInPossibilities("any", tc.possibilities, tc.optionSetters...)
+			values, err := e.CSVInside("any", tc.possibilities, tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -478,7 +478,7 @@ func Test_GetCSVInPossibilities(t *testing.T) {
 	}
 }
 
-func Test_GetDuration(t *testing.T) {
+func Test_Duration(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -523,7 +523,7 @@ func Test_GetDuration(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			duration, err := e.GetDuration("any", tc.optionSetters...)
+			duration, err := e.Duration("any", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -535,7 +535,7 @@ func Test_GetDuration(t *testing.T) {
 	}
 }
 
-func Test_GetHTTPTimeout(t *testing.T) {
+func Test_HTTPTimeout(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -581,7 +581,7 @@ func Test_GetHTTPTimeout(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			timeout, err := e.GetHTTPTimeout(tc.optionSetters...)
+			timeout, err := e.HTTPTimeout(tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -593,7 +593,7 @@ func Test_GetHTTPTimeout(t *testing.T) {
 	}
 }
 
-func Test_GetUserID(t *testing.T) {
+func Test_UserID(t *testing.T) {
 	t.Parallel()
 	const expectedUID = 1
 	e := &envParams{
@@ -601,11 +601,11 @@ func Test_GetUserID(t *testing.T) {
 			return expectedUID
 		},
 	}
-	uid := e.GetUserID()
+	uid := e.UserID()
 	assert.Equal(t, expectedUID, uid)
 }
 
-func Test_GetGroupID(t *testing.T) {
+func Test_GroupID(t *testing.T) {
 	t.Parallel()
 	const expectedUID = 1
 	e := &envParams{
@@ -613,11 +613,11 @@ func Test_GetGroupID(t *testing.T) {
 			return expectedUID
 		},
 	}
-	gid := e.GetGroupID()
+	gid := e.GroupID()
 	assert.Equal(t, expectedUID, gid)
 }
 
-func Test_GetListeningPort(t *testing.T) {
+func Test_ListeningPort(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -663,7 +663,7 @@ func Test_GetListeningPort(t *testing.T) {
 				},
 				verifier: verification.NewVerifier(),
 			}
-			listeningPort, warning, err := e.GetListeningPort("LISTENING_PORT", tc.optionSetters...)
+			listeningPort, warning, err := e.ListeningPort("LISTENING_PORT", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -676,7 +676,7 @@ func Test_GetListeningPort(t *testing.T) {
 	}
 }
 
-func Test_GetRootURL(t *testing.T) {
+func Test_RootURL(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -716,7 +716,7 @@ func Test_GetRootURL(t *testing.T) {
 				},
 				verifier: verification.NewVerifier(),
 			}
-			rootURL, err := e.GetRootURL(tc.optionSetters...)
+			rootURL, err := e.RootURL(tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -728,7 +728,7 @@ func Test_GetRootURL(t *testing.T) {
 	}
 }
 
-func Test_GetLoggerEncoding(t *testing.T) {
+func Test_LoggerEncoding(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -769,7 +769,7 @@ func Test_GetLoggerEncoding(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			encoding, err := e.GetLoggerEncoding(tc.optionSetters...)
+			encoding, err := e.LoggerEncoding(tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -781,7 +781,7 @@ func Test_GetLoggerEncoding(t *testing.T) {
 	}
 }
 
-func Test_GetLoggerLevel(t *testing.T) {
+func Test_LoggerLevel(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -828,7 +828,7 @@ func Test_GetLoggerLevel(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			level, err := e.GetLoggerLevel(tc.optionSetters...)
+			level, err := e.LoggerLevel(tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -840,7 +840,7 @@ func Test_GetLoggerLevel(t *testing.T) {
 	}
 }
 
-func Test_GetURL(t *testing.T) {
+func Test_URL(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -873,7 +873,7 @@ func Test_GetURL(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			URL, err := e.GetURL("any", tc.optionSetters...)
+			URL, err := e.URL("any", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -889,20 +889,20 @@ func Test_GetURL(t *testing.T) {
 	}
 }
 
-func Test_GetGotifyURLL(t *testing.T) {
+func Test_GotifyURLL(t *testing.T) {
 	t.Parallel()
 	e := &envParams{
 		getenv: func(key string) string {
 			return "https://google.com"
 		},
 	}
-	URL, err := e.GetGotifyURL()
+	URL, err := e.GotifyURL()
 	require.NoError(t, err)
 	require.NotNil(t, URL)
 	assert.Equal(t, "https://google.com", URL.String())
 }
 
-func Test_GetGotifyToken(t *testing.T) {
+func Test_GotifyToken(t *testing.T) {
 	t.Parallel()
 	e := &envParams{
 		getenv: func(key string) string {
@@ -910,7 +910,7 @@ func Test_GetGotifyToken(t *testing.T) {
 		},
 		unset: func(k string) error { return nil },
 	}
-	token, err := e.GetGotifyToken()
+	token, err := e.GotifyToken()
 	require.NoError(t, err)
 	assert.Equal(t, "x", token)
 }

@@ -18,30 +18,30 @@ import (
 
 // Env has functions to obtain values from environment variables.
 type Env interface {
-	GetEnv(key string, optionSetters ...OptionSetter) (value string, err error)
-	GetEnvInt(key string, optionSetters ...OptionSetter) (n int, err error)
-	GetEnvIntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error)
-	GetYesNo(key string, optionSetters ...OptionSetter) (yes bool, err error)
-	GetOnOff(key string, optionSetters ...OptionSetter) (on bool, err error)
-	GetValueIfInside(key string, possibilities []string, optionSetters ...OptionSetter) (value string, err error)
-	GetCSVInPossibilities(key string, possibilities []string, optionSetters ...OptionSetter) (values []string, err error)
-	GetDuration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
-	GetHTTPTimeout(optionSetters ...OptionSetter) (duration time.Duration, err error)
-	GetUserID() int
-	GetGroupID() int
-	GetPort(key string, optionSetters ...OptionSetter) (port uint16, err error)
-	GetListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error)
-	GetRootURL(optionSetters ...OptionSetter) (rootURL string, err error)
-	GetDatabaseDetails() (hostname, user, password, dbName string, err error)
-	GetRedisDetails() (hostname, port, password string, err error)
-	GetExeDir() (dir string, err error)
-	GetPath(key string, optionSetters ...OptionSetter) (path string, err error)
-	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error)
-	GetLoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
-	GetLoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error)
-	GetURL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
-	GetGotifyURL(optionSetters ...OptionSetter) (URL *liburl.URL, err error)
-	GetGotifyToken(optionSetters ...OptionSetter) (token string, err error)
+	Get(key string, optionSetters ...OptionSetter) (value string, err error)
+	Int(key string, optionSetters ...OptionSetter) (n int, err error)
+	IntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error)
+	YesNo(key string, optionSetters ...OptionSetter) (yes bool, err error)
+	OnOff(key string, optionSetters ...OptionSetter) (on bool, err error)
+	Inside(key string, possibilities []string, optionSetters ...OptionSetter) (value string, err error)
+	CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (values []string, err error)
+	Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
+	HTTPTimeout(optionSetters ...OptionSetter) (duration time.Duration, err error)
+	UserID() int
+	GroupID() int
+	Port(key string, optionSetters ...OptionSetter) (port uint16, err error)
+	ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error)
+	RootURL(optionSetters ...OptionSetter) (rootURL string, err error)
+	DatabaseDetails() (hostname, user, password, dbName string, err error)
+	RedisDetails() (hostname, port, password string, err error)
+	ExeDir() (dir string, err error)
+	Path(key string, optionSetters ...OptionSetter) (path string, err error)
+	LoggerConfig() (encoding logging.Encoding, level logging.Level, err error)
+	LoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
+	LoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error)
+	URL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
+	GotifyURL(optionSetters ...OptionSetter) (URL *liburl.URL, err error)
+	GotifyToken(optionSetters ...OptionSetter) (token string, err error)
 }
 
 type envParams struct {
@@ -74,7 +74,7 @@ type getEnvOptions struct {
 	onRetro            func(oldKey, newKey string)
 }
 
-// OptionSetter is a setter for options to GetEnv functions.
+// OptionSetter is a setter for options to Get functions.
 type OptionSetter func(options *getEnvOptions) error
 
 // Compulsory forces the environment variable to contain a value.
@@ -126,9 +126,9 @@ func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) OptionSetter 
 	}
 }
 
-// GetEnv returns the value stored for a named environment variable,
+// Get returns the value stored for a named environment variable,
 // and a default if no value is found.
-func (e *envParams) GetEnv(key string, optionSetters ...OptionSetter) (value string, err error) {
+func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string, err error) {
 	options := getEnvOptions{}
 	defer func() {
 		if options.unset {
@@ -165,11 +165,11 @@ func (e *envParams) GetEnv(key string, optionSetters ...OptionSetter) (value str
 	return value, nil
 }
 
-// GetEnvInt returns the value stored for a named environment variable,
+// Int returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer, an error is returned.
-func (e *envParams) GetEnvInt(key string, optionSetters ...OptionSetter) (n int, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) Int(key string, optionSetters ...OptionSetter) (n int, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return n, err
 	}
@@ -180,11 +180,11 @@ func (e *envParams) GetEnvInt(key string, optionSetters ...OptionSetter) (n int,
 	return n, nil
 }
 
-// GetEnvIntRange returns the value stored for a named environment variable,
+// IntRange returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer in the range specified, an error is returned.
-func (e *envParams) GetEnvIntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) IntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return n, err
 	}
@@ -198,13 +198,13 @@ func (e *envParams) GetEnvIntRange(key string, lower, upper int, optionSetters .
 	return n, nil
 }
 
-// GetYesNo obtains the value stored for a named environment variable and returns:
+// YesNo obtains the value stored for a named environment variable and returns:
 // if the value is 'yes', it returns true
 // if the value is 'no', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParams) GetYesNo(key string, optionSetters ...OptionSetter) (yes bool, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) YesNo(key string, optionSetters ...OptionSetter) (yes bool, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return false, err
 	}
@@ -218,13 +218,13 @@ func (e *envParams) GetYesNo(key string, optionSetters ...OptionSetter) (yes boo
 	}
 }
 
-// GetOnOff obtains the value stored for a named environment variable and returns:
+// OnOff obtains the value stored for a named environment variable and returns:
 // if the value is 'on', it returns true
 // if the value is 'off', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParams) GetOnOff(key string, optionSetters ...OptionSetter) (on bool, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) OnOff(key string, optionSetters ...OptionSetter) (on bool, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return false, err
 	}
@@ -238,15 +238,15 @@ func (e *envParams) GetOnOff(key string, optionSetters ...OptionSetter) (on bool
 	}
 }
 
-// GetValueIfInside obtains the value stored for a named environment variable if it is part of a
+// Inside obtains the value stored for a named environment variable if it is part of a
 // list of possible values. You can optionally specify a defaultValue.
-func (e *envParams) GetValueIfInside(key string, possibilities []string, optionSetters ...OptionSetter) (
+func (e *envParams) Inside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	value string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range optionSetters {
-		_ = setter(&options) // error is checked in e.GetEnv
+		_ = setter(&options) // error is checked in e.Get
 	}
-	s, err := e.GetEnv(key, optionSetters...)
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return "", err
 	} else if len(s) == 0 && !options.compulsory {
@@ -263,13 +263,13 @@ func (e *envParams) GetValueIfInside(key string, possibilities []string, optionS
 	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, csvPossibilities)
 }
 
-func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, optionSetters ...OptionSetter) (
+func (e *envParams) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	values []string, err error) {
 	options := getEnvOptions{}
 	for _, setter := range optionSetters {
-		_ = setter(&options) // error is checked in e.GetEnv
+		_ = setter(&options) // error is checked in e.Get
 	}
-	csv, err := e.GetEnv(key, optionSetters...)
+	csv, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return nil, err
 	}
@@ -314,9 +314,9 @@ func (e *envParams) GetCSVInPossibilities(key string, possibilities []string, op
 	return values, nil
 }
 
-// GetDuration gets the duration from the environment variable corresponding to the key provided.
-func (e *envParams) GetDuration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+// Duration gets the duration from the environment variable corresponding to the key provided.
+func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return 0, err
 	} else if len(s) == 0 {
@@ -335,36 +335,36 @@ func (e *envParams) GetDuration(key string, optionSetters ...OptionSetter) (dura
 	}
 }
 
-// GetPort obtains and checks a port number from the
+// Port obtains and checks a port number from the
 // environment variable corresponding to the key provided.
-func (e *envParams) GetPort(key string, optionSetters ...OptionSetter) (port uint16, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) Port(key string, optionSetters ...OptionSetter) (port uint16, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return 0, err
 	}
 	return verification.ParsePort(s)
 }
 
-// GetHTTPTimeout returns the HTTP client timeout duration in milliseconds
+// HTTPTimeout returns the HTTP client timeout duration in milliseconds
 // from the environment variable HTTP_TIMEOUT.
-func (e *envParams) GetHTTPTimeout(optionSetters ...OptionSetter) (timeout time.Duration, err error) {
-	return e.GetDuration("HTTP_TIMEOUT", optionSetters...)
+func (e *envParams) HTTPTimeout(optionSetters ...OptionSetter) (timeout time.Duration, err error) {
+	return e.Duration("HTTP_TIMEOUT", optionSetters...)
 }
 
-// GetUserID obtains the user ID running the program.
-func (e *envParams) GetUserID() int {
+// UserID obtains the user ID running the program.
+func (e *envParams) UserID() int {
 	return e.getuid()
 }
 
-// GetGroupID obtains the user ID running the program.
-func (e *envParams) GetGroupID() int {
+// GroupID obtains the user ID running the program.
+func (e *envParams) GroupID() int {
 	return e.getgid()
 }
 
-// GetListeningPort obtains and checks a port from an environment variable
+// ListeningPort obtains and checks a port from an environment variable
 // and returns a warning associated with the user ID and the port found.
-func (e *envParams) GetListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error) {
-	port, err = e.GetPort(key, optionSetters...)
+func (e *envParams) ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error) {
+	port, err = e.Port(key, optionSetters...)
 	if err != nil {
 		return 0, "", err
 	}
@@ -388,10 +388,10 @@ func (e *envParams) GetListeningPort(key string, optionSetters ...OptionSetter) 
 	return port, warning, err
 }
 
-// GetRootURL obtains and checks the root URL from the environment variable specified by envKey.
-func (e *envParams) GetRootURL(optionSetters ...OptionSetter) (rootURL string, err error) {
+// RootURL obtains and checks the root URL from the environment variable specified by envKey.
+func (e *envParams) RootURL(optionSetters ...OptionSetter) (rootURL string, err error) {
 	optionSetters = append([]OptionSetter{Default("/")}, optionSetters...)
-	rootURL, err = e.GetEnv("ROOT_URL", optionSetters...)
+	rootURL, err = e.Get("ROOT_URL", optionSetters...)
 	if err != nil {
 		return rootURL, err
 	}
@@ -403,10 +403,10 @@ func (e *envParams) GetRootURL(optionSetters ...OptionSetter) (rootURL string, e
 	return rootURL, nil
 }
 
-// GetDatabaseDetails obtains the SQL database details from the
+// DatabaseDetails obtains the SQL database details from the
 // environment variables SQL_USER, SQL_PASSWORD and SQL_DBNAME.
-func (e *envParams) GetDatabaseDetails() (hostname, user, password, dbName string, err error) {
-	hostname, err = e.GetEnv("SQL_HOST", Default("postgres"))
+func (e *envParams) DatabaseDetails() (hostname, user, password, dbName string, err error) {
+	hostname, err = e.Get("SQL_HOST", Default("postgres"))
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
@@ -414,15 +414,15 @@ func (e *envParams) GetDatabaseDetails() (hostname, user, password, dbName strin
 		return hostname, user, password, dbName,
 			fmt.Errorf("Postgres parameters: hostname %q is not valid", hostname)
 	}
-	user, err = e.GetEnv("SQL_USER", Default("postgres"), CaseSensitiveValue())
+	user, err = e.Get("SQL_USER", Default("postgres"), CaseSensitiveValue())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
-	password, err = e.GetEnv("SQL_PASSWORD", Default("postgres"), CaseSensitiveValue(), Unset())
+	password, err = e.Get("SQL_PASSWORD", Default("postgres"), CaseSensitiveValue(), Unset())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
-	dbName, err = e.GetEnv("SQL_DBNAME", Default("postgres"), CaseSensitiveValue())
+	dbName, err = e.Get("SQL_DBNAME", Default("postgres"), CaseSensitiveValue())
 	if err != nil {
 		return hostname, user, password, dbName, err
 	}
@@ -430,10 +430,10 @@ func (e *envParams) GetDatabaseDetails() (hostname, user, password, dbName strin
 	return hostname, user, password, dbName, nil
 }
 
-// GetRedisDetails obtains the Redis details from the
+// RedisDetails obtains the Redis details from the
 // environment variables REDIS_HOST, REDIS_PORT and REDIS_PASSWORD.
-func (e *envParams) GetRedisDetails() (hostname, port, password string, err error) {
-	hostname, err = e.GetEnv("REDIS_HOST", Default("redis"))
+func (e *envParams) RedisDetails() (hostname, port, password string, err error) {
+	hostname, err = e.Get("REDIS_HOST", Default("redis"))
 	if err != nil {
 		return hostname, port, password, err
 	}
@@ -441,7 +441,7 @@ func (e *envParams) GetRedisDetails() (hostname, port, password string, err erro
 		return hostname, port, password,
 			fmt.Errorf(`environment variable "REDIS_HOST" value %q is not valid`, hostname)
 	}
-	port, err = e.GetEnv("REDIS_PORT", Default("6379"))
+	port, err = e.Get("REDIS_PORT", Default("6379"))
 	if err != nil {
 		return hostname, port, password, err
 	}
@@ -449,15 +449,15 @@ func (e *envParams) GetRedisDetails() (hostname, port, password string, err erro
 		return hostname, port, password,
 			fmt.Errorf("environment variable REDIS_PORT: %w", err)
 	}
-	password, err = e.GetEnv("REDIS_PASSWORD", CaseSensitiveValue(), Unset())
+	password, err = e.Get("REDIS_PASSWORD", CaseSensitiveValue(), Unset())
 	if err != nil {
 		return hostname, port, password, err
 	}
 	return hostname, port, password, nil
 }
 
-// GetExeDir obtains the executable directory.
-func (e *envParams) GetExeDir() (dir string, err error) {
+// ExeDir obtains the executable directory.
+func (e *envParams) ExeDir() (dir string, err error) {
 	ex, err := e.executable()
 	if err != nil {
 		return dir, err
@@ -466,16 +466,16 @@ func (e *envParams) GetExeDir() (dir string, err error) {
 	return dir, nil
 }
 
-// GetPath obtains a path from the environment variable corresponding
+// Path obtains a path from the environment variable corresponding
 // to key, and verifies it is valid. If it is a relative path,
 // it prepends it with the executable path to obtain an absolute path.
 // It uses defaultValue if no value is found.
-func (e *envParams) GetPath(key string, optionSetters ...OptionSetter) (path string, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return "", err
 	} else if !filepath.IsAbs(s) {
-		exDir, err := e.GetExeDir()
+		exDir, err := e.ExeDir()
 		if err != nil {
 			return "", err
 		}
@@ -484,25 +484,25 @@ func (e *envParams) GetPath(key string, optionSetters ...OptionSetter) (path str
 	return filepath.Abs(s)
 }
 
-// GetLoggerConfig obtains configuration details for the logger
+// LoggerConfig obtains configuration details for the logger
 // using the environment variables LOG_ENCODING and LOG_LEVEL.
-func (e *envParams) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error) {
-	encoding, err = e.GetLoggerEncoding()
+func (e *envParams) LoggerConfig() (encoding logging.Encoding, level logging.Level, err error) {
+	encoding, err = e.LoggerEncoding()
 	if err != nil {
 		return "", "", fmt.Errorf("logger configuration error: %w", err)
 	}
-	level, err = e.GetLoggerLevel()
+	level, err = e.LoggerLevel()
 	if err != nil {
 		return "", "", fmt.Errorf("logger configuration error: %w", err)
 	}
 	return encoding, level, nil
 }
 
-// GetLoggerEncoding obtains the logging encoding
+// LoggerEncoding obtains the logging encoding
 // from the environment variable LOG_ENCODING.
-func (e *envParams) GetLoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error) {
+func (e *envParams) LoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error) {
 	optionSetters = append([]OptionSetter{Default("json")}, optionSetters...)
-	s, err := e.GetEnv("LOG_ENCODING", optionSetters...)
+	s, err := e.Get("LOG_ENCODING", optionSetters...)
 	if err != nil {
 		return "", err
 	}
@@ -515,11 +515,11 @@ func (e *envParams) GetLoggerEncoding(optionSetters ...OptionSetter) (encoding l
 	}
 }
 
-// GetLoggerLevel obtains the logging level
+// LoggerLevel obtains the logging level
 // from the environment variable LOG_LEVEL.
-func (e *envParams) GetLoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error) {
+func (e *envParams) LoggerLevel(optionSetters ...OptionSetter) (level logging.Level, err error) {
 	optionSetters = append([]OptionSetter{Default("info")}, optionSetters...)
-	s, err := e.GetEnv("LOG_LEVEL", optionSetters...)
+	s, err := e.Get("LOG_LEVEL", optionSetters...)
 	if err != nil {
 		return level, err
 	}
@@ -535,11 +535,11 @@ func (e *envParams) GetLoggerLevel(optionSetters ...OptionSetter) (level logging
 	}
 }
 
-// GetURL obtains the HTTP URL for the environment variable for the key given.
+// URL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
-func (e *envParams) GetURL(key string, optionSetters ...OptionSetter) (url *liburl.URL, err error) {
-	s, err := e.GetEnv(key, optionSetters...)
+func (e *envParams) URL(key string, optionSetters ...OptionSetter) (url *liburl.URL, err error) {
+	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return nil, err
 	} else if s == "" {
@@ -555,16 +555,16 @@ func (e *envParams) GetURL(key string, optionSetters ...OptionSetter) (url *libu
 	return url, nil
 }
 
-// GetGotifyURL obtains the URL for Gotify server
+// GotifyURL obtains the URL for Gotify server
 // from the environment variable GOTIFY_URL.
 // It returns a nil URL if no value is found.
-func (e *envParams) GetGotifyURL(optionSetters ...OptionSetter) (url *liburl.URL, err error) {
-	return e.GetURL("GOTIFY_URL", optionSetters...)
+func (e *envParams) GotifyURL(optionSetters ...OptionSetter) (url *liburl.URL, err error) {
+	return e.URL("GOTIFY_URL", optionSetters...)
 }
 
-// GetGotifyToken obtains the token for the app on the Gotify server
+// GotifyToken obtains the token for the app on the Gotify server
 // from the environment variable GOTIFY_TOKEN.
-func (e *envParams) GetGotifyToken(optionSetters ...OptionSetter) (token string, err error) {
+func (e *envParams) GotifyToken(optionSetters ...OptionSetter) (token string, err error) {
 	optionSetters = append(optionSetters, CaseSensitiveValue(), Unset())
-	return e.GetEnv("GOTIFY_TOKEN", optionSetters...)
+	return e.Get("GOTIFY_TOKEN", optionSetters...)
 }

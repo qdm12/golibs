@@ -36,30 +36,30 @@ func (m *MockEnv) EXPECT() *MockEnvMockRecorder {
 	return m.recorder
 }
 
-// GetCSVInPossibilities mocks base method
-func (m *MockEnv) GetCSVInPossibilities(arg0 string, arg1 []string, arg2 ...params.OptionSetter) ([]string, error) {
+// CSVInside mocks base method
+func (m *MockEnv) CSVInside(arg0 string, arg1 []string, arg2 ...params.OptionSetter) ([]string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetCSVInPossibilities", varargs...)
+	ret := m.ctrl.Call(m, "CSVInside", varargs...)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetCSVInPossibilities indicates an expected call of GetCSVInPossibilities
-func (mr *MockEnvMockRecorder) GetCSVInPossibilities(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+// CSVInside indicates an expected call of CSVInside
+func (mr *MockEnvMockRecorder) CSVInside(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCSVInPossibilities", reflect.TypeOf((*MockEnv)(nil).GetCSVInPossibilities), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CSVInside", reflect.TypeOf((*MockEnv)(nil).CSVInside), varargs...)
 }
 
-// GetDatabaseDetails mocks base method
-func (m *MockEnv) GetDatabaseDetails() (string, string, string, string, error) {
+// DatabaseDetails mocks base method
+func (m *MockEnv) DatabaseDetails() (string, string, string, string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDatabaseDetails")
+	ret := m.ctrl.Call(m, "DatabaseDetails")
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(string)
 	ret2, _ := ret[2].(string)
@@ -68,317 +68,337 @@ func (m *MockEnv) GetDatabaseDetails() (string, string, string, string, error) {
 	return ret0, ret1, ret2, ret3, ret4
 }
 
-// GetDatabaseDetails indicates an expected call of GetDatabaseDetails
-func (mr *MockEnvMockRecorder) GetDatabaseDetails() *gomock.Call {
+// DatabaseDetails indicates an expected call of DatabaseDetails
+func (mr *MockEnvMockRecorder) DatabaseDetails() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabaseDetails", reflect.TypeOf((*MockEnv)(nil).GetDatabaseDetails))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatabaseDetails", reflect.TypeOf((*MockEnv)(nil).DatabaseDetails))
 }
 
-// GetDuration mocks base method
-func (m *MockEnv) GetDuration(arg0 string, arg1 ...params.OptionSetter) (time.Duration, error) {
+// Duration mocks base method
+func (m *MockEnv) Duration(arg0 string, arg1 ...params.OptionSetter) (time.Duration, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetDuration", varargs...)
+	ret := m.ctrl.Call(m, "Duration", varargs...)
 	ret0, _ := ret[0].(time.Duration)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetDuration indicates an expected call of GetDuration
-func (mr *MockEnvMockRecorder) GetDuration(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// Duration indicates an expected call of Duration
+func (mr *MockEnvMockRecorder) Duration(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDuration", reflect.TypeOf((*MockEnv)(nil).GetDuration), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Duration", reflect.TypeOf((*MockEnv)(nil).Duration), varargs...)
 }
 
-// GetEnv mocks base method
-func (m *MockEnv) GetEnv(arg0 string, arg1 ...params.OptionSetter) (string, error) {
+// ExeDir mocks base method
+func (m *MockEnv) ExeDir() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExeDir")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExeDir indicates an expected call of ExeDir
+func (mr *MockEnvMockRecorder) ExeDir() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExeDir", reflect.TypeOf((*MockEnv)(nil).ExeDir))
+}
+
+// Get mocks base method
+func (m *MockEnv) Get(arg0 string, arg1 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetEnv", varargs...)
+	ret := m.ctrl.Call(m, "Get", varargs...)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetEnv indicates an expected call of GetEnv
-func (mr *MockEnvMockRecorder) GetEnv(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// Get indicates an expected call of Get
+func (mr *MockEnvMockRecorder) Get(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnv", reflect.TypeOf((*MockEnv)(nil).GetEnv), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockEnv)(nil).Get), varargs...)
 }
 
-// GetEnvInt mocks base method
-func (m *MockEnv) GetEnvInt(arg0 string, arg1 ...params.OptionSetter) (int, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0}
-	for _, a := range arg1 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetEnvInt", varargs...)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvInt indicates an expected call of GetEnvInt
-func (mr *MockEnvMockRecorder) GetEnvInt(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvInt", reflect.TypeOf((*MockEnv)(nil).GetEnvInt), varargs...)
-}
-
-// GetEnvIntRange mocks base method
-func (m *MockEnv) GetEnvIntRange(arg0 string, arg1, arg2 int, arg3 ...params.OptionSetter) (int, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1, arg2}
-	for _, a := range arg3 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetEnvIntRange", varargs...)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetEnvIntRange indicates an expected call of GetEnvIntRange
-func (mr *MockEnvMockRecorder) GetEnvIntRange(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEnvIntRange", reflect.TypeOf((*MockEnv)(nil).GetEnvIntRange), varargs...)
-}
-
-// GetExeDir mocks base method
-func (m *MockEnv) GetExeDir() (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetExeDir")
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetExeDir indicates an expected call of GetExeDir
-func (mr *MockEnvMockRecorder) GetExeDir() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetExeDir", reflect.TypeOf((*MockEnv)(nil).GetExeDir))
-}
-
-// GetGotifyToken mocks base method
-func (m *MockEnv) GetGotifyToken(arg0 ...params.OptionSetter) (string, error) {
+// GotifyToken mocks base method
+func (m *MockEnv) GotifyToken(arg0 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetGotifyToken", varargs...)
+	ret := m.ctrl.Call(m, "GotifyToken", varargs...)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetGotifyToken indicates an expected call of GetGotifyToken
-func (mr *MockEnvMockRecorder) GetGotifyToken(arg0 ...interface{}) *gomock.Call {
+// GotifyToken indicates an expected call of GotifyToken
+func (mr *MockEnvMockRecorder) GotifyToken(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGotifyToken", reflect.TypeOf((*MockEnv)(nil).GetGotifyToken), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GotifyToken", reflect.TypeOf((*MockEnv)(nil).GotifyToken), arg0...)
 }
 
-// GetGotifyURL mocks base method
-func (m *MockEnv) GetGotifyURL(arg0 ...params.OptionSetter) (*url.URL, error) {
+// GotifyURL mocks base method
+func (m *MockEnv) GotifyURL(arg0 ...params.OptionSetter) (*url.URL, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetGotifyURL", varargs...)
+	ret := m.ctrl.Call(m, "GotifyURL", varargs...)
 	ret0, _ := ret[0].(*url.URL)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetGotifyURL indicates an expected call of GetGotifyURL
-func (mr *MockEnvMockRecorder) GetGotifyURL(arg0 ...interface{}) *gomock.Call {
+// GotifyURL indicates an expected call of GotifyURL
+func (mr *MockEnvMockRecorder) GotifyURL(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGotifyURL", reflect.TypeOf((*MockEnv)(nil).GetGotifyURL), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GotifyURL", reflect.TypeOf((*MockEnv)(nil).GotifyURL), arg0...)
 }
 
-// GetGroupID mocks base method
-func (m *MockEnv) GetGroupID() int {
+// GroupID mocks base method
+func (m *MockEnv) GroupID() int {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetGroupID")
+	ret := m.ctrl.Call(m, "GroupID")
 	ret0, _ := ret[0].(int)
 	return ret0
 }
 
-// GetGroupID indicates an expected call of GetGroupID
-func (mr *MockEnvMockRecorder) GetGroupID() *gomock.Call {
+// GroupID indicates an expected call of GroupID
+func (mr *MockEnvMockRecorder) GroupID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupID", reflect.TypeOf((*MockEnv)(nil).GetGroupID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GroupID", reflect.TypeOf((*MockEnv)(nil).GroupID))
 }
 
-// GetHTTPTimeout mocks base method
-func (m *MockEnv) GetHTTPTimeout(arg0 ...params.OptionSetter) (time.Duration, error) {
+// HTTPTimeout mocks base method
+func (m *MockEnv) HTTPTimeout(arg0 ...params.OptionSetter) (time.Duration, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetHTTPTimeout", varargs...)
+	ret := m.ctrl.Call(m, "HTTPTimeout", varargs...)
 	ret0, _ := ret[0].(time.Duration)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetHTTPTimeout indicates an expected call of GetHTTPTimeout
-func (mr *MockEnvMockRecorder) GetHTTPTimeout(arg0 ...interface{}) *gomock.Call {
+// HTTPTimeout indicates an expected call of HTTPTimeout
+func (mr *MockEnvMockRecorder) HTTPTimeout(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetHTTPTimeout", reflect.TypeOf((*MockEnv)(nil).GetHTTPTimeout), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HTTPTimeout", reflect.TypeOf((*MockEnv)(nil).HTTPTimeout), arg0...)
 }
 
-// GetListeningPort mocks base method
-func (m *MockEnv) GetListeningPort(arg0 string, arg1 ...params.OptionSetter) (uint16, string, error) {
+// Inside mocks base method
+func (m *MockEnv) Inside(arg0 string, arg1 []string, arg2 ...params.OptionSetter) (string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Inside", varargs...)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Inside indicates an expected call of Inside
+func (mr *MockEnvMockRecorder) Inside(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Inside", reflect.TypeOf((*MockEnv)(nil).Inside), varargs...)
+}
+
+// Int mocks base method
+func (m *MockEnv) Int(arg0 string, arg1 ...params.OptionSetter) (int, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetListeningPort", varargs...)
+	ret := m.ctrl.Call(m, "Int", varargs...)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Int indicates an expected call of Int
+func (mr *MockEnvMockRecorder) Int(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Int", reflect.TypeOf((*MockEnv)(nil).Int), varargs...)
+}
+
+// IntRange mocks base method
+func (m *MockEnv) IntRange(arg0 string, arg1, arg2 int, arg3 ...params.OptionSetter) (int, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1, arg2}
+	for _, a := range arg3 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "IntRange", varargs...)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IntRange indicates an expected call of IntRange
+func (mr *MockEnvMockRecorder) IntRange(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IntRange", reflect.TypeOf((*MockEnv)(nil).IntRange), varargs...)
+}
+
+// ListeningPort mocks base method
+func (m *MockEnv) ListeningPort(arg0 string, arg1 ...params.OptionSetter) (uint16, string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListeningPort", varargs...)
 	ret0, _ := ret[0].(uint16)
 	ret1, _ := ret[1].(string)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// GetListeningPort indicates an expected call of GetListeningPort
-func (mr *MockEnvMockRecorder) GetListeningPort(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// ListeningPort indicates an expected call of ListeningPort
+func (mr *MockEnvMockRecorder) ListeningPort(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListeningPort", reflect.TypeOf((*MockEnv)(nil).GetListeningPort), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListeningPort", reflect.TypeOf((*MockEnv)(nil).ListeningPort), varargs...)
 }
 
-// GetLoggerConfig mocks base method
-func (m *MockEnv) GetLoggerConfig() (logging.Encoding, logging.Level, error) {
+// LoggerConfig mocks base method
+func (m *MockEnv) LoggerConfig() (logging.Encoding, logging.Level, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLoggerConfig")
+	ret := m.ctrl.Call(m, "LoggerConfig")
 	ret0, _ := ret[0].(logging.Encoding)
 	ret1, _ := ret[1].(logging.Level)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// GetLoggerConfig indicates an expected call of GetLoggerConfig
-func (mr *MockEnvMockRecorder) GetLoggerConfig() *gomock.Call {
+// LoggerConfig indicates an expected call of LoggerConfig
+func (mr *MockEnvMockRecorder) LoggerConfig() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoggerConfig", reflect.TypeOf((*MockEnv)(nil).GetLoggerConfig))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoggerConfig", reflect.TypeOf((*MockEnv)(nil).LoggerConfig))
 }
 
-// GetLoggerEncoding mocks base method
-func (m *MockEnv) GetLoggerEncoding(arg0 ...params.OptionSetter) (logging.Encoding, error) {
+// LoggerEncoding mocks base method
+func (m *MockEnv) LoggerEncoding(arg0 ...params.OptionSetter) (logging.Encoding, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetLoggerEncoding", varargs...)
+	ret := m.ctrl.Call(m, "LoggerEncoding", varargs...)
 	ret0, _ := ret[0].(logging.Encoding)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetLoggerEncoding indicates an expected call of GetLoggerEncoding
-func (mr *MockEnvMockRecorder) GetLoggerEncoding(arg0 ...interface{}) *gomock.Call {
+// LoggerEncoding indicates an expected call of LoggerEncoding
+func (mr *MockEnvMockRecorder) LoggerEncoding(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoggerEncoding", reflect.TypeOf((*MockEnv)(nil).GetLoggerEncoding), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoggerEncoding", reflect.TypeOf((*MockEnv)(nil).LoggerEncoding), arg0...)
 }
 
-// GetLoggerLevel mocks base method
-func (m *MockEnv) GetLoggerLevel(arg0 ...params.OptionSetter) (logging.Level, error) {
+// LoggerLevel mocks base method
+func (m *MockEnv) LoggerLevel(arg0 ...params.OptionSetter) (logging.Level, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetLoggerLevel", varargs...)
+	ret := m.ctrl.Call(m, "LoggerLevel", varargs...)
 	ret0, _ := ret[0].(logging.Level)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetLoggerLevel indicates an expected call of GetLoggerLevel
-func (mr *MockEnvMockRecorder) GetLoggerLevel(arg0 ...interface{}) *gomock.Call {
+// LoggerLevel indicates an expected call of LoggerLevel
+func (mr *MockEnvMockRecorder) LoggerLevel(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLoggerLevel", reflect.TypeOf((*MockEnv)(nil).GetLoggerLevel), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoggerLevel", reflect.TypeOf((*MockEnv)(nil).LoggerLevel), arg0...)
 }
 
-// GetOnOff mocks base method
-func (m *MockEnv) GetOnOff(arg0 string, arg1 ...params.OptionSetter) (bool, error) {
+// OnOff mocks base method
+func (m *MockEnv) OnOff(arg0 string, arg1 ...params.OptionSetter) (bool, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetOnOff", varargs...)
+	ret := m.ctrl.Call(m, "OnOff", varargs...)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetOnOff indicates an expected call of GetOnOff
-func (mr *MockEnvMockRecorder) GetOnOff(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// OnOff indicates an expected call of OnOff
+func (mr *MockEnvMockRecorder) OnOff(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOnOff", reflect.TypeOf((*MockEnv)(nil).GetOnOff), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OnOff", reflect.TypeOf((*MockEnv)(nil).OnOff), varargs...)
 }
 
-// GetPath mocks base method
-func (m *MockEnv) GetPath(arg0 string, arg1 ...params.OptionSetter) (string, error) {
+// Path mocks base method
+func (m *MockEnv) Path(arg0 string, arg1 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetPath", varargs...)
+	ret := m.ctrl.Call(m, "Path", varargs...)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPath indicates an expected call of GetPath
-func (mr *MockEnvMockRecorder) GetPath(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// Path indicates an expected call of Path
+func (mr *MockEnvMockRecorder) Path(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPath", reflect.TypeOf((*MockEnv)(nil).GetPath), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Path", reflect.TypeOf((*MockEnv)(nil).Path), varargs...)
 }
 
-// GetPort mocks base method
-func (m *MockEnv) GetPort(arg0 string, arg1 ...params.OptionSetter) (uint16, error) {
+// Port mocks base method
+func (m *MockEnv) Port(arg0 string, arg1 ...params.OptionSetter) (uint16, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetPort", varargs...)
+	ret := m.ctrl.Call(m, "Port", varargs...)
 	ret0, _ := ret[0].(uint16)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetPort indicates an expected call of GetPort
-func (mr *MockEnvMockRecorder) GetPort(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// Port indicates an expected call of Port
+func (mr *MockEnvMockRecorder) Port(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPort", reflect.TypeOf((*MockEnv)(nil).GetPort), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Port", reflect.TypeOf((*MockEnv)(nil).Port), varargs...)
 }
 
-// GetRedisDetails mocks base method
-func (m *MockEnv) GetRedisDetails() (string, string, string, error) {
+// RedisDetails mocks base method
+func (m *MockEnv) RedisDetails() (string, string, string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRedisDetails")
+	ret := m.ctrl.Call(m, "RedisDetails")
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(string)
 	ret2, _ := ret[2].(string)
@@ -386,101 +406,81 @@ func (m *MockEnv) GetRedisDetails() (string, string, string, error) {
 	return ret0, ret1, ret2, ret3
 }
 
-// GetRedisDetails indicates an expected call of GetRedisDetails
-func (mr *MockEnvMockRecorder) GetRedisDetails() *gomock.Call {
+// RedisDetails indicates an expected call of RedisDetails
+func (mr *MockEnvMockRecorder) RedisDetails() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRedisDetails", reflect.TypeOf((*MockEnv)(nil).GetRedisDetails))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RedisDetails", reflect.TypeOf((*MockEnv)(nil).RedisDetails))
 }
 
-// GetRootURL mocks base method
-func (m *MockEnv) GetRootURL(arg0 ...params.OptionSetter) (string, error) {
+// RootURL mocks base method
+func (m *MockEnv) RootURL(arg0 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{}
 	for _, a := range arg0 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetRootURL", varargs...)
+	ret := m.ctrl.Call(m, "RootURL", varargs...)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetRootURL indicates an expected call of GetRootURL
-func (mr *MockEnvMockRecorder) GetRootURL(arg0 ...interface{}) *gomock.Call {
+// RootURL indicates an expected call of RootURL
+func (mr *MockEnvMockRecorder) RootURL(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRootURL", reflect.TypeOf((*MockEnv)(nil).GetRootURL), arg0...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RootURL", reflect.TypeOf((*MockEnv)(nil).RootURL), arg0...)
 }
 
-// GetURL mocks base method
-func (m *MockEnv) GetURL(arg0 string, arg1 ...params.OptionSetter) (*url.URL, error) {
+// URL mocks base method
+func (m *MockEnv) URL(arg0 string, arg1 ...params.OptionSetter) (*url.URL, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetURL", varargs...)
+	ret := m.ctrl.Call(m, "URL", varargs...)
 	ret0, _ := ret[0].(*url.URL)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetURL indicates an expected call of GetURL
-func (mr *MockEnvMockRecorder) GetURL(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// URL indicates an expected call of URL
+func (mr *MockEnvMockRecorder) URL(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetURL", reflect.TypeOf((*MockEnv)(nil).GetURL), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "URL", reflect.TypeOf((*MockEnv)(nil).URL), varargs...)
 }
 
-// GetUserID mocks base method
-func (m *MockEnv) GetUserID() int {
+// UserID mocks base method
+func (m *MockEnv) UserID() int {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserID")
+	ret := m.ctrl.Call(m, "UserID")
 	ret0, _ := ret[0].(int)
 	return ret0
 }
 
-// GetUserID indicates an expected call of GetUserID
-func (mr *MockEnvMockRecorder) GetUserID() *gomock.Call {
+// UserID indicates an expected call of UserID
+func (mr *MockEnvMockRecorder) UserID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserID", reflect.TypeOf((*MockEnv)(nil).GetUserID))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserID", reflect.TypeOf((*MockEnv)(nil).UserID))
 }
 
-// GetValueIfInside mocks base method
-func (m *MockEnv) GetValueIfInside(arg0 string, arg1 []string, arg2 ...params.OptionSetter) (string, error) {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "GetValueIfInside", varargs...)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetValueIfInside indicates an expected call of GetValueIfInside
-func (mr *MockEnvMockRecorder) GetValueIfInside(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValueIfInside", reflect.TypeOf((*MockEnv)(nil).GetValueIfInside), varargs...)
-}
-
-// GetYesNo mocks base method
-func (m *MockEnv) GetYesNo(arg0 string, arg1 ...params.OptionSetter) (bool, error) {
+// YesNo mocks base method
+func (m *MockEnv) YesNo(arg0 string, arg1 ...params.OptionSetter) (bool, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
 	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetYesNo", varargs...)
+	ret := m.ctrl.Call(m, "YesNo", varargs...)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetYesNo indicates an expected call of GetYesNo
-func (mr *MockEnvMockRecorder) GetYesNo(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+// YesNo indicates an expected call of YesNo
+func (mr *MockEnvMockRecorder) YesNo(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetYesNo", reflect.TypeOf((*MockEnv)(nil).GetYesNo), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "YesNo", reflect.TypeOf((*MockEnv)(nil).YesNo), varargs...)
 }
