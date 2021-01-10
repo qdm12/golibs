@@ -45,7 +45,7 @@ type envParams struct {
 // NewEnv returns a new Env object.
 func NewEnv() Env {
 	return &envParams{
-		getuid: NewOS().UID,
+		getuid: os.Getuid,
 		getenv: os.Getenv,
 		regex:  verification.NewRegex(),
 		unset:  os.Unsetenv,
