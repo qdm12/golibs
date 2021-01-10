@@ -3,6 +3,7 @@ package params
 import (
 	"errors"
 	"fmt"
+	"net"
 	liburl "net/url"
 	"os"
 	"path"
@@ -29,6 +30,7 @@ type Env interface {
 	Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
 	Port(key string, optionSetters ...OptionSetter) (port uint16, err error)
 	ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error)
+	ListeningAddress(key string, optionSetters ...OptionSetter) (address, warning string, err error)
 	RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error)
 	Path(key string, optionSetters ...OptionSetter) (path string, err error)
 	LoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
@@ -331,6 +333,30 @@ func (e *envParams) Port(key string, optionSetters ...OptionSetter) (port uint16
 		return 0, err
 	}
 	return verification.ParsePort(s)
+}
+
+var ErrInvalidPort = errors.New("invalid port")
+
+func (e *envParams) ListeningAddress(key string, optionSetters ...OptionSetter) (
+	address, warning string, err error) {
+	hostport, err := e.Get(key, optionSetters...)
+	if err != nil {
+		return "", "", err
+	}
+	host, port, err := net.SplitHostPort(hostport)
+	if err != nil {
+		return "", "", err
+	}
+	p, err := strconv.Atoi(port)
+	if err != nil {
+		return "", "", fmt.Errorf("%w: %s", ErrInvalidPort, err)
+	}
+	warning, err = e.checkListeningPort(uint16(p))
+	if err != nil {
+		return "", warning, fmt.Errorf("%w: %s", ErrInvalidPort, err)
+	}
+	address = host + ":" + port
+	return address, warning, nil
 }
 
 // ListeningPort obtains and checks a port from an environment variable
