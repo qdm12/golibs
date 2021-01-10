@@ -36,19 +36,19 @@ type Env interface {
 }
 
 type envParams struct {
-	getuid   func() int
-	getenv   func(key string) string
-	verifier verification.Verifier
-	unset    func(k string) error
+	getuid func() int
+	getenv func(key string) string
+	regex  verification.Regex
+	unset  func(k string) error
 }
 
 // NewEnv returns a new Env object.
 func NewEnv() Env {
 	return &envParams{
-		getuid:   NewOS().UID,
-		getenv:   os.Getenv,
-		verifier: verification.NewVerifier(),
-		unset:    os.Unsetenv,
+		getuid: NewOS().UID,
+		getenv: os.Getenv,
+		regex:  verification.NewRegex(),
+		unset:  os.Unsetenv,
 	}
 }
 
@@ -367,7 +367,7 @@ func (e *envParams) RootURL(key string, optionSetters ...OptionSetter) (rootURL 
 		return rootURL, err
 	}
 	rootURL = path.Clean(rootURL)
-	if !e.verifier.MatchRootURL(rootURL) {
+	if !e.regex.MatchRootURL(rootURL) {
 		return "", fmt.Errorf("environment variable ROOT_URL value %q is not valid", rootURL)
 	}
 	rootURL = strings.TrimSuffix(rootURL, "/") // already have / from paths of router

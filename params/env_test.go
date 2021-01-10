@@ -579,7 +579,7 @@ func Test_ListeningPort(t *testing.T) {
 				getuid: func() int {
 					return expectedUID
 				},
-				verifier: verification.NewVerifier(),
+				regex: verification.NewRegex(),
 			}
 			listeningPort, warning, err := e.ListeningPort("LISTENING_PORT", tc.optionSetters...)
 			if tc.err != nil {
@@ -632,7 +632,7 @@ func Test_RootURL(t *testing.T) {
 				getenv: func(key string) string {
 					return tc.envValue
 				},
-				verifier: verification.NewVerifier(),
+				regex: verification.NewRegex(),
 			}
 			rootURL, err := e.RootURL("ROOT_URL", tc.optionSetters...)
 			if tc.err != nil {
