@@ -782,6 +782,55 @@ func Test_RootURL(t *testing.T) {
 	}
 }
 
+func Test_Path(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue      string
+		optionSetters []OptionSetter
+		absPath       string
+		absErr        error
+		path          string
+		err           error
+	}{
+		"valid path": {
+			envValue: "/path",
+			absPath:  "/real/path",
+			path:     "/real/path",
+		},
+		"get error": {
+			optionSetters: []OptionSetter{Compulsory()},
+			err:           errors.New(`no value found for environment variable "key"`),
+		},
+		"abs error": {
+			envValue: "/path",
+			absErr:   errors.New("abs error"),
+			err:      errors.New(`invalid filepath: for environment variable key: abs error`),
+		},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParams{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+				fpAbs: func(s string) (string, error) {
+					return tc.absPath, tc.absErr
+				},
+			}
+			path, err := e.Path("key", tc.optionSetters...)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+			assert.Equal(t, tc.path, path)
+		})
+	}
+}
+
 func Test_LoggerEncoding(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {

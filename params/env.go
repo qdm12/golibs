@@ -43,6 +43,7 @@ type envParams struct {
 	getenv func(key string) string
 	regex  verification.Regex
 	unset  func(k string) error
+	fpAbs  func(s string) (string, error)
 }
 
 // NewEnv returns a new Env object.
@@ -52,6 +53,7 @@ func NewEnv() Env {
 		getenv: os.Getenv,
 		regex:  verification.NewRegex(),
 		unset:  os.Unsetenv,
+		fpAbs:  filepath.Abs,
 	}
 }
 
@@ -415,6 +417,8 @@ func (e *envParams) RootURL(key string, optionSetters ...OptionSetter) (rootURL 
 	return rootURL, nil
 }
 
+var ErrInvalidPath = errors.New("invalid filepath")
+
 // Path obtains a path from the environment variable corresponding
 // to key, and verifies it is valid. If it is a relative path,
 // it is converted to an absolute path.
@@ -423,7 +427,13 @@ func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string
 	if err != nil {
 		return "", err
 	}
-	return filepath.Abs(s)
+	path, err = e.fpAbs(s)
+	if err != nil {
+		return "", fmt.Errorf(
+			"%w: for environment variable %s: %s",
+			ErrInvalidPath, key, err)
+	}
+	return path, nil
 }
 
 // LoggerEncoding obtains the logging encoding
