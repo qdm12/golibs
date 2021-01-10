@@ -94,21 +94,6 @@ func (mr *MockEnvMockRecorder) Duration(arg0 interface{}, arg1 ...interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Duration", reflect.TypeOf((*MockEnv)(nil).Duration), varargs...)
 }
 
-// ExeDir mocks base method
-func (m *MockEnv) ExeDir() (string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ExeDir")
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ExeDir indicates an expected call of ExeDir
-func (mr *MockEnvMockRecorder) ExeDir() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExeDir", reflect.TypeOf((*MockEnv)(nil).ExeDir))
-}
-
 // Get mocks base method
 func (m *MockEnv) Get(arg0 string, arg1 ...params.OptionSetter) (string, error) {
 	m.ctrl.T.Helper()
@@ -165,20 +150,6 @@ func (m *MockEnv) GotifyURL(arg0 ...params.OptionSetter) (*url.URL, error) {
 func (mr *MockEnvMockRecorder) GotifyURL(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GotifyURL", reflect.TypeOf((*MockEnv)(nil).GotifyURL), arg0...)
-}
-
-// GroupID mocks base method
-func (m *MockEnv) GroupID() int {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GroupID")
-	ret0, _ := ret[0].(int)
-	return ret0
-}
-
-// GroupID indicates an expected call of GroupID
-func (mr *MockEnvMockRecorder) GroupID() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GroupID", reflect.TypeOf((*MockEnv)(nil).GroupID))
 }
 
 // HTTPTimeout mocks base method
@@ -449,20 +420,6 @@ func (mr *MockEnvMockRecorder) URL(arg0 interface{}, arg1 ...interface{}) *gomoc
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "URL", reflect.TypeOf((*MockEnv)(nil).URL), varargs...)
-}
-
-// UserID mocks base method
-func (m *MockEnv) UserID() int {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UserID")
-	ret0, _ := ret[0].(int)
-	return ret0
-}
-
-// UserID indicates an expected call of UserID
-func (mr *MockEnvMockRecorder) UserID() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserID", reflect.TypeOf((*MockEnv)(nil).UserID))
 }
 
 // YesNo mocks base method

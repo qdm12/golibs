@@ -27,14 +27,11 @@ type Env interface {
 	CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (values []string, err error)
 	Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
 	HTTPTimeout(optionSetters ...OptionSetter) (duration time.Duration, err error)
-	UserID() int
-	GroupID() int
 	Port(key string, optionSetters ...OptionSetter) (port uint16, err error)
 	ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error)
 	RootURL(optionSetters ...OptionSetter) (rootURL string, err error)
 	DatabaseDetails() (hostname, user, password, dbName string, err error)
 	RedisDetails() (hostname, port, password string, err error)
-	ExeDir() (dir string, err error)
 	Path(key string, optionSetters ...OptionSetter) (path string, err error)
 	LoggerConfig() (encoding logging.Encoding, level logging.Level, err error)
 	LoggerEncoding(optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
@@ -45,23 +42,19 @@ type Env interface {
 }
 
 type envParams struct {
-	getenv     func(key string) string
-	getuid     func() int
-	getgid     func() int
-	executable func() (string, error)
-	verifier   verification.Verifier
-	unset      func(k string) error
+	getuid   func() int
+	getenv   func(key string) string
+	verifier verification.Verifier
+	unset    func(k string) error
 }
 
 // NewEnv returns a new Env object.
 func NewEnv() Env {
 	return &envParams{
-		getenv:     os.Getenv,
-		getuid:     os.Getuid,
-		getgid:     os.Getgid,
-		executable: os.Executable,
-		verifier:   verification.NewVerifier(),
-		unset:      os.Unsetenv,
+		getuid:   NewOS().UID,
+		getenv:   os.Getenv,
+		verifier: verification.NewVerifier(),
+		unset:    os.Unsetenv,
 	}
 }
 
@@ -351,16 +344,6 @@ func (e *envParams) HTTPTimeout(optionSetters ...OptionSetter) (timeout time.Dur
 	return e.Duration("HTTP_TIMEOUT", optionSetters...)
 }
 
-// UserID obtains the user ID running the program.
-func (e *envParams) UserID() int {
-	return e.getuid()
-}
-
-// GroupID obtains the user ID running the program.
-func (e *envParams) GroupID() int {
-	return e.getgid()
-}
-
 // ListeningPort obtains and checks a port from an environment variable
 // and returns a warning associated with the user ID and the port found.
 func (e *envParams) ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error) {
@@ -456,30 +439,13 @@ func (e *envParams) RedisDetails() (hostname, port, password string, err error) 
 	return hostname, port, password, nil
 }
 
-// ExeDir obtains the executable directory.
-func (e *envParams) ExeDir() (dir string, err error) {
-	ex, err := e.executable()
-	if err != nil {
-		return dir, err
-	}
-	dir = filepath.Dir(ex)
-	return dir, nil
-}
-
 // Path obtains a path from the environment variable corresponding
 // to key, and verifies it is valid. If it is a relative path,
-// it prepends it with the executable path to obtain an absolute path.
-// It uses defaultValue if no value is found.
+// it is converted to an absolute path.
 func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return "", err
-	} else if !filepath.IsAbs(s) {
-		exDir, err := e.ExeDir()
-		if err != nil {
-			return "", err
-		}
-		s = filepath.Join(exDir, s)
 	}
 	return filepath.Abs(s)
 }

@@ -593,30 +593,6 @@ func Test_HTTPTimeout(t *testing.T) {
 	}
 }
 
-func Test_UserID(t *testing.T) {
-	t.Parallel()
-	const expectedUID = 1
-	e := &envParams{
-		getuid: func() int {
-			return expectedUID
-		},
-	}
-	uid := e.UserID()
-	assert.Equal(t, expectedUID, uid)
-}
-
-func Test_GroupID(t *testing.T) {
-	t.Parallel()
-	const expectedUID = 1
-	e := &envParams{
-		getgid: func() int {
-			return expectedUID
-		},
-	}
-	gid := e.GroupID()
-	assert.Equal(t, expectedUID, gid)
-}
-
 func Test_ListeningPort(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
