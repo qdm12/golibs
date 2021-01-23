@@ -521,15 +521,12 @@ func Test_Duration(t *testing.T) {
 		},
 		"key with 0 integer value": {
 			envValue: "0",
-			err:      fmt.Errorf(`environment variable "any" duration value cannot be 0`),
 		},
 		"key with negative duration": {
 			envValue: "-1s",
 			err:      fmt.Errorf(`environment variable "any" duration value cannot be lower than 0`),
 		},
-		"key without value": {
-			err: fmt.Errorf(`environment variable "any" duration value is empty`),
-		},
+		"key without value": {},
 		"key without value and default": {
 			optionSetters: []OptionSetter{Default("1s")},
 			duration:      time.Second,

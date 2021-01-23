@@ -312,7 +312,7 @@ func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duratio
 	if err != nil {
 		return 0, err
 	} else if len(s) == 0 {
-		return 0, fmt.Errorf("environment variable %q duration value is empty", key)
+		return 0, nil
 	}
 	duration, err = time.ParseDuration(s)
 	switch {
@@ -320,8 +320,6 @@ func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duratio
 		return 0, fmt.Errorf("environment variable %q duration value is malformed: %w", key, err)
 	case duration < 0:
 		return 0, fmt.Errorf("environment variable %q duration value cannot be lower than 0", key)
-	case duration == 0:
-		return 0, fmt.Errorf("environment variable %q duration value cannot be 0", key)
 	default:
 		return duration, nil
 	}
