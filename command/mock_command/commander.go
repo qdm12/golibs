@@ -7,7 +7,6 @@ package mock_command
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	io "io"
 	reflect "reflect"
 )
 
@@ -55,16 +54,16 @@ func (mr *MockCommanderMockRecorder) Run(arg0, arg1 interface{}, arg2 ...interfa
 }
 
 // Start mocks base method
-func (m *MockCommander) Start(arg0 context.Context, arg1 string, arg2 ...string) (io.ReadCloser, io.ReadCloser, func() error, error) {
+func (m *MockCommander) Start(arg0 context.Context, arg1 string, arg2 ...string) (chan string, chan string, chan error, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Start", varargs...)
-	ret0, _ := ret[0].(io.ReadCloser)
-	ret1, _ := ret[1].(io.ReadCloser)
-	ret2, _ := ret[2].(func() error)
+	ret0, _ := ret[0].(chan string)
+	ret1, _ := ret[1].(chan string)
+	ret2, _ := ret[2].(chan error)
 	ret3, _ := ret[3].(error)
 	return ret0, ret1, ret2, ret3
 }
