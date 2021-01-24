@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"os/exec"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,21 +14,18 @@ func Test_Start(t *testing.T) {
 		execCommand: exec.CommandContext,
 	}
 	ctx := context.Background()
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	stdoutLines := make(chan string)
-	stderrLines := make(chan string)
-	wait := make(chan error)
 
+	const program = "echo"
+	const args = "hello\nworld"
 	expectedStdoutLines := []string{"hello", "world"}
 	expectedStderrLines := []string{}
 
-	go commander.Start(ctx, wg, stdoutLines, stderrLines, wait, "echo", "hello\nworld")
+	stdoutLines, stderrLines, waitError, err := commander.Start(ctx, program, args)
 
+	assert.NoError(t, err)
 	var stdoutLinesIndex, stderrLinesIndex int
 
-	var done bool
-	for !done {
+	for {
 		select {
 		case line := <-stdoutLines:
 			assert.Equal(t, expectedStdoutLines[stdoutLinesIndex], line)
@@ -37,13 +33,12 @@ func Test_Start(t *testing.T) {
 		case line := <-stderrLines:
 			assert.Equal(t, expectedStderrLines[stderrLinesIndex], line)
 			stderrLinesIndex++
-		case err := <-wait:
+		case err := <-waitError:
 			assert.NoError(t, err)
 			close(stdoutLines)
 			close(stderrLines)
-			close(wait)
-			done = true
+			close(waitError)
+			return
 		}
 	}
-	wg.Wait()
 }

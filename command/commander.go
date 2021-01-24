@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"os/exec"
-	"sync"
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Commander
@@ -12,13 +11,11 @@ import (
 type Commander interface {
 	// Run runs a command in a blocking manner, returning its output and an error if it failed
 	Run(ctx context.Context, name string, arg ...string) (output string, err error)
-	// Start launches a command and reads from its stdout and stderr streams
-	// until it completes. It should therefore be run in a goroutine.
-	// All the channels given should also be closed after an error,
-	// nil or not, is received in the wait channel.
-	Start(ctx context.Context, wg *sync.WaitGroup,
-		stdoutLines, stderrLines chan<- string, wait chan<- error,
-		name string, arg ...string)
+	// Start launches a command and stream stdout and stderr to channels.
+	// All the channels returned should be closed when an error,
+	// nil or not, is received in the waitError channel.
+	Start(ctx context.Context, name string, arg ...string) (
+		stdoutLines, stderrLines chan string, waitError chan error, err error)
 }
 
 type commander struct {

@@ -9,49 +9,51 @@ import (
 	"sync"
 )
 
-// Start launches a command and reads from its stdout and stderr streams
-// until it completes. It should therefore be run in a goroutine.
-// All the channels given should also be closed after an error,
-// nil or not, is received in the wait channel.
-func (c *commander) Start(ctx context.Context, wg *sync.WaitGroup,
-	stdoutLines, stderrLines chan<- string, wait chan<- error,
-	name string, arg ...string) {
-	defer wg.Done()
-
-	streamWg := &sync.WaitGroup{}
-	defer streamWg.Wait()
-
+// Start launches a command and stream stdout and stderr to channels.
+// All the channels returned should be closed when an error,
+// nil or not, is received in the waitError channel.
+func (c *commander) Start(ctx context.Context, name string, arg ...string) (
+	stdoutLines, stderrLines chan string, waitError chan error, err error) {
 	cmd := c.execCommand(ctx, name, arg...)
+
+	wg := &sync.WaitGroup{}
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		_ = stdout.Close()
-		wait <- err
-		return
+		return nil, nil, nil, err
 	}
-	streamWg.Add(1)
-	go streamToChannel(ctx, streamWg, stdout, stdoutLines)
+	wg.Add(1)
+	stdoutLines = make(chan string)
+	go streamToChannel(ctx, wg, stdout, stdoutLines)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		_ = stdout.Close()
-		_ = stderr.Close()
-		wait <- err
-		return
+		close(stdoutLines)
+		return nil, nil, nil, err
 	}
-	streamWg.Add(1)
-	go streamToChannel(ctx, streamWg, stdout, stderrLines)
+	wg.Add(1)
+	stderrLines = make(chan string)
+	go streamToChannel(ctx, wg, stderr, stderrLines)
 
 	if err := cmd.Start(); err != nil {
 		_ = stdout.Close()
+		close(stdoutLines)
 		_ = stderr.Close()
-		wait <- err
-		return
+		close(stderrLines)
+		return nil, nil, nil, err
 	}
 
-	wait <- cmd.Wait()
-	_ = stdout.Close()
-	_ = stderr.Close()
+	waitError = make(chan error)
+	go func() {
+		err := cmd.Wait()
+		_ = stdout.Close()
+		_ = stderr.Close()
+		wg.Wait()
+		waitError <- err
+	}()
+
+	return stdoutLines, stderrLines, waitError, nil
 }
 
 func streamToChannel(ctx context.Context, wg *sync.WaitGroup,
