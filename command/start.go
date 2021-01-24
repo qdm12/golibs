@@ -12,6 +12,8 @@ import (
 // Start launches a command and stream stdout and stderr to channels.
 // All the channels returned should be closed when an error,
 // nil or not, is received in the waitError channel.
+// The channels should NOT be closed if an error is returned directly
+// with err, as they will already be closed internally by the function.
 func (c *commander) Start(ctx context.Context, name string, arg ...string) (
 	stdoutLines, stderrLines chan string, waitError chan error, err error) {
 	cmd := c.execCommand(ctx, name, arg...)
