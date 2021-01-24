@@ -7,8 +7,8 @@ package mock_command
 import (
 	context "context"
 	gomock "github.com/golang/mock/gomock"
-	io "io"
 	reflect "reflect"
+	sync "sync"
 )
 
 // MockCommander is a mock of Commander interface
@@ -55,23 +55,18 @@ func (mr *MockCommanderMockRecorder) Run(arg0, arg1 interface{}, arg2 ...interfa
 }
 
 // Start mocks base method
-func (m *MockCommander) Start(arg0 context.Context, arg1 string, arg2 ...string) (io.ReadCloser, io.ReadCloser, func() error, error) {
+func (m *MockCommander) Start(arg0 context.Context, arg1 *sync.WaitGroup, arg2, arg3 chan<- string, arg4 chan<- error, arg5 string, arg6 ...string) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []interface{}{arg0, arg1, arg2, arg3, arg4, arg5}
+	for _, a := range arg6 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "Start", varargs...)
-	ret0, _ := ret[0].(io.ReadCloser)
-	ret1, _ := ret[1].(io.ReadCloser)
-	ret2, _ := ret[2].(func() error)
-	ret3, _ := ret[3].(error)
-	return ret0, ret1, ret2, ret3
+	m.ctrl.Call(m, "Start", varargs...)
 }
 
 // Start indicates an expected call of Start
-func (mr *MockCommanderMockRecorder) Start(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+func (mr *MockCommanderMockRecorder) Start(arg0, arg1, arg2, arg3, arg4, arg5 interface{}, arg6 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	varargs := append([]interface{}{arg0, arg1, arg2, arg3, arg4, arg5}, arg6...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Start", reflect.TypeOf((*MockCommander)(nil).Start), varargs...)
 }
