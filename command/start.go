@@ -30,6 +30,7 @@ func (c *commander) Start(ctx context.Context, name string, arg ...string) (
 	if err != nil {
 		_ = stdout.Close()
 		close(stdoutLines)
+		wg.Wait()
 		return nil, nil, nil, err
 	}
 	wg.Add(1)
@@ -41,6 +42,7 @@ func (c *commander) Start(ctx context.Context, name string, arg ...string) (
 		close(stdoutLines)
 		_ = stderr.Close()
 		close(stderrLines)
+		wg.Wait()
 		return nil, nil, nil, err
 	}
 
