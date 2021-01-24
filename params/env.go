@@ -26,6 +26,7 @@ type Env interface {
 	YesNo(key string, optionSetters ...OptionSetter) (yes bool, err error)
 	OnOff(key string, optionSetters ...OptionSetter) (on bool, err error)
 	Inside(key string, possibilities []string, optionSetters ...OptionSetter) (value string, err error)
+	CSV(key string, optionSetters ...OptionSetter) (values []string, err error)
 	CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (values []string, err error)
 	Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
 	Port(key string, optionSetters ...OptionSetter) (port uint16, err error)
@@ -255,8 +256,7 @@ func (e *envParams) Inside(key string, possibilities []string, optionSetters ...
 	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, csvPossibilities)
 }
 
-func (e *envParams) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
-	values []string, err error) {
+func (e *envParams) CSV(key string, optionSetters ...OptionSetter) (values []string, err error) {
 	options := envOptions{}
 	for _, setter := range optionSetters {
 		_ = setter(&options) // error is checked in e.Get
@@ -268,7 +268,22 @@ func (e *envParams) CSVInside(key string, possibilities []string, optionSetters 
 	if !options.compulsory && len(csv) == 0 {
 		return nil, nil
 	}
-	values = strings.Split(csv, ",")
+	return strings.Split(csv, ","), nil
+}
+
+func (e *envParams) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
+	values []string, err error) {
+	values, err = e.CSV(key, optionSetters...)
+	if err != nil {
+		return nil, err
+	} else if values == nil {
+		return nil, nil
+	}
+
+	options := envOptions{}
+	for _, setter := range optionSetters {
+		_ = setter(&options) // error is checked in e.Get
+	}
 	type valuePosition struct {
 		position int
 		value    string
