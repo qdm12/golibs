@@ -36,6 +36,26 @@ func (m *MockEnv) EXPECT() *MockEnvMockRecorder {
 	return m.recorder
 }
 
+// CSV mocks base method
+func (m *MockEnv) CSV(arg0 string, arg1 ...params.OptionSetter) ([]string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CSV", varargs...)
+	ret0, _ := ret[0].([]string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CSV indicates an expected call of CSV
+func (mr *MockEnvMockRecorder) CSV(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CSV", reflect.TypeOf((*MockEnv)(nil).CSV), varargs...)
+}
+
 // CSVInside mocks base method
 func (m *MockEnv) CSVInside(arg0 string, arg1 []string, arg2 ...params.OptionSetter) ([]string, error) {
 	m.ctrl.T.Helper()
@@ -156,6 +176,27 @@ func (mr *MockEnvMockRecorder) IntRange(arg0, arg1, arg2 interface{}, arg3 ...in
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IntRange", reflect.TypeOf((*MockEnv)(nil).IntRange), varargs...)
 }
 
+// ListeningAddress mocks base method
+func (m *MockEnv) ListeningAddress(arg0 string, arg1 ...params.OptionSetter) (string, string, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListeningAddress", varargs...)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ListeningAddress indicates an expected call of ListeningAddress
+func (mr *MockEnvMockRecorder) ListeningAddress(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListeningAddress", reflect.TypeOf((*MockEnv)(nil).ListeningAddress), varargs...)
+}
+
 // ListeningPort mocks base method
 func (m *MockEnv) ListeningPort(arg0 string, arg1 ...params.OptionSetter) (uint16, string, error) {
 	m.ctrl.T.Helper()
@@ -177,42 +218,44 @@ func (mr *MockEnvMockRecorder) ListeningPort(arg0 interface{}, arg1 ...interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListeningPort", reflect.TypeOf((*MockEnv)(nil).ListeningPort), varargs...)
 }
 
-// LoggerEncoding mocks base method
-func (m *MockEnv) LoggerEncoding(arg0 ...params.OptionSetter) (logging.Encoding, error) {
+// LogEncoding mocks base method
+func (m *MockEnv) LogEncoding(arg0 string, arg1 ...params.OptionSetter) (logging.Encoding, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "LoggerEncoding", varargs...)
+	ret := m.ctrl.Call(m, "LogEncoding", varargs...)
 	ret0, _ := ret[0].(logging.Encoding)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// LoggerEncoding indicates an expected call of LoggerEncoding
-func (mr *MockEnvMockRecorder) LoggerEncoding(arg0 ...interface{}) *gomock.Call {
+// LogEncoding indicates an expected call of LogEncoding
+func (mr *MockEnvMockRecorder) LogEncoding(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoggerEncoding", reflect.TypeOf((*MockEnv)(nil).LoggerEncoding), arg0...)
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogEncoding", reflect.TypeOf((*MockEnv)(nil).LogEncoding), varargs...)
 }
 
-// LoggerLevel mocks base method
-func (m *MockEnv) LoggerLevel(arg0 ...params.OptionSetter) (logging.Level, error) {
+// LogLevel mocks base method
+func (m *MockEnv) LogLevel(arg0 string, arg1 ...params.OptionSetter) (logging.Level, error) {
 	m.ctrl.T.Helper()
-	varargs := []interface{}{}
-	for _, a := range arg0 {
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "LoggerLevel", varargs...)
+	ret := m.ctrl.Call(m, "LogLevel", varargs...)
 	ret0, _ := ret[0].(logging.Level)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// LoggerLevel indicates an expected call of LoggerLevel
-func (mr *MockEnvMockRecorder) LoggerLevel(arg0 ...interface{}) *gomock.Call {
+// LogLevel indicates an expected call of LogLevel
+func (mr *MockEnvMockRecorder) LogLevel(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoggerLevel", reflect.TypeOf((*MockEnv)(nil).LoggerLevel), arg0...)
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LogLevel", reflect.TypeOf((*MockEnv)(nil).LogLevel), varargs...)
 }
 
 // OnOff mocks base method
