@@ -481,6 +481,8 @@ func (e *envParams) LogLevel(key string, optionSetters ...OptionSetter) (level l
 		return logging.WarnLevel, nil
 	case "error":
 		return logging.ErrorLevel, nil
+	case "debug":
+		return logging.DebugLevel, nil
 	default:
 		return level, fmt.Errorf("environment variable %s: %w: %q", key, ErrUnknownLogLevel, s)
 	}
