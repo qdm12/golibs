@@ -8,12 +8,12 @@ import (
 type stdLogger struct {
 	logImpl  *log.Logger
 	settings settings
-	// hasChild and writerMutex are only used
+	// isConcurrent and writerMutex are only used
 	// when more loggers are created using the
 	// NewChild method to avoid writing to the
 	// same writer at the same time.
-	hasChild    bool
-	writerMutex sync.Mutex
+	isConcurrent bool
+	writerMutex  *sync.Mutex
 }
 
 func newStdLog(settings settings) Logger {
@@ -25,14 +25,15 @@ func newStdLog(settings settings) Logger {
 	logImpl := log.New(settings.writer, settings.prefix, flags)
 
 	return &stdLogger{
-		logImpl: logImpl,
+		logImpl:     logImpl,
+		writerMutex: &sync.Mutex{},
 	}
 }
 
 func (l *stdLogger) NewChild(options ...Option) Logger {
 	settings := newSettings(options...)
 
-	l.hasChild = true
+	l.isConcurrent = true
 
 	flags := log.Ldate | log.Ltime
 	if settings.caller == CallerShort {
@@ -42,7 +43,9 @@ func (l *stdLogger) NewChild(options ...Option) Logger {
 	logImpl := log.New(settings.writer, settings.prefix, flags)
 
 	return &stdLogger{
-		logImpl: logImpl,
+		isConcurrent: true,
+		logImpl:      logImpl,
+		writerMutex:  l.writerMutex,
 	}
 }
 
@@ -51,7 +54,7 @@ func (l *stdLogger) log(logLevel Level, args ...interface{}) {
 		return
 	}
 
-	if l.hasChild {
+	if l.isConcurrent {
 		l.writerMutex.Lock()
 		defer l.writerMutex.Unlock()
 	}

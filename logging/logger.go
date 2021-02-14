@@ -13,6 +13,8 @@ type Logger interface {
 	Error(args ...interface{})
 	// NewChild creates a child logger with the options given
 	// and is thread safe to use with other child loggers.
+	// It should really only be used to create another logger
+	// to the same io.Writer such that it is thread safe.
 	NewChild(options ...Option) Logger
 }
 
