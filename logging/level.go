@@ -24,5 +24,3 @@ func (level Level) String() (s string) {
 		return "UNKNOWN"
 	}
 }
-
-func discard(args ...interface{}) {}

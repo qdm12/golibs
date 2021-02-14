@@ -28,8 +28,7 @@ func Test_stdLog_Debug(t *testing.T) {
 	lines := strings.Split(result, "\n")
 	require.Len(t, lines, 2)
 
-	expectedVariablePrefix, err := regexp.Compile(`2[0-9]{3}/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9] `)
-	require.NoError(t, err)
+	expectedVariablePrefix := regexp.MustCompile(`2[0-9]{3}/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9] `)
 
 	expectedLinesWithoutPrefix := []string{
 		`stdlog_test.go:20: DEBUG: isn't this "function"...`,

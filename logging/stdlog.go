@@ -57,7 +57,7 @@ func (l *stdLogger) log(logLevel Level, args ...interface{}) {
 	}
 
 	const callDepth = 3
-	l.logImpl.Output(callDepth, logLevel.String()+": "+
+	_ = l.logImpl.Output(callDepth, logLevel.String()+": "+
 		formatWithSettings(l.settings, args...))
 }
 
