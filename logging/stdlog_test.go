@@ -35,8 +35,8 @@ func Test_stdLog_Debug(t *testing.T) {
 	expectedVariablePrefix := regexp.MustCompile(`2[0-9]{3}/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9] `)
 
 	expectedLinesWithoutPrefix := []string{
-		`stdlog_test.go:20: DEBUG: isn't this "function"... (postprocessed)`,
-		`stdlog_test.go:21: DEBUG: ...fun? (postprocessed)`,
+		`stdlog_test.go:24: DEBUG: isn't this "function"... (postprocessed)`,
+		`stdlog_test.go:25: DEBUG: ...fun? (postprocessed)`,
 	}
 
 	for i, line := range lines {
