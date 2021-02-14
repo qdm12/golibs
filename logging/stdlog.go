@@ -26,6 +26,7 @@ func newStdLog(settings settings) Logger {
 
 	return &stdLogger{
 		logImpl:     logImpl,
+		settings:    settings,
 		writerMutex: &sync.Mutex{},
 	}
 }
