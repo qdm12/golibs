@@ -11,10 +11,10 @@ type Logger interface {
 	Warn(args ...interface{})
 	// Error formats and logs with the Error level.
 	Error(args ...interface{})
-	// NewChild creates a child logger with the options given
-	// and is thread safe to use with other child loggers.
-	// It should really only be used to create another logger
-	// to the same io.Writer such that it is thread safe.
+	// NewChild creates a child logger with the same writer as
+	// the current logger and with the options given.
+	// It should be used to have thread safety on the same writer.
+	// Note that the SetWriter option is ignored.
 	NewChild(options ...Option) Logger
 }
 

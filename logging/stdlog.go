@@ -40,7 +40,7 @@ func (l *stdLogger) NewChild(options ...Option) Logger {
 		flags |= log.Lshortfile
 	}
 
-	logImpl := log.New(settings.writer, settings.prefix, flags)
+	logImpl := log.New(l.logImpl.Writer(), settings.prefix, flags)
 
 	return &stdLogger{
 		isConcurrent: true,
