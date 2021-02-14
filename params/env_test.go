@@ -828,52 +828,6 @@ func Test_Path(t *testing.T) {
 	}
 }
 
-func Test_LogEncoding(t *testing.T) {
-	t.Parallel()
-	tests := map[string]struct {
-		envValue      string
-		optionSetters []OptionSetter
-		encoding      logging.Encoding
-		err           error
-	}{
-		"json": {
-			envValue: "json",
-			encoding: logging.JSONEncoding,
-		},
-		"console": {
-			envValue: "console",
-			encoding: logging.ConsoleEncoding,
-		},
-		"get error": {
-			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "LOG_ENCODING"`),
-		},
-		"invalid value": {
-			envValue: "bla",
-			err:      fmt.Errorf(`environment variable LOG_ENCODING: unknown log encoding: "bla"`),
-		},
-	}
-	for name, tc := range tests {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			e := &envParams{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
-			}
-			encoding, err := e.LogEncoding("LOG_ENCODING", tc.optionSetters...)
-			if tc.err != nil {
-				require.Error(t, err)
-				assert.Equal(t, tc.err.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, tc.encoding, encoding)
-		})
-	}
-}
-
 func Test_LogLevel(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
@@ -884,24 +838,24 @@ func Test_LogLevel(t *testing.T) {
 	}{
 		"info": {
 			envValue: "info",
-			level:    logging.InfoLevel,
+			level:    logging.LevelInfo,
 		},
 		"warning": {
 			envValue: "warning",
-			level:    logging.WarnLevel,
+			level:    logging.LevelWarn,
 		},
 		"error": {
 			envValue: "error",
-			level:    logging.ErrorLevel,
+			level:    logging.LevelError,
 		},
 		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
-			level:         logging.InfoLevel,
+			level:         logging.LevelInfo,
 			err:           errors.New(`no value found for environment variable "LOG_LEVEL"`),
 		},
 		"invalid value": {
 			envValue: "bla",
-			level:    logging.InfoLevel,
+			level:    logging.LevelInfo,
 			err:      errors.New(`environment variable LOG_LEVEL: unknown log level: "bla"`),
 		},
 	}
