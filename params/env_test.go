@@ -828,6 +828,54 @@ func Test_Path(t *testing.T) {
 	}
 }
 
+func Test_LogCaller(t *testing.T) {
+	t.Parallel()
+	tests := map[string]struct {
+		envValue      string
+		optionSetters []OptionSetter
+		caller        logging.Caller
+		err           error
+	}{
+		"hidden": {
+			envValue: "hidden",
+			caller:   logging.CallerHidden,
+		},
+		"short": {
+			envValue: "short",
+			caller:   logging.CallerShort,
+		},
+		"get error": {
+			optionSetters: []OptionSetter{Compulsory()},
+			caller:        logging.CallerHidden,
+			err:           errors.New(`no value found for environment variable "LOG_CALLER"`),
+		},
+		"invalid value": {
+			envValue: "bla",
+			caller:   logging.CallerHidden,
+			err:      errors.New(`environment variable LOG_CALLER: unknown log caller "bla", can only be one of: hidden, short`),
+		},
+	}
+	for name, tc := range tests {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			e := &envParams{
+				getenv: func(key string) string {
+					return tc.envValue
+				},
+			}
+			caller, err := e.LogCaller("LOG_CALLER", tc.optionSetters...)
+			if tc.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, tc.err.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.caller, caller)
+			}
+		})
+	}
+}
+
 func Test_LogLevel(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {

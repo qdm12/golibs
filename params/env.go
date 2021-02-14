@@ -34,6 +34,7 @@ type Env interface {
 	ListeningAddress(key string, optionSetters ...OptionSetter) (address, warning string, err error)
 	RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error)
 	Path(key string, optionSetters ...OptionSetter) (path string, err error)
+	LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error)
 	LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error)
 	URL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
 }
@@ -448,7 +449,23 @@ func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string
 	return path, nil
 }
 
-var ErrUnknownLogEncoding = errors.New("unknown log encoding")
+var ErrUnknownLogCaller = errors.New("unknown log caller")
+
+func (e *envParams) LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error) {
+	s, err := e.Get(key, optionSetters...)
+	if err != nil {
+		return caller, err
+	}
+	switch strings.ToLower(s) {
+	case "hidden":
+		return logging.CallerHidden, nil
+	case "short":
+		return logging.CallerShort, nil
+	}
+	return caller, fmt.Errorf(
+		"environment variable %s: %w %q, can only be one of: hidden, short",
+		key, ErrUnknownLogCaller, s)
+}
 
 var ErrUnknownLogLevel = errors.New("unknown log level")
 
