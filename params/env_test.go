@@ -836,6 +836,10 @@ func Test_LogLevel(t *testing.T) {
 		level         logging.Level
 		err           error
 	}{
+		"debug": {
+			envValue: "debug",
+			level:    logging.LevelDebug,
+		},
 		"info": {
 			envValue: "info",
 			level:    logging.LevelInfo,
@@ -856,7 +860,7 @@ func Test_LogLevel(t *testing.T) {
 		"invalid value": {
 			envValue: "bla",
 			level:    logging.LevelInfo,
-			err:      errors.New(`environment variable LOG_LEVEL: unknown log level: "bla"`),
+			err:      errors.New(`environment variable LOG_LEVEL: unknown log level "bla", can only be one of: debug, info, warning, error`), //nolint:lll
 		},
 	}
 	for name, tc := range tests {
