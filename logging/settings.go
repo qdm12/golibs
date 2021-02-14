@@ -20,7 +20,6 @@ func newSettings(setters ...Option) (s settings) {
 	// Defaults
 	s.level = LevelInfo
 	s.writer = os.Stdout
-	s.postProcess = func(line string) string { return line }
 
 	for _, setter := range setters {
 		setter(&s)
