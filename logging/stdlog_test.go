@@ -15,11 +15,12 @@ func Test_stdLog_Debug(t *testing.T) {
 
 	buffer := bytes.NewBuffer(nil)
 
-	postProcess := func(line string) string {
-		return line + " (postprocessed)"
+	preprocess := func(line string) string {
+		return line + " (preprocessed)"
 	}
 
-	logger := New(StdLog, SetWriter(buffer), SetCaller(CallerShort), SetPostProcess(postProcess))
+	logger := New(StdLog, SetLevel(LevelDebug), SetWriter(buffer),
+		SetCaller(CallerShort), SetPreProcess(preprocess), SetPrefix("server: "))
 
 	logger.Debug("isn't this %q...", "function")
 	logger.Debug("...fun?")
@@ -35,8 +36,8 @@ func Test_stdLog_Debug(t *testing.T) {
 	expectedVariablePrefix := regexp.MustCompile(`2[0-9]{3}/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9] `)
 
 	expectedLinesWithoutPrefix := []string{
-		`stdlog_test.go:24: DEBUG: isn't this "function"... (postprocessed)`,
-		`stdlog_test.go:25: DEBUG: ...fun? (postprocessed)`,
+		`stdlog_test.go:25: DEBUG server: isn't this "function"... (preprocessed)`,
+		`stdlog_test.go:26: DEBUG server: ...fun? (preprocessed)`,
 	}
 
 	for i, line := range lines {

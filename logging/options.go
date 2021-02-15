@@ -36,8 +36,14 @@ func SetWriter(writer io.Writer) Option {
 	}
 }
 
-func SetPostProcess(postProcess func(line string) string) Option {
+// SetPreProcess sets a pre processing function to act as a middleware
+// on the line before it is written to stdout, allowing it to get modified
+// depending on custom logic. This does not block other child loggers
+// but blocks the current logger, so it should be designed to be fast enough.
+// Also note that the line is formatted and colored, but the prefix is not
+// part of it.
+func SetPreProcess(preProcess func(line string) string) Option {
 	return func(s *settings) {
-		s.postProcess = postProcess
+		s.preProcess = preProcess
 	}
 }

@@ -11,9 +11,9 @@ func formatWithSettings(settings settings, args ...interface{}) (s string) {
 		s = settings.color.Sprintf(s)
 	}
 
-	if settings.postProcess != nil {
-		s = settings.postProcess(s)
+	if settings.preProcess != nil {
+		s = settings.preProcess(s)
 	}
 
-	return s
+	return settings.prefix + s
 }

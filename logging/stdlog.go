@@ -22,7 +22,7 @@ func newStdLog(settings settings) Logger {
 		flags |= log.Lshortfile
 	}
 
-	logImpl := log.New(settings.writer, settings.prefix, flags)
+	logImpl := log.New(settings.writer, "", flags)
 
 	return &stdLogger{
 		logImpl:     logImpl,
@@ -41,19 +41,24 @@ func (l *stdLogger) NewChild(options ...Option) Logger {
 		flags |= log.Lshortfile
 	}
 
-	logImpl := log.New(l.logImpl.Writer(), settings.prefix, flags)
+	logImpl := log.New(l.logImpl.Writer(), "", flags)
 
 	return &stdLogger{
-		isConcurrent: true,
 		logImpl:      logImpl,
+		settings:     settings,
+		isConcurrent: true,
 		writerMutex:  l.writerMutex,
 	}
 }
 
 func (l *stdLogger) log(logLevel Level, args ...interface{}) {
-	if l.settings.level < logLevel {
+	if l.settings.level > logLevel {
 		return
 	}
+
+	// Line is computed here to avoid blocking child loggers with its
+	// computing and the eventual preprocess function.
+	line := logLevel.String() + " " + formatWithSettings(l.settings, args...)
 
 	if l.isConcurrent {
 		l.writerMutex.Lock()
@@ -61,8 +66,7 @@ func (l *stdLogger) log(logLevel Level, args ...interface{}) {
 	}
 
 	const callDepth = 3
-	_ = l.logImpl.Output(callDepth, logLevel.String()+": "+
-		formatWithSettings(l.settings, args...))
+	_ = l.logImpl.Output(callDepth, line)
 }
 
 func (l *stdLogger) Debug(args ...interface{}) { l.log(LevelDebug, args...) }

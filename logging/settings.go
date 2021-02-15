@@ -8,12 +8,12 @@ import (
 )
 
 type settings struct {
-	level       Level
-	caller      Caller
-	color       *color.Color
-	prefix      string
-	writer      io.Writer
-	postProcess func(line string) string
+	level      Level
+	caller     Caller
+	color      *color.Color
+	prefix     string
+	writer     io.Writer
+	preProcess func(line string) string
 }
 
 func newSettings(setters ...Option) (s settings) {
