@@ -76,15 +76,15 @@ func (g *gotify) NotifyAndLog(title string, level logging.Level, logger logging.
 	toLog := fmt.Sprintf("%s: %s", title, s)
 	var priority int
 	switch level {
-	case logging.DebugLevel:
+	case logging.LevelDebug:
 		logger.Debug(toLog)
-	case logging.InfoLevel:
+	case logging.LevelInfo:
 		priority = 1
 		logger.Info(toLog)
-	case logging.WarnLevel:
+	case logging.LevelWarn:
 		priority = 2
 		logger.Warn(toLog)
-	case logging.ErrorLevel:
+	case logging.LevelError:
 		priority = 3
 		logger.Error(toLog)
 	default:

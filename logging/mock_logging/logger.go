@@ -81,32 +81,22 @@ func (mr *MockLoggerMockRecorder) Info(arg0 ...interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockLogger)(nil).Info), arg0...)
 }
 
-// SetPrefix mocks base method
-func (m *MockLogger) SetPrefix(arg0 string) logging.Logger {
+// NewChild mocks base method
+func (m *MockLogger) NewChild(arg0 ...logging.Option) logging.Logger {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetPrefix", arg0)
+	varargs := []interface{}{}
+	for _, a := range arg0 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "NewChild", varargs...)
 	ret0, _ := ret[0].(logging.Logger)
 	return ret0
 }
 
-// SetPrefix indicates an expected call of SetPrefix
-func (mr *MockLoggerMockRecorder) SetPrefix(arg0 interface{}) *gomock.Call {
+// NewChild indicates an expected call of NewChild
+func (mr *MockLoggerMockRecorder) NewChild(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetPrefix", reflect.TypeOf((*MockLogger)(nil).SetPrefix), arg0)
-}
-
-// Sync mocks base method
-func (m *MockLogger) Sync() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Sync")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Sync indicates an expected call of Sync
-func (mr *MockLoggerMockRecorder) Sync() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Sync", reflect.TypeOf((*MockLogger)(nil).Sync))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewChild", reflect.TypeOf((*MockLogger)(nil).NewChild), arg0...)
 }
 
 // Warn mocks base method
@@ -123,18 +113,4 @@ func (m *MockLogger) Warn(arg0 ...interface{}) {
 func (mr *MockLoggerMockRecorder) Warn(arg0 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Warn", reflect.TypeOf((*MockLogger)(nil).Warn), arg0...)
-}
-
-// WithPrefix mocks base method
-func (m *MockLogger) WithPrefix(arg0 string) logging.Logger {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WithPrefix", arg0)
-	ret0, _ := ret[0].(logging.Logger)
-	return ret0
-}
-
-// WithPrefix indicates an expected call of WithPrefix
-func (mr *MockLoggerMockRecorder) WithPrefix(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithPrefix", reflect.TypeOf((*MockLogger)(nil).WithPrefix), arg0)
 }

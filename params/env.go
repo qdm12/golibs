@@ -34,7 +34,7 @@ type Env interface {
 	ListeningAddress(key string, optionSetters ...OptionSetter) (address, warning string, err error)
 	RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error)
 	Path(key string, optionSetters ...OptionSetter) (path string, err error)
-	LogEncoding(key string, optionSetters ...OptionSetter) (encoding logging.Encoding, err error)
+	LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error)
 	LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error)
 	URL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
 }
@@ -449,21 +449,22 @@ func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string
 	return path, nil
 }
 
-var ErrUnknownLogEncoding = errors.New("unknown log encoding")
+var ErrUnknownLogCaller = errors.New("unknown log caller")
 
-// LogEncoding obtains the log encoding from an environment variable.
-func (e *envParams) LogEncoding(key string, optionSetters ...OptionSetter) (encoding logging.Encoding, err error) {
+func (e *envParams) LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
-		return "", err
+		return caller, err
 	}
-	s = strings.ToLower(s)
-	switch s {
-	case "json", "console":
-		return logging.Encoding(s), nil
-	default:
-		return "", fmt.Errorf("environment variable %s: %w: %q", key, ErrUnknownLogEncoding, s)
+	switch strings.ToLower(s) {
+	case "hidden":
+		return logging.CallerHidden, nil
+	case "short":
+		return logging.CallerShort, nil
 	}
+	return caller, fmt.Errorf(
+		"environment variable %s: %w %q, can only be one of: hidden, short",
+		key, ErrUnknownLogCaller, s)
 }
 
 var ErrUnknownLogLevel = errors.New("unknown log level")
@@ -475,16 +476,18 @@ func (e *envParams) LogLevel(key string, optionSetters ...OptionSetter) (level l
 		return level, err
 	}
 	switch strings.ToLower(s) {
-	case "info":
-		return logging.InfoLevel, nil
-	case "warning":
-		return logging.WarnLevel, nil
-	case "error":
-		return logging.ErrorLevel, nil
 	case "debug":
-		return logging.DebugLevel, nil
+		return logging.LevelDebug, nil
+	case "info":
+		return logging.LevelInfo, nil
+	case "warning":
+		return logging.LevelWarn, nil
+	case "error":
+		return logging.LevelError, nil
 	default:
-		return level, fmt.Errorf("environment variable %s: %w: %q", key, ErrUnknownLogLevel, s)
+		return level, fmt.Errorf(
+			"environment variable %s: %w %q, can only be one of: debug, info, warning, error",
+			key, ErrUnknownLogLevel, s)
 	}
 }
 

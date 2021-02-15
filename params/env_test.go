@@ -828,29 +828,31 @@ func Test_Path(t *testing.T) {
 	}
 }
 
-func Test_LogEncoding(t *testing.T) {
+func Test_LogCaller(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
 		optionSetters []OptionSetter
-		encoding      logging.Encoding
+		caller        logging.Caller
 		err           error
 	}{
-		"json": {
-			envValue: "json",
-			encoding: logging.JSONEncoding,
+		"hidden": {
+			envValue: "hidden",
+			caller:   logging.CallerHidden,
 		},
-		"console": {
-			envValue: "console",
-			encoding: logging.ConsoleEncoding,
+		"short": {
+			envValue: "short",
+			caller:   logging.CallerShort,
 		},
 		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "LOG_ENCODING"`),
+			caller:        logging.CallerHidden,
+			err:           errors.New(`no value found for environment variable "LOG_CALLER"`),
 		},
 		"invalid value": {
 			envValue: "bla",
-			err:      fmt.Errorf(`environment variable LOG_ENCODING: unknown log encoding: "bla"`),
+			caller:   logging.CallerHidden,
+			err:      errors.New(`environment variable LOG_CALLER: unknown log caller "bla", can only be one of: hidden, short`),
 		},
 	}
 	for name, tc := range tests {
@@ -862,14 +864,14 @@ func Test_LogEncoding(t *testing.T) {
 					return tc.envValue
 				},
 			}
-			encoding, err := e.LogEncoding("LOG_ENCODING", tc.optionSetters...)
+			caller, err := e.LogCaller("LOG_CALLER", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
 			} else {
 				assert.NoError(t, err)
+				assert.Equal(t, tc.caller, caller)
 			}
-			assert.Equal(t, tc.encoding, encoding)
 		})
 	}
 }
@@ -882,27 +884,31 @@ func Test_LogLevel(t *testing.T) {
 		level         logging.Level
 		err           error
 	}{
+		"debug": {
+			envValue: "debug",
+			level:    logging.LevelDebug,
+		},
 		"info": {
 			envValue: "info",
-			level:    logging.InfoLevel,
+			level:    logging.LevelInfo,
 		},
 		"warning": {
 			envValue: "warning",
-			level:    logging.WarnLevel,
+			level:    logging.LevelWarn,
 		},
 		"error": {
 			envValue: "error",
-			level:    logging.ErrorLevel,
+			level:    logging.LevelError,
 		},
 		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
-			level:         logging.InfoLevel,
+			level:         logging.LevelInfo,
 			err:           errors.New(`no value found for environment variable "LOG_LEVEL"`),
 		},
 		"invalid value": {
 			envValue: "bla",
-			level:    logging.InfoLevel,
-			err:      errors.New(`environment variable LOG_LEVEL: unknown log level: "bla"`),
+			level:    logging.LevelInfo,
+			err:      errors.New(`environment variable LOG_LEVEL: unknown log level "bla", can only be one of: debug, info, warning, error`), //nolint:lll
 		},
 	}
 	for name, tc := range tests {
