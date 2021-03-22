@@ -20,7 +20,8 @@ const (
 	maxInt63      = 9223372036854775807
 )
 
-// Random has methods to generate random values.
+// Random has methods to generate random values from the cryptographic
+// randomness reader. All should be considered slow and thread safe.
 type Random interface {
 	// GenerateRandomBytes generates a byte slice of n random bytes
 	GenerateRandomBytes(n int) ([]byte, error)
@@ -49,10 +50,10 @@ func NewRandom() Random {
 func randReader(b []byte) error {
 	l := len(b)
 	n, err := rand.Read(b)
-	if l != n {
-		return fmt.Errorf("read %d random bytes instead of expected %d bytes", n, l)
-	} else if err != nil {
+	if err != nil {
 		return err
+	} else if l != n {
+		return fmt.Errorf("read %d random bytes instead of expected %d bytes", n, l)
 	}
 	return nil
 }
