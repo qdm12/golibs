@@ -23,10 +23,6 @@ type Settings struct {
 // setDefaults only set the defaults where the value is empty.
 func (s *Settings) setDefaults() {
 	// Defaults
-	if string(s.Level) == "" {
-		s.Level = LevelInfo
-	}
-
 	if s.Writer == nil {
 		s.Writer = os.Stdout
 	}
