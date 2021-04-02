@@ -19,18 +19,7 @@ type stdLogger struct {
 // New creates a new logger using the standard library logger.
 // It should only be called once at most per writer (settings.Writer).
 func New(settings Settings) Logger {
-	flags := log.Ldate | log.Ltime
-	if settings.Caller == CallerShort {
-		flags |= log.Lshortfile
-	}
-
-	logImpl := log.New(settings.Writer, "", flags)
-
-	return &stdLogger{
-		logImpl:     logImpl,
-		settings:    settings,
-		writerMutex: &sync.Mutex{},
-	}
+	return NewParent(settings)
 }
 
 // NewParent creates a new logger using the standard library logger.
@@ -43,6 +32,7 @@ func NewParent(settings Settings) ParentLogger {
 	if settings.Caller == CallerShort {
 		flags |= log.Lshortfile
 	}
+	settings.setDefaults()
 
 	logImpl := log.New(settings.Writer, "", flags)
 
