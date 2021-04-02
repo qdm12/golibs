@@ -19,7 +19,7 @@ func Test_stdLog_Debug(t *testing.T) {
 		return line + " (preprocessed)"
 	}
 
-	logger := New(StdLog, Settings{
+	logger := NewStdLogger(Settings{
 		Level:      LevelDebug,
 		Writer:     buffer,
 		Caller:     CallerShort,

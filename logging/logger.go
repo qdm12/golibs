@@ -17,17 +17,3 @@ type Logger interface {
 	// Note that the Writer setting is ignored.
 	NewChild(settings Settings) Logger
 }
-
-// New creates a new logger.
-// It should only be called once per writer (options.Writer), child loggers
-// can be created using the NewChild method.
-func New(loggerType Type, settings Settings) Logger {
-	settings.setDefaults()
-
-	switch loggerType {
-	case StdLog:
-		return newStdLog(settings)
-	default:
-		panic("logger type " + loggerType + " not supported")
-	}
-}

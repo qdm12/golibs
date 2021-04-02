@@ -16,7 +16,10 @@ type stdLogger struct {
 	writerMutex  *sync.Mutex
 }
 
-func newStdLog(settings Settings) Logger {
+// New creates a new logger using the standard library logger.
+// It should only be called once per writer (options.Writer), child loggers
+// can be created using the NewChild method.
+func NewStdLogger(settings Settings) Logger {
 	flags := log.Ldate | log.Ltime
 	if settings.Caller == CallerShort {
 		flags |= log.Lshortfile
