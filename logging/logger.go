@@ -12,17 +12,17 @@ type Logger interface {
 	// Error formats and logs with the Error level.
 	Error(args ...interface{})
 	// NewChild creates a child logger with the same writer as
-	// the current logger and with the options given.
+	// the current logger and with the settings given.
 	// It should be used to have thread safety on the same writer.
-	// Note that the SetWriter option is ignored.
-	NewChild(options ...Option) Logger
+	// Note that the Writer setting is ignored.
+	NewChild(settings Settings) Logger
 }
 
 // New creates a new logger.
 // It should only be called once per writer (options.Writer), child loggers
-// can be created using the WithOptions method.
-func New(loggerType Type, options ...Option) Logger {
-	settings := newSettings(options...)
+// can be created using the NewChild method.
+func New(loggerType Type, settings Settings) Logger {
+	settings.setDefaults()
 
 	switch loggerType {
 	case StdLog:

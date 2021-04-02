@@ -4,16 +4,16 @@ import (
 	"github.com/qdm12/golibs/format"
 )
 
-func formatWithSettings(settings settings, args ...interface{}) (s string) {
+func formatWithSettings(settings Settings, args ...interface{}) (s string) {
 	s = format.ArgsToString(args...)
 
-	if settings.color != nil {
-		s = settings.color.Sprintf(s)
+	if settings.Color != nil {
+		s = settings.Color().Sprintf(s)
 	}
 
-	if settings.preProcess != nil {
-		s = settings.preProcess(s)
+	if settings.PreProcess != nil {
+		s = settings.PreProcess(s)
 	}
 
-	return settings.prefix + s
+	return settings.Prefix + s
 }

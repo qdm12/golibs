@@ -7,7 +7,7 @@ import (
 
 type stdLogger struct {
 	logImpl  *log.Logger
-	settings settings
+	settings Settings
 	// isConcurrent and writerMutex are only used
 	// when more loggers are created using the
 	// NewChild method to avoid writing to the
@@ -16,13 +16,13 @@ type stdLogger struct {
 	writerMutex  *sync.Mutex
 }
 
-func newStdLog(settings settings) Logger {
+func newStdLog(settings Settings) Logger {
 	flags := log.Ldate | log.Ltime
-	if settings.caller == CallerShort {
+	if settings.Caller == CallerShort {
 		flags |= log.Lshortfile
 	}
 
-	logImpl := log.New(settings.writer, "", flags)
+	logImpl := log.New(settings.Writer, "", flags)
 
 	return &stdLogger{
 		logImpl:     logImpl,
@@ -31,13 +31,13 @@ func newStdLog(settings settings) Logger {
 	}
 }
 
-func (l *stdLogger) NewChild(options ...Option) Logger {
-	settings := newSettings(options...)
+func (l *stdLogger) NewChild(settings Settings) Logger {
+	settings.setDefaults()
 
 	l.isConcurrent = true
 
 	flags := log.Ldate | log.Ltime
-	if settings.caller == CallerShort {
+	if settings.Caller == CallerShort {
 		flags |= log.Lshortfile
 	}
 
@@ -52,7 +52,7 @@ func (l *stdLogger) NewChild(options ...Option) Logger {
 }
 
 func (l *stdLogger) log(logLevel Level, args ...interface{}) {
-	if l.settings.level > logLevel {
+	if l.settings.Level > logLevel {
 		return
 	}
 

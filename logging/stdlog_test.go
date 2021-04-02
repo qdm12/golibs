@@ -19,8 +19,13 @@ func Test_stdLog_Debug(t *testing.T) {
 		return line + " (preprocessed)"
 	}
 
-	logger := New(StdLog, SetLevel(LevelDebug), SetWriter(buffer),
-		SetCaller(CallerShort), SetPreProcess(preprocess), SetPrefix("server: "))
+	logger := New(StdLog, Settings{
+		Level:      LevelDebug,
+		Writer:     buffer,
+		Caller:     CallerShort,
+		PreProcess: preprocess,
+		Prefix:     "server: ",
+	})
 
 	logger.Debug("isn't this %q...", "function")
 	logger.Debug("...fun?")
@@ -36,8 +41,8 @@ func Test_stdLog_Debug(t *testing.T) {
 	expectedVariablePrefix := regexp.MustCompile(`2[0-9]{3}/[0-1][0-9]/[0-3][0-9] [0-2][0-9]:[0-5][0-9]:[0-5][0-9] `)
 
 	expectedLinesWithoutPrefix := []string{
-		`stdlog_test.go:25: DEBUG server: isn't this "function"... (preprocessed)`,
-		`stdlog_test.go:26: DEBUG server: ...fun? (preprocessed)`,
+		`stdlog_test.go:30: DEBUG server: isn't this "function"... (preprocessed)`,
+		`stdlog_test.go:31: DEBUG server: ...fun? (preprocessed)`,
 	}
 
 	for i, line := range lines {

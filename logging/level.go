@@ -1,26 +1,15 @@
 package logging
 
 // Level is the level of the logger.
-type Level uint8
+type Level string
 
 const (
-	LevelDebug Level = iota
-	LevelInfo
-	LevelWarn
-	LevelError
+	LevelDebug Level = "DEBUG"
+	LevelInfo  Level = "INFO"
+	LevelWarn  Level = "WARN"
+	LevelError Level = "ERROR"
 )
 
 func (level Level) String() (s string) {
-	switch level {
-	case LevelDebug:
-		return "DEBUG"
-	case LevelInfo:
-		return "INFO"
-	case LevelWarn:
-		return "WARN"
-	case LevelError:
-		return "ERROR"
-	default:
-		return "UNKNOWN"
-	}
+	return string(level)
 }
