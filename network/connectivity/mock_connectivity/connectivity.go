@@ -6,34 +6,35 @@ package mock_connectivity
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockConnectivity is a mock of Connectivity interface
+// MockConnectivity is a mock of Connectivity interface.
 type MockConnectivity struct {
 	ctrl     *gomock.Controller
 	recorder *MockConnectivityMockRecorder
 }
 
-// MockConnectivityMockRecorder is the mock recorder for MockConnectivity
+// MockConnectivityMockRecorder is the mock recorder for MockConnectivity.
 type MockConnectivityMockRecorder struct {
 	mock *MockConnectivity
 }
 
-// NewMockConnectivity creates a new mock instance
+// NewMockConnectivity creates a new mock instance.
 func NewMockConnectivity(ctrl *gomock.Controller) *MockConnectivity {
 	mock := &MockConnectivity{ctrl: ctrl}
 	mock.recorder = &MockConnectivityMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockConnectivity) EXPECT() *MockConnectivityMockRecorder {
 	return m.recorder
 }
 
-// Checks mocks base method
+// Checks mocks base method.
 func (m *MockConnectivity) Checks(arg0 context.Context, arg1 ...string) []error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
@@ -45,7 +46,7 @@ func (m *MockConnectivity) Checks(arg0 context.Context, arg1 ...string) []error 
 	return ret0
 }
 
-// Checks indicates an expected call of Checks
+// Checks indicates an expected call of Checks.
 func (mr *MockConnectivityMockRecorder) Checks(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)

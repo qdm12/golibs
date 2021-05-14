@@ -5,34 +5,35 @@
 package mock_params
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockOS is a mock of OS interface
+// MockOS is a mock of OS interface.
 type MockOS struct {
 	ctrl     *gomock.Controller
 	recorder *MockOSMockRecorder
 }
 
-// MockOSMockRecorder is the mock recorder for MockOS
+// MockOSMockRecorder is the mock recorder for MockOS.
 type MockOSMockRecorder struct {
 	mock *MockOS
 }
 
-// NewMockOS creates a new mock instance
+// NewMockOS creates a new mock instance.
 func NewMockOS(ctrl *gomock.Controller) *MockOS {
 	mock := &MockOS{ctrl: ctrl}
 	mock.recorder = &MockOSMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockOS) EXPECT() *MockOSMockRecorder {
 	return m.recorder
 }
 
-// ExeDir mocks base method
+// ExeDir mocks base method.
 func (m *MockOS) ExeDir() (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ExeDir")
@@ -41,13 +42,13 @@ func (m *MockOS) ExeDir() (string, error) {
 	return ret0, ret1
 }
 
-// ExeDir indicates an expected call of ExeDir
+// ExeDir indicates an expected call of ExeDir.
 func (mr *MockOSMockRecorder) ExeDir() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExeDir", reflect.TypeOf((*MockOS)(nil).ExeDir))
 }
 
-// GID mocks base method
+// GID mocks base method.
 func (m *MockOS) GID() int {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GID")
@@ -55,13 +56,13 @@ func (m *MockOS) GID() int {
 	return ret0
 }
 
-// GID indicates an expected call of GID
+// GID indicates an expected call of GID.
 func (mr *MockOSMockRecorder) GID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GID", reflect.TypeOf((*MockOS)(nil).GID))
 }
 
-// UID mocks base method
+// UID mocks base method.
 func (m *MockOS) UID() int {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UID")
@@ -69,7 +70,7 @@ func (m *MockOS) UID() int {
 	return ret0
 }
 
-// UID indicates an expected call of UID
+// UID indicates an expected call of UID.
 func (mr *MockOSMockRecorder) UID() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UID", reflect.TypeOf((*MockOS)(nil).UID))

@@ -6,34 +6,35 @@ package mock_command
 
 import (
 	context "context"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockCommander is a mock of Commander interface
+// MockCommander is a mock of Commander interface.
 type MockCommander struct {
 	ctrl     *gomock.Controller
 	recorder *MockCommanderMockRecorder
 }
 
-// MockCommanderMockRecorder is the mock recorder for MockCommander
+// MockCommanderMockRecorder is the mock recorder for MockCommander.
 type MockCommanderMockRecorder struct {
 	mock *MockCommander
 }
 
-// NewMockCommander creates a new mock instance
+// NewMockCommander creates a new mock instance.
 func NewMockCommander(ctrl *gomock.Controller) *MockCommander {
 	mock := &MockCommander{ctrl: ctrl}
 	mock.recorder = &MockCommanderMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCommander) EXPECT() *MockCommanderMockRecorder {
 	return m.recorder
 }
 
-// Run mocks base method
+// Run mocks base method.
 func (m *MockCommander) Run(arg0 context.Context, arg1 string, arg2 ...string) (string, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -46,14 +47,14 @@ func (m *MockCommander) Run(arg0 context.Context, arg1 string, arg2 ...string) (
 	return ret0, ret1
 }
 
-// Run indicates an expected call of Run
+// Run indicates an expected call of Run.
 func (mr *MockCommanderMockRecorder) Run(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockCommander)(nil).Run), varargs...)
 }
 
-// Start mocks base method
+// Start mocks base method.
 func (m *MockCommander) Start(arg0 context.Context, arg1 string, arg2 ...string) (chan string, chan string, chan error, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -68,7 +69,7 @@ func (m *MockCommander) Start(arg0 context.Context, arg1 string, arg2 ...string)
 	return ret0, ret1, ret2, ret3
 }
 
-// Start indicates an expected call of Start
+// Start indicates an expected call of Start.
 func (mr *MockCommanderMockRecorder) Start(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)

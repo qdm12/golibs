@@ -5,35 +5,36 @@
 package crypto
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	sha3 "golang.org/x/crypto/sha3"
-	reflect "reflect"
 )
 
-// MockShakeHash is a mock of ShakeHash interface
+// MockShakeHash is a mock of ShakeHash interface.
 type MockShakeHash struct {
 	ctrl     *gomock.Controller
 	recorder *MockShakeHashMockRecorder
 }
 
-// MockShakeHashMockRecorder is the mock recorder for MockShakeHash
+// MockShakeHashMockRecorder is the mock recorder for MockShakeHash.
 type MockShakeHashMockRecorder struct {
 	mock *MockShakeHash
 }
 
-// NewMockShakeHash creates a new mock instance
+// NewMockShakeHash creates a new mock instance.
 func NewMockShakeHash(ctrl *gomock.Controller) *MockShakeHash {
 	mock := &MockShakeHash{ctrl: ctrl}
 	mock.recorder = &MockShakeHashMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockShakeHash) EXPECT() *MockShakeHashMockRecorder {
 	return m.recorder
 }
 
-// Clone mocks base method
+// Clone mocks base method.
 func (m *MockShakeHash) Clone() sha3.ShakeHash {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Clone")
@@ -41,13 +42,13 @@ func (m *MockShakeHash) Clone() sha3.ShakeHash {
 	return ret0
 }
 
-// Clone indicates an expected call of Clone
+// Clone indicates an expected call of Clone.
 func (mr *MockShakeHashMockRecorder) Clone() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Clone", reflect.TypeOf((*MockShakeHash)(nil).Clone))
 }
 
-// Read mocks base method
+// Read mocks base method.
 func (m *MockShakeHash) Read(arg0 []byte) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0)
@@ -56,25 +57,25 @@ func (m *MockShakeHash) Read(arg0 []byte) (int, error) {
 	return ret0, ret1
 }
 
-// Read indicates an expected call of Read
+// Read indicates an expected call of Read.
 func (mr *MockShakeHashMockRecorder) Read(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockShakeHash)(nil).Read), arg0)
 }
 
-// Reset mocks base method
+// Reset mocks base method.
 func (m *MockShakeHash) Reset() {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Reset")
 }
 
-// Reset indicates an expected call of Reset
+// Reset indicates an expected call of Reset.
 func (mr *MockShakeHashMockRecorder) Reset() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reset", reflect.TypeOf((*MockShakeHash)(nil).Reset))
 }
 
-// Write mocks base method
+// Write mocks base method.
 func (m *MockShakeHash) Write(arg0 []byte) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Write", arg0)
@@ -83,7 +84,7 @@ func (m *MockShakeHash) Write(arg0 []byte) (int, error) {
 	return ret0, ret1
 }
 
-// Write indicates an expected call of Write
+// Write indicates an expected call of Write.
 func (mr *MockShakeHashMockRecorder) Write(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Write", reflect.TypeOf((*MockShakeHash)(nil).Write), arg0)

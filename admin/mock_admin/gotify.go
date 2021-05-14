@@ -5,35 +5,36 @@
 package mock_admin
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	logging "github.com/qdm12/golibs/logging"
-	reflect "reflect"
 )
 
-// MockGotify is a mock of Gotify interface
+// MockGotify is a mock of Gotify interface.
 type MockGotify struct {
 	ctrl     *gomock.Controller
 	recorder *MockGotifyMockRecorder
 }
 
-// MockGotifyMockRecorder is the mock recorder for MockGotify
+// MockGotifyMockRecorder is the mock recorder for MockGotify.
 type MockGotifyMockRecorder struct {
 	mock *MockGotify
 }
 
-// NewMockGotify creates a new mock instance
+// NewMockGotify creates a new mock instance.
 func NewMockGotify(ctrl *gomock.Controller) *MockGotify {
 	mock := &MockGotify{ctrl: ctrl}
 	mock.recorder = &MockGotifyMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockGotify) EXPECT() *MockGotifyMockRecorder {
 	return m.recorder
 }
 
-// Notify mocks base method
+// Notify mocks base method.
 func (m *MockGotify) Notify(arg0 string, arg1 int, arg2 ...interface{}) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -45,14 +46,14 @@ func (m *MockGotify) Notify(arg0 string, arg1 int, arg2 ...interface{}) error {
 	return ret0
 }
 
-// Notify indicates an expected call of Notify
+// Notify indicates an expected call of Notify.
 func (mr *MockGotifyMockRecorder) Notify(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Notify", reflect.TypeOf((*MockGotify)(nil).Notify), varargs...)
 }
 
-// NotifyAndLog mocks base method
+// NotifyAndLog mocks base method.
 func (m *MockGotify) NotifyAndLog(arg0 string, arg1 logging.Level, arg2 logging.Logger, arg3 ...interface{}) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1, arg2}
@@ -62,14 +63,14 @@ func (m *MockGotify) NotifyAndLog(arg0 string, arg1 logging.Level, arg2 logging.
 	m.ctrl.Call(m, "NotifyAndLog", varargs...)
 }
 
-// NotifyAndLog indicates an expected call of NotifyAndLog
+// NotifyAndLog indicates an expected call of NotifyAndLog.
 func (mr *MockGotifyMockRecorder) NotifyAndLog(arg0, arg1, arg2 interface{}, arg3 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1, arg2}, arg3...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NotifyAndLog", reflect.TypeOf((*MockGotify)(nil).NotifyAndLog), varargs...)
 }
 
-// Ping mocks base method
+// Ping mocks base method.
 func (m *MockGotify) Ping() error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Ping")
@@ -77,7 +78,7 @@ func (m *MockGotify) Ping() error {
 	return ret0
 }
 
-// Ping indicates an expected call of Ping
+// Ping indicates an expected call of Ping.
 func (mr *MockGotifyMockRecorder) Ping() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockGotify)(nil).Ping))

@@ -5,36 +5,37 @@
 package mock_files
 
 import (
+	fs "io/fs"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	files "github.com/qdm12/golibs/files"
-	os "os"
-	reflect "reflect"
 )
 
-// MockFileManager is a mock of FileManager interface
+// MockFileManager is a mock of FileManager interface.
 type MockFileManager struct {
 	ctrl     *gomock.Controller
 	recorder *MockFileManagerMockRecorder
 }
 
-// MockFileManagerMockRecorder is the mock recorder for MockFileManager
+// MockFileManagerMockRecorder is the mock recorder for MockFileManager.
 type MockFileManagerMockRecorder struct {
 	mock *MockFileManager
 }
 
-// NewMockFileManager creates a new mock instance
+// NewMockFileManager creates a new mock instance.
 func NewMockFileManager(ctrl *gomock.Controller) *MockFileManager {
 	mock := &MockFileManager{ctrl: ctrl}
 	mock.recorder = &MockFileManagerMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockFileManager) EXPECT() *MockFileManagerMockRecorder {
 	return m.recorder
 }
 
-// CopyDirectory mocks base method
+// CopyDirectory mocks base method.
 func (m *MockFileManager) CopyDirectory(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CopyDirectory", arg0, arg1)
@@ -42,13 +43,13 @@ func (m *MockFileManager) CopyDirectory(arg0, arg1 string) error {
 	return ret0
 }
 
-// CopyDirectory indicates an expected call of CopyDirectory
+// CopyDirectory indicates an expected call of CopyDirectory.
 func (mr *MockFileManagerMockRecorder) CopyDirectory(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyDirectory", reflect.TypeOf((*MockFileManager)(nil).CopyDirectory), arg0, arg1)
 }
 
-// CopyFile mocks base method
+// CopyFile mocks base method.
 func (m *MockFileManager) CopyFile(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CopyFile", arg0, arg1)
@@ -56,13 +57,13 @@ func (m *MockFileManager) CopyFile(arg0, arg1 string) error {
 	return ret0
 }
 
-// CopyFile indicates an expected call of CopyFile
+// CopyFile indicates an expected call of CopyFile.
 func (mr *MockFileManagerMockRecorder) CopyFile(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopyFile", reflect.TypeOf((*MockFileManager)(nil).CopyFile), arg0, arg1)
 }
 
-// CopySymLink mocks base method
+// CopySymLink mocks base method.
 func (m *MockFileManager) CopySymLink(arg0, arg1 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CopySymLink", arg0, arg1)
@@ -70,13 +71,13 @@ func (m *MockFileManager) CopySymLink(arg0, arg1 string) error {
 	return ret0
 }
 
-// CopySymLink indicates an expected call of CopySymLink
+// CopySymLink indicates an expected call of CopySymLink.
 func (mr *MockFileManagerMockRecorder) CopySymLink(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CopySymLink", reflect.TypeOf((*MockFileManager)(nil).CopySymLink), arg0, arg1)
 }
 
-// CreateDir mocks base method
+// CreateDir mocks base method.
 func (m *MockFileManager) CreateDir(arg0 string, arg1 ...files.WriteOptionSetter) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
@@ -88,14 +89,14 @@ func (m *MockFileManager) CreateDir(arg0 string, arg1 ...files.WriteOptionSetter
 	return ret0
 }
 
-// CreateDir indicates an expected call of CreateDir
+// CreateDir indicates an expected call of CreateDir.
 func (mr *MockFileManagerMockRecorder) CreateDir(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDir", reflect.TypeOf((*MockFileManager)(nil).CreateDir), varargs...)
 }
 
-// DirectoryExists mocks base method
+// DirectoryExists mocks base method.
 func (m *MockFileManager) DirectoryExists(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DirectoryExists", arg0)
@@ -104,13 +105,13 @@ func (m *MockFileManager) DirectoryExists(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// DirectoryExists indicates an expected call of DirectoryExists
+// DirectoryExists indicates an expected call of DirectoryExists.
 func (mr *MockFileManagerMockRecorder) DirectoryExists(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DirectoryExists", reflect.TypeOf((*MockFileManager)(nil).DirectoryExists), arg0)
 }
 
-// FileExists mocks base method
+// FileExists mocks base method.
 func (m *MockFileManager) FileExists(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FileExists", arg0)
@@ -119,13 +120,13 @@ func (m *MockFileManager) FileExists(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// FileExists indicates an expected call of FileExists
+// FileExists indicates an expected call of FileExists.
 func (mr *MockFileManagerMockRecorder) FileExists(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FileExists", reflect.TypeOf((*MockFileManager)(nil).FileExists), arg0)
 }
 
-// FilepathExists mocks base method
+// FilepathExists mocks base method.
 func (m *MockFileManager) FilepathExists(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FilepathExists", arg0)
@@ -134,13 +135,13 @@ func (m *MockFileManager) FilepathExists(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// FilepathExists indicates an expected call of FilepathExists
+// FilepathExists indicates an expected call of FilepathExists.
 func (mr *MockFileManagerMockRecorder) FilepathExists(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FilepathExists", reflect.TypeOf((*MockFileManager)(nil).FilepathExists), arg0)
 }
 
-// GetGroupPermissions mocks base method
+// GetGroupPermissions mocks base method.
 func (m *MockFileManager) GetGroupPermissions(arg0 string) (bool, bool, bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetGroupPermissions", arg0)
@@ -151,13 +152,13 @@ func (m *MockFileManager) GetGroupPermissions(arg0 string) (bool, bool, bool, er
 	return ret0, ret1, ret2, ret3
 }
 
-// GetGroupPermissions indicates an expected call of GetGroupPermissions
+// GetGroupPermissions indicates an expected call of GetGroupPermissions.
 func (mr *MockFileManagerMockRecorder) GetGroupPermissions(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGroupPermissions", reflect.TypeOf((*MockFileManager)(nil).GetGroupPermissions), arg0)
 }
 
-// GetOthersPermissions mocks base method
+// GetOthersPermissions mocks base method.
 func (m *MockFileManager) GetOthersPermissions(arg0 string) (bool, bool, bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOthersPermissions", arg0)
@@ -168,13 +169,13 @@ func (m *MockFileManager) GetOthersPermissions(arg0 string) (bool, bool, bool, e
 	return ret0, ret1, ret2, ret3
 }
 
-// GetOthersPermissions indicates an expected call of GetOthersPermissions
+// GetOthersPermissions indicates an expected call of GetOthersPermissions.
 func (mr *MockFileManagerMockRecorder) GetOthersPermissions(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOthersPermissions", reflect.TypeOf((*MockFileManager)(nil).GetOthersPermissions), arg0)
 }
 
-// GetOwnership mocks base method
+// GetOwnership mocks base method.
 func (m *MockFileManager) GetOwnership(arg0 string) (int, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOwnership", arg0)
@@ -184,13 +185,13 @@ func (m *MockFileManager) GetOwnership(arg0 string) (int, int, error) {
 	return ret0, ret1, ret2
 }
 
-// GetOwnership indicates an expected call of GetOwnership
+// GetOwnership indicates an expected call of GetOwnership.
 func (mr *MockFileManagerMockRecorder) GetOwnership(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetOwnership", reflect.TypeOf((*MockFileManager)(nil).GetOwnership), arg0)
 }
 
-// GetUserPermissions mocks base method
+// GetUserPermissions mocks base method.
 func (m *MockFileManager) GetUserPermissions(arg0 string) (bool, bool, bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUserPermissions", arg0)
@@ -201,13 +202,13 @@ func (m *MockFileManager) GetUserPermissions(arg0 string) (bool, bool, bool, err
 	return ret0, ret1, ret2, ret3
 }
 
-// GetUserPermissions indicates an expected call of GetUserPermissions
+// GetUserPermissions indicates an expected call of GetUserPermissions.
 func (mr *MockFileManagerMockRecorder) GetUserPermissions(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserPermissions", reflect.TypeOf((*MockFileManager)(nil).GetUserPermissions), arg0)
 }
 
-// IsDirectory mocks base method
+// IsDirectory mocks base method.
 func (m *MockFileManager) IsDirectory(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsDirectory", arg0)
@@ -216,13 +217,13 @@ func (m *MockFileManager) IsDirectory(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// IsDirectory indicates an expected call of IsDirectory
+// IsDirectory indicates an expected call of IsDirectory.
 func (mr *MockFileManagerMockRecorder) IsDirectory(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsDirectory", reflect.TypeOf((*MockFileManager)(nil).IsDirectory), arg0)
 }
 
-// IsExecutable mocks base method
+// IsExecutable mocks base method.
 func (m *MockFileManager) IsExecutable(arg0 string, arg1, arg2 int) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsExecutable", arg0, arg1, arg2)
@@ -231,13 +232,13 @@ func (m *MockFileManager) IsExecutable(arg0 string, arg1, arg2 int) (bool, error
 	return ret0, ret1
 }
 
-// IsExecutable indicates an expected call of IsExecutable
+// IsExecutable indicates an expected call of IsExecutable.
 func (mr *MockFileManagerMockRecorder) IsExecutable(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsExecutable", reflect.TypeOf((*MockFileManager)(nil).IsExecutable), arg0, arg1, arg2)
 }
 
-// IsFile mocks base method
+// IsFile mocks base method.
 func (m *MockFileManager) IsFile(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsFile", arg0)
@@ -246,13 +247,13 @@ func (m *MockFileManager) IsFile(arg0 string) (bool, error) {
 	return ret0, ret1
 }
 
-// IsFile indicates an expected call of IsFile
+// IsFile indicates an expected call of IsFile.
 func (mr *MockFileManagerMockRecorder) IsFile(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsFile", reflect.TypeOf((*MockFileManager)(nil).IsFile), arg0)
 }
 
-// IsReadable mocks base method
+// IsReadable mocks base method.
 func (m *MockFileManager) IsReadable(arg0 string, arg1, arg2 int) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsReadable", arg0, arg1, arg2)
@@ -261,13 +262,13 @@ func (m *MockFileManager) IsReadable(arg0 string, arg1, arg2 int) (bool, error) 
 	return ret0, ret1
 }
 
-// IsReadable indicates an expected call of IsReadable
+// IsReadable indicates an expected call of IsReadable.
 func (mr *MockFileManagerMockRecorder) IsReadable(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsReadable", reflect.TypeOf((*MockFileManager)(nil).IsReadable), arg0, arg1, arg2)
 }
 
-// IsWritable mocks base method
+// IsWritable mocks base method.
 func (m *MockFileManager) IsWritable(arg0 string, arg1, arg2 int) (bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "IsWritable", arg0, arg1, arg2)
@@ -276,13 +277,13 @@ func (m *MockFileManager) IsWritable(arg0 string, arg1, arg2 int) (bool, error) 
 	return ret0, ret1
 }
 
-// IsWritable indicates an expected call of IsWritable
+// IsWritable indicates an expected call of IsWritable.
 func (mr *MockFileManagerMockRecorder) IsWritable(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsWritable", reflect.TypeOf((*MockFileManager)(nil).IsWritable), arg0, arg1, arg2)
 }
 
-// ReadFile mocks base method
+// ReadFile mocks base method.
 func (m *MockFileManager) ReadFile(arg0 string) ([]byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReadFile", arg0)
@@ -291,13 +292,13 @@ func (m *MockFileManager) ReadFile(arg0 string) ([]byte, error) {
 	return ret0, ret1
 }
 
-// ReadFile indicates an expected call of ReadFile
+// ReadFile indicates an expected call of ReadFile.
 func (mr *MockFileManagerMockRecorder) ReadFile(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadFile", reflect.TypeOf((*MockFileManager)(nil).ReadFile), arg0)
 }
 
-// Remove mocks base method
+// Remove mocks base method.
 func (m *MockFileManager) Remove(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Remove", arg0)
@@ -305,13 +306,13 @@ func (m *MockFileManager) Remove(arg0 string) error {
 	return ret0
 }
 
-// Remove indicates an expected call of Remove
+// Remove indicates an expected call of Remove.
 func (mr *MockFileManagerMockRecorder) Remove(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockFileManager)(nil).Remove), arg0)
 }
 
-// SetOwnership mocks base method
+// SetOwnership mocks base method.
 func (m *MockFileManager) SetOwnership(arg0 string, arg1, arg2 int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetOwnership", arg0, arg1, arg2)
@@ -319,27 +320,27 @@ func (m *MockFileManager) SetOwnership(arg0 string, arg1, arg2 int) error {
 	return ret0
 }
 
-// SetOwnership indicates an expected call of SetOwnership
+// SetOwnership indicates an expected call of SetOwnership.
 func (mr *MockFileManagerMockRecorder) SetOwnership(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetOwnership", reflect.TypeOf((*MockFileManager)(nil).SetOwnership), arg0, arg1, arg2)
 }
 
-// SetUserPermissions mocks base method
-func (m *MockFileManager) SetUserPermissions(arg0 string, arg1 os.FileMode) error {
+// SetUserPermissions mocks base method.
+func (m *MockFileManager) SetUserPermissions(arg0 string, arg1 fs.FileMode) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetUserPermissions", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SetUserPermissions indicates an expected call of SetUserPermissions
+// SetUserPermissions indicates an expected call of SetUserPermissions.
 func (mr *MockFileManagerMockRecorder) SetUserPermissions(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetUserPermissions", reflect.TypeOf((*MockFileManager)(nil).SetUserPermissions), arg0, arg1)
 }
 
-// Touch mocks base method
+// Touch mocks base method.
 func (m *MockFileManager) Touch(arg0 string, arg1 ...files.WriteOptionSetter) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0}
@@ -351,14 +352,14 @@ func (m *MockFileManager) Touch(arg0 string, arg1 ...files.WriteOptionSetter) er
 	return ret0
 }
 
-// Touch indicates an expected call of Touch
+// Touch indicates an expected call of Touch.
 func (mr *MockFileManagerMockRecorder) Touch(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0}, arg1...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Touch", reflect.TypeOf((*MockFileManager)(nil).Touch), varargs...)
 }
 
-// WriteLinesToFile mocks base method
+// WriteLinesToFile mocks base method.
 func (m *MockFileManager) WriteLinesToFile(arg0 string, arg1 []string, arg2 ...files.WriteOptionSetter) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -370,14 +371,14 @@ func (m *MockFileManager) WriteLinesToFile(arg0 string, arg1 []string, arg2 ...f
 	return ret0
 }
 
-// WriteLinesToFile indicates an expected call of WriteLinesToFile
+// WriteLinesToFile indicates an expected call of WriteLinesToFile.
 func (mr *MockFileManagerMockRecorder) WriteLinesToFile(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteLinesToFile", reflect.TypeOf((*MockFileManager)(nil).WriteLinesToFile), varargs...)
 }
 
-// WriteToFile mocks base method
+// WriteToFile mocks base method.
 func (m *MockFileManager) WriteToFile(arg0 string, arg1 []byte, arg2 ...files.WriteOptionSetter) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
@@ -389,7 +390,7 @@ func (m *MockFileManager) WriteToFile(arg0 string, arg1 []byte, arg2 ...files.Wr
 	return ret0
 }
 
-// WriteToFile indicates an expected call of WriteToFile
+// WriteToFile indicates an expected call of WriteToFile.
 func (mr *MockFileManagerMockRecorder) WriteToFile(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{arg0, arg1}, arg2...)

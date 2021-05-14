@@ -5,34 +5,35 @@
 package mock_verification
 
 import (
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
-// MockVerifier is a mock of Verifier interface
+// MockVerifier is a mock of Verifier interface.
 type MockVerifier struct {
 	ctrl     *gomock.Controller
 	recorder *MockVerifierMockRecorder
 }
 
-// MockVerifierMockRecorder is the mock recorder for MockVerifier
+// MockVerifierMockRecorder is the mock recorder for MockVerifier.
 type MockVerifierMockRecorder struct {
 	mock *MockVerifier
 }
 
-// NewMockVerifier creates a new mock instance
+// NewMockVerifier creates a new mock instance.
 func NewMockVerifier(ctrl *gomock.Controller) *MockVerifier {
 	mock := &MockVerifier{ctrl: ctrl}
 	mock.recorder = &MockVerifierMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockVerifier) EXPECT() *MockVerifierMockRecorder {
 	return m.recorder
 }
 
-// Match64BytesHex mocks base method
+// Match64BytesHex mocks base method.
 func (m *MockVerifier) Match64BytesHex(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Match64BytesHex", arg0)
@@ -40,13 +41,13 @@ func (m *MockVerifier) Match64BytesHex(arg0 string) bool {
 	return ret0
 }
 
-// Match64BytesHex indicates an expected call of Match64BytesHex
+// Match64BytesHex indicates an expected call of Match64BytesHex.
 func (mr *MockVerifierMockRecorder) Match64BytesHex(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Match64BytesHex", reflect.TypeOf((*MockVerifier)(nil).Match64BytesHex), arg0)
 }
 
-// MatchDomain mocks base method
+// MatchDomain mocks base method.
 func (m *MockVerifier) MatchDomain(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchDomain", arg0)
@@ -54,13 +55,13 @@ func (m *MockVerifier) MatchDomain(arg0 string) bool {
 	return ret0
 }
 
-// MatchDomain indicates an expected call of MatchDomain
+// MatchDomain indicates an expected call of MatchDomain.
 func (mr *MockVerifierMockRecorder) MatchDomain(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchDomain", reflect.TypeOf((*MockVerifier)(nil).MatchDomain), arg0)
 }
 
-// MatchEmail mocks base method
+// MatchEmail mocks base method.
 func (m *MockVerifier) MatchEmail(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchEmail", arg0)
@@ -68,13 +69,13 @@ func (m *MockVerifier) MatchEmail(arg0 string) bool {
 	return ret0
 }
 
-// MatchEmail indicates an expected call of MatchEmail
+// MatchEmail indicates an expected call of MatchEmail.
 func (mr *MockVerifierMockRecorder) MatchEmail(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchEmail", reflect.TypeOf((*MockVerifier)(nil).MatchEmail), arg0)
 }
 
-// MatchHostname mocks base method
+// MatchHostname mocks base method.
 func (m *MockVerifier) MatchHostname(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchHostname", arg0)
@@ -82,13 +83,13 @@ func (m *MockVerifier) MatchHostname(arg0 string) bool {
 	return ret0
 }
 
-// MatchHostname indicates an expected call of MatchHostname
+// MatchHostname indicates an expected call of MatchHostname.
 func (mr *MockVerifierMockRecorder) MatchHostname(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchHostname", reflect.TypeOf((*MockVerifier)(nil).MatchHostname), arg0)
 }
 
-// MatchMD5String mocks base method
+// MatchMD5String mocks base method.
 func (m *MockVerifier) MatchMD5String(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchMD5String", arg0)
@@ -96,13 +97,13 @@ func (m *MockVerifier) MatchMD5String(arg0 string) bool {
 	return ret0
 }
 
-// MatchMD5String indicates an expected call of MatchMD5String
+// MatchMD5String indicates an expected call of MatchMD5String.
 func (mr *MockVerifierMockRecorder) MatchMD5String(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchMD5String", reflect.TypeOf((*MockVerifier)(nil).MatchMD5String), arg0)
 }
 
-// MatchPhoneIntl mocks base method
+// MatchPhoneIntl mocks base method.
 func (m *MockVerifier) MatchPhoneIntl(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchPhoneIntl", arg0)
@@ -110,13 +111,13 @@ func (m *MockVerifier) MatchPhoneIntl(arg0 string) bool {
 	return ret0
 }
 
-// MatchPhoneIntl indicates an expected call of MatchPhoneIntl
+// MatchPhoneIntl indicates an expected call of MatchPhoneIntl.
 func (mr *MockVerifierMockRecorder) MatchPhoneIntl(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchPhoneIntl", reflect.TypeOf((*MockVerifier)(nil).MatchPhoneIntl), arg0)
 }
 
-// MatchPhoneLocal mocks base method
+// MatchPhoneLocal mocks base method.
 func (m *MockVerifier) MatchPhoneLocal(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchPhoneLocal", arg0)
@@ -124,13 +125,13 @@ func (m *MockVerifier) MatchPhoneLocal(arg0 string) bool {
 	return ret0
 }
 
-// MatchPhoneLocal indicates an expected call of MatchPhoneLocal
+// MatchPhoneLocal indicates an expected call of MatchPhoneLocal.
 func (mr *MockVerifierMockRecorder) MatchPhoneLocal(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchPhoneLocal", reflect.TypeOf((*MockVerifier)(nil).MatchPhoneLocal), arg0)
 }
 
-// MatchRootURL mocks base method
+// MatchRootURL mocks base method.
 func (m *MockVerifier) MatchRootURL(arg0 string) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MatchRootURL", arg0)
@@ -138,13 +139,13 @@ func (m *MockVerifier) MatchRootURL(arg0 string) bool {
 	return ret0
 }
 
-// MatchRootURL indicates an expected call of MatchRootURL
+// MatchRootURL indicates an expected call of MatchRootURL.
 func (mr *MockVerifierMockRecorder) MatchRootURL(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MatchRootURL", reflect.TypeOf((*MockVerifier)(nil).MatchRootURL), arg0)
 }
 
-// SearchEmail mocks base method
+// SearchEmail mocks base method.
 func (m *MockVerifier) SearchEmail(arg0 string) []string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchEmail", arg0)
@@ -152,13 +153,13 @@ func (m *MockVerifier) SearchEmail(arg0 string) []string {
 	return ret0
 }
 
-// SearchEmail indicates an expected call of SearchEmail
+// SearchEmail indicates an expected call of SearchEmail.
 func (mr *MockVerifierMockRecorder) SearchEmail(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchEmail", reflect.TypeOf((*MockVerifier)(nil).SearchEmail), arg0)
 }
 
-// SearchIPv4 mocks base method
+// SearchIPv4 mocks base method.
 func (m *MockVerifier) SearchIPv4(arg0 string) []string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchIPv4", arg0)
@@ -166,13 +167,13 @@ func (m *MockVerifier) SearchIPv4(arg0 string) []string {
 	return ret0
 }
 
-// SearchIPv4 indicates an expected call of SearchIPv4
+// SearchIPv4 indicates an expected call of SearchIPv4.
 func (mr *MockVerifierMockRecorder) SearchIPv4(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchIPv4", reflect.TypeOf((*MockVerifier)(nil).SearchIPv4), arg0)
 }
 
-// SearchIPv6 mocks base method
+// SearchIPv6 mocks base method.
 func (m *MockVerifier) SearchIPv6(arg0 string) []string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchIPv6", arg0)
@@ -180,13 +181,13 @@ func (m *MockVerifier) SearchIPv6(arg0 string) []string {
 	return ret0
 }
 
-// SearchIPv6 indicates an expected call of SearchIPv6
+// SearchIPv6 indicates an expected call of SearchIPv6.
 func (mr *MockVerifierMockRecorder) SearchIPv6(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchIPv6", reflect.TypeOf((*MockVerifier)(nil).SearchIPv6), arg0)
 }
 
-// SearchPhone mocks base method
+// SearchPhone mocks base method.
 func (m *MockVerifier) SearchPhone(arg0 string) []string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchPhone", arg0)
@@ -194,13 +195,13 @@ func (m *MockVerifier) SearchPhone(arg0 string) []string {
 	return ret0
 }
 
-// SearchPhone indicates an expected call of SearchPhone
+// SearchPhone indicates an expected call of SearchPhone.
 func (mr *MockVerifierMockRecorder) SearchPhone(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPhone", reflect.TypeOf((*MockVerifier)(nil).SearchPhone), arg0)
 }
 
-// ValidateEmail mocks base method
+// ValidateEmail mocks base method.
 func (m *MockVerifier) ValidateEmail(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ValidateEmail", arg0)
@@ -208,13 +209,13 @@ func (m *MockVerifier) ValidateEmail(arg0 string) error {
 	return ret0
 }
 
-// ValidateEmail indicates an expected call of ValidateEmail
+// ValidateEmail indicates an expected call of ValidateEmail.
 func (mr *MockVerifierMockRecorder) ValidateEmail(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateEmail", reflect.TypeOf((*MockVerifier)(nil).ValidateEmail), arg0)
 }
 
-// VerifyPort mocks base method
+// VerifyPort mocks base method.
 func (m *MockVerifier) VerifyPort(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "VerifyPort", arg0)
@@ -222,7 +223,7 @@ func (m *MockVerifier) VerifyPort(arg0 string) error {
 	return ret0
 }
 
-// VerifyPort indicates an expected call of VerifyPort
+// VerifyPort indicates an expected call of VerifyPort.
 func (mr *MockVerifierMockRecorder) VerifyPort(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VerifyPort", reflect.TypeOf((*MockVerifier)(nil).VerifyPort), arg0)

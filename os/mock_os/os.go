@@ -5,36 +5,37 @@
 package mock_os
 
 import (
+	fs "io/fs"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	os "github.com/qdm12/golibs/os"
-	os0 "os"
-	reflect "reflect"
 )
 
-// MockOS is a mock of OS interface
+// MockOS is a mock of OS interface.
 type MockOS struct {
 	ctrl     *gomock.Controller
 	recorder *MockOSMockRecorder
 }
 
-// MockOSMockRecorder is the mock recorder for MockOS
+// MockOSMockRecorder is the mock recorder for MockOS.
 type MockOSMockRecorder struct {
 	mock *MockOS
 }
 
-// NewMockOS creates a new mock instance
+// NewMockOS creates a new mock instance.
 func NewMockOS(ctrl *gomock.Controller) *MockOS {
 	mock := &MockOS{ctrl: ctrl}
 	mock.recorder = &MockOSMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockOS) EXPECT() *MockOSMockRecorder {
 	return m.recorder
 }
 
-// Chown mocks base method
+// Chown mocks base method.
 func (m *MockOS) Chown(arg0 string, arg1, arg2 int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Chown", arg0, arg1, arg2)
@@ -42,13 +43,13 @@ func (m *MockOS) Chown(arg0 string, arg1, arg2 int) error {
 	return ret0
 }
 
-// Chown indicates an expected call of Chown
+// Chown indicates an expected call of Chown.
 func (mr *MockOSMockRecorder) Chown(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Chown", reflect.TypeOf((*MockOS)(nil).Chown), arg0, arg1, arg2)
 }
 
-// MkdirAll mocks base method
+// MkdirAll mocks base method.
 func (m *MockOS) MkdirAll(arg0 string, arg1 os.FileMode) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MkdirAll", arg0, arg1)
@@ -56,13 +57,13 @@ func (m *MockOS) MkdirAll(arg0 string, arg1 os.FileMode) error {
 	return ret0
 }
 
-// MkdirAll indicates an expected call of MkdirAll
+// MkdirAll indicates an expected call of MkdirAll.
 func (mr *MockOSMockRecorder) MkdirAll(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MkdirAll", reflect.TypeOf((*MockOS)(nil).MkdirAll), arg0, arg1)
 }
 
-// OpenFile mocks base method
+// OpenFile mocks base method.
 func (m *MockOS) OpenFile(arg0 string, arg1 int, arg2 os.FileMode) (os.File, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OpenFile", arg0, arg1, arg2)
@@ -71,13 +72,13 @@ func (m *MockOS) OpenFile(arg0 string, arg1 int, arg2 os.FileMode) (os.File, err
 	return ret0, ret1
 }
 
-// OpenFile indicates an expected call of OpenFile
+// OpenFile indicates an expected call of OpenFile.
 func (mr *MockOSMockRecorder) OpenFile(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OpenFile", reflect.TypeOf((*MockOS)(nil).OpenFile), arg0, arg1, arg2)
 }
 
-// Remove mocks base method
+// Remove mocks base method.
 func (m *MockOS) Remove(arg0 string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Remove", arg0)
@@ -85,22 +86,22 @@ func (m *MockOS) Remove(arg0 string) error {
 	return ret0
 }
 
-// Remove indicates an expected call of Remove
+// Remove indicates an expected call of Remove.
 func (mr *MockOSMockRecorder) Remove(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Remove", reflect.TypeOf((*MockOS)(nil).Remove), arg0)
 }
 
-// Stat mocks base method
-func (m *MockOS) Stat(arg0 string) (os0.FileInfo, error) {
+// Stat mocks base method.
+func (m *MockOS) Stat(arg0 string) (fs.FileInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Stat", arg0)
-	ret0, _ := ret[0].(os0.FileInfo)
+	ret0, _ := ret[0].(fs.FileInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Stat indicates an expected call of Stat
+// Stat indicates an expected call of Stat.
 func (mr *MockOSMockRecorder) Stat(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Stat", reflect.TypeOf((*MockOS)(nil).Stat), arg0)
