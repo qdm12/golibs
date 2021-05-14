@@ -1,5 +1,5 @@
-ARG ALPINE_VERSION=3.12
-ARG GO_VERSION=1.15
+ARG ALPINE_VERSION=3.13
+ARG GO_VERSION=1.16
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 RUN apk --update add git
@@ -17,7 +17,7 @@ ENV CGO_ENABLED=1
 RUN apk --update --no-cache add g++
 
 FROM --platform=$BUILDPLATFORM base AS lint
-ARG GOLANGCI_LINT_VERSION=v1.36.0
+ARG GOLANGCI_LINT_VERSION=v1.40.1
 RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
   sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
 COPY .golangci.yml ./
