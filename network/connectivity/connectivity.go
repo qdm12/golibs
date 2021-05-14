@@ -2,12 +2,14 @@ package connectivity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
-	"time"
+)
 
-	"github.com/qdm12/golibs/network"
+var (
+	ErrConnectivity = errors.New("failed connectivity check")
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Connectivity
@@ -20,29 +22,24 @@ type Connectivity interface {
 }
 
 type connectivity struct {
-	checkDNS checkDNSFunc
-	client   network.Client
+	resolver *net.Resolver
+	client   *http.Client
 }
 
 // NewConnectivity returns a new connectivity object.
-func NewConnectivity(timeout time.Duration) Connectivity {
+func NewConnectivity(resolver *net.Resolver, client *http.Client) Connectivity {
 	return &connectivity{
-		checkDNS: func(ctx context.Context, host string) error {
-			_, err := net.DefaultResolver.LookupIP(ctx, "ip", host)
-			return err
-		},
-		client: network.NewClient(timeout),
+		resolver: resolver,
+		client:   client,
 	}
 }
-
-type checkDNSFunc func(ctx context.Context, host string) error
 
 // Checks verifies the connection to the domains in terms of DNS, HTTP and HTTPS.
 func (c *connectivity) Checks(ctx context.Context, domains ...string) (errs []error) {
 	chErrors := make(chan []error)
 	for _, domain := range domains {
 		go func(domain string) {
-			chErrors <- connectivityCheck(ctx, domain, c.checkDNS, c.client)
+			chErrors <- connectivityCheck(ctx, domain, c.resolver, c.client)
 		}(domain)
 	}
 	for range domains {
@@ -54,13 +51,14 @@ func (c *connectivity) Checks(ctx context.Context, domains ...string) (errs []er
 }
 
 func connectivityCheck(ctx context.Context, domain string,
-	checkDNS checkDNSFunc, client network.Client) (errs []error) {
+	resolver *net.Resolver, client *http.Client) (errs []error) {
 	chError := make(chan error)
-	go func() { chError <- domainNameResolutionCheck(ctx, domain, checkDNS) }()
+	go func() { chError <- domainNameResolutionCheck(ctx, domain, resolver) }()
 	go func() { chError <- httpGetCheck(ctx, "http://"+domain, client) }()
 	go func() { chError <- httpGetCheck(ctx, "https://"+domain, client) }()
 	for i := 0; i < 3; i++ {
 		if err := <-chError; err != nil {
+			err = fmt.Errorf("%w: for %s: %s", ErrConnectivity, domain, err)
 			errs = append(errs, err)
 		}
 	}
@@ -68,19 +66,27 @@ func connectivityCheck(ctx context.Context, domain string,
 	return errs
 }
 
-func httpGetCheck(ctx context.Context, url string, client network.Client) error {
-	_, status, err := client.Get(ctx, url)
+var errNotOKHTTPStatus = errors.New("HTTP status is not OK")
+
+func httpGetCheck(ctx context.Context, url string, client *http.Client) error {
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return fmt.Errorf("HTTP GET failed for %s: %w", url, err)
-	} else if status != http.StatusOK {
-		return fmt.Errorf("HTTP GET failed for %s: HTTP Status %d", url, status)
+		return err
+	}
+
+	response, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return fmt.Errorf("%w: %s", errNotOKHTTPStatus, response.Status)
 	}
 	return nil
 }
 
-func domainNameResolutionCheck(ctx context.Context, domain string, checkDNS checkDNSFunc) error {
-	if err := checkDNS(ctx, domain); err != nil {
-		return fmt.Errorf("Domain name resolution is not working for %s: %w", domain, err)
-	}
-	return nil
+func domainNameResolutionCheck(ctx context.Context, domain string, resolver *net.Resolver) error {
+	_, err := resolver.LookupIP(ctx, "ip", domain)
+	return err
 }
