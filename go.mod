@@ -3,7 +3,7 @@ module github.com/qdm12/golibs
 go 1.16
 
 require (
-	github.com/fatih/color v1.11.0
+	github.com/fatih/color v1.12.0
 	github.com/golang/mock v1.5.0
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/gotify/go-api-client/v2 v2.0.4
