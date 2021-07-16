@@ -1,13 +1,12 @@
 package command
 
 import (
-	"context"
 	"strings"
 )
 
-// Run runs a command in a blocking manner, returning its output and an error if it failed.
-func (c *commander) Run(ctx context.Context, name string, arg ...string) (output string, err error) {
-	cmd := c.execCommand(ctx, name, arg...)
+// Run runs a command in a blocking manner, returning its output and
+// an error if it failed.
+func (c *commander) Run(cmd Cmd) (output string, err error) {
 	stdout, err := cmd.CombinedOutput()
 	output = string(stdout)
 	output = strings.TrimSuffix(output, "\n")
