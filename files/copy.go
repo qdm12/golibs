@@ -39,7 +39,9 @@ func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
 		if !ok {
 			return fmt.Errorf("%w: for path %s", ErrSyscallStat, subFromPath)
 		}
-		switch fileInfo.Mode() & os.ModeType {
+
+		mode := fileInfo.Mode() & os.ModeType
+		switch mode {
 		case os.ModeDir:
 			const defaultPermissions os.FileMode = 0700
 			if err := f.CreateDir(subToPath, Permissions(defaultPermissions)); err != nil {

@@ -13,7 +13,7 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    - exhaustive
+    # - exhaustive
     - exportloopref
     - gci
     - gochecknoglobals
