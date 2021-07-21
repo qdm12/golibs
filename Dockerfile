@@ -1,13 +1,15 @@
 ARG ALPINE_VERSION=3.13
 ARG GO_VERSION=1.16
+ARG GOLANGCI_LINT_VERSION=v1.41.1
+
+FROM --platform=${BUILDPLATFORM} qmcgaw/binpot:golangci-lint-${GOLANGCI_LINT_VERSION} AS golangci-lint
 
 FROM --platform=${BUILDPLATFORM} golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 RUN apk --update --no-cache add git g++
 ENV CGO_ENABLED=0
 WORKDIR /tmp/gobuild
 ARG GOLANGCI_LINT_VERSION=v1.41.1
-RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-  sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
+COPY --from=golangci-lint /bin /go/bin/golangci-lint
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
