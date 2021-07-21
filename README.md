@@ -2,7 +2,7 @@
 
 *Golang libraries I use across my projects*
 
-<img height="250" src="https://raw.githubusercontent.com/qdm12/golibs/master/title.svg?sanitize=true">
+<img height="250" src="https://raw.githubusercontent.com/qdm12/golibs/master/title.svg">
 
 [![Build status](https://github.com/qdm12/golibs/workflows/CI/badge.svg?branch=master)](https://github.com/qdm12/golibs/actions?query=workflow%3A"CI")
 [![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/golibs.svg)](https://github.com/qdm12/golibs/commits/master)
@@ -80,9 +80,9 @@ and used with [gomock](https://github.com/golang/mock#building-mocks) for testin
 
 ## TODOs
 
+- Test ed25519 signatures
 - HTTP server/client unit tests
 - Server rework to write unique request ID (see timesheet)
-- More hashing functions
 
 ## License
 
