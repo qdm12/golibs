@@ -31,7 +31,7 @@ type Crypto interface {
 type crypto struct {
 	shakeHashFactory func() sha3.ShakeHash
 	argon2ID         func(password []byte, salt []byte, time uint32, memory uint32, threads uint8, keyLen uint32) []byte
-	random           random.Random
+	random           random.Randomer
 }
 
 func NewCrypto() Crypto {

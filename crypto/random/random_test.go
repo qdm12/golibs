@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_GenerateRandomBytes(t *testing.T) {
+func Test_Random_GenerateRandomBytes(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		n          int
@@ -37,7 +37,7 @@ func Test_GenerateRandomBytes(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			r := &random{
+			r := &Random{
 				randReader: tc.randReader,
 			}
 			out, err := r.GenerateRandomBytes(tc.n)
@@ -52,7 +52,7 @@ func Test_GenerateRandomBytes(t *testing.T) {
 	}
 }
 
-func Test_GenerateRandomInt63(t *testing.T) {
+func Test_Random_GenerateRandomInt63(t *testing.T) {
 	t.Parallel()
 	r := NewRandom()
 	var previousValue int64
@@ -64,7 +64,7 @@ func Test_GenerateRandomInt63(t *testing.T) {
 	}
 	t.Run("panics from rand.Read error", func(t *testing.T) {
 		t.Parallel()
-		r := &random{
+		r := &Random{
 			randReader: func(b []byte) error {
 				return fmt.Errorf("error")
 			},
@@ -73,7 +73,7 @@ func Test_GenerateRandomInt63(t *testing.T) {
 	})
 }
 
-func Test_GenerateRandomInt(t *testing.T) {
+func Test_Random_GenerateRandomInt(t *testing.T) {
 	t.Parallel()
 	r := NewRandom()
 	tests := map[string]struct {
@@ -97,7 +97,7 @@ func Test_GenerateRandomInt(t *testing.T) {
 	}
 }
 
-func Test_GenerateRandomAlphaNum(t *testing.T) {
+func Test_Random_GenerateRandomAlphaNum(t *testing.T) {
 	t.Parallel()
 	r := NewRandom()
 	tests := map[string]struct {
@@ -137,7 +137,7 @@ func Test_GenerateRandomAlphaNum(t *testing.T) {
 	})
 }
 
-func Test_GenerateRandomNum(t *testing.T) {
+func Test_Random_GenerateRandomNum(t *testing.T) {
 	t.Parallel()
 	r := NewRandom()
 	tests := map[string]struct {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Random
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Randomer
 
 const (
 	lowercase     = "abcdefghijklmnopqrstuvwxyz"
@@ -20,9 +20,9 @@ const (
 	maxInt63      = 9223372036854775807
 )
 
-// Random has methods to generate random values from the cryptographic
+// Randomer has methods to generate random values from the cryptographic
 // randomness reader. All should be considered slow and thread safe.
-type Random interface {
+type Randomer interface {
 	// GenerateRandomBytes generates a byte slice of n random bytes
 	GenerateRandomBytes(n int) ([]byte, error)
 	// GenerateRandomInt63 generates a random 64 bits signed integer
@@ -35,14 +35,14 @@ type Random interface {
 	GenerateRandomNum(n uint64) string
 }
 
-// random implements Random.
-type random struct {
+// Random implements Randomer.
+type Random struct {
 	randReader func(b []byte) error
 }
 
 // NewRandom returns a new Random object.
-func NewRandom() Random {
-	return &random{
+func NewRandom() *Random {
+	return &Random{
 		randReader: randReader,
 	}
 }
@@ -59,7 +59,7 @@ func randReader(b []byte) error {
 }
 
 // GenerateRandomBytes generates n random bytes.
-func (r *random) GenerateRandomBytes(n int) ([]byte, error) {
+func (r *Random) GenerateRandomBytes(n int) ([]byte, error) {
 	b := make([]byte, n)
 	if err := r.randReader(b); err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (r *random) GenerateRandomBytes(n int) ([]byte, error) {
 }
 
 // GenerateRandomInt63 returns a random 63 bit positive integer.
-func (r *random) GenerateRandomInt63() int64 {
+func (r *Random) GenerateRandomInt63() int64 {
 	const int63Length = 8
 	b, err := r.GenerateRandomBytes(int63Length)
 	if err != nil {
@@ -82,7 +82,7 @@ func (r *random) GenerateRandomInt63() int64 {
 }
 
 // GenerateRandomInt returns a random integer between 0 and n.
-func (r *random) GenerateRandomInt(n int) (result int) {
+func (r *Random) GenerateRandomInt(n int) (result int) {
 	if n == 0 {
 		return 0
 	}
@@ -94,7 +94,7 @@ func (r *random) GenerateRandomInt(n int) (result int) {
 }
 
 // GenerateRandomAlphaNum returns a string of random alphanumeric characters of a specified length.
-func (r *random) GenerateRandomAlphaNum(length uint64) string {
+func (r *Random) GenerateRandomAlphaNum(length uint64) string {
 	if length >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
@@ -116,7 +116,7 @@ func (r *random) GenerateRandomAlphaNum(length uint64) string {
 }
 
 // GenerateRandomNum returns a string of random numeric characters of a specified length.
-func (r *random) GenerateRandomNum(n uint64) string {
+func (r *Random) GenerateRandomNum(n uint64) string {
 	if n >= maxInt63 {
 		panic("length argument cannot be bigger than 2^63 - 1")
 	}
