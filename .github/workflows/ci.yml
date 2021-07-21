@@ -25,9 +25,4 @@ jobs:
           touch coverage.txt
           docker run --rm \
           -v "$(pwd)/coverage.txt:/tmp/gobuild/coverage.txt" \
-          test-container \
-          go test \
-          -race \
-          -coverprofile=coverage.txt \
-          -covermode=atomic \
-          ./...
+          test-container
