@@ -59,6 +59,9 @@ issues:
       linters:
         - gochecknoglobals
       text: IsNotExist is a global variable
+    - text: "mnd: Magic number: 0700*"
+      linters:
+        - gomnd
 
 run:
   skip-dirs:
