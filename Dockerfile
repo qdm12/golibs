@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=3.13
 ARG GO_VERSION=1.16
 
-FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
+FROM --platform=${BUILDPLATFORM} golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 RUN apk --update --no-cache add git g++
 ENV CGO_ENABLED=0
 WORKDIR /tmp/gobuild
