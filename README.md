@@ -13,12 +13,12 @@
 
 Simply import one of the following libraries in your Go code:
 
-- `"github.com/qdm12/golibs/command"` for interacting the shell command line
+- `"github.com/qdm12/golibs/command"` for interacting with other subprograms
+- `"github.com/qdm12/golibs/connectivity"` for checking for connectivity (DNS resolution, HTTP requests etc.)
 - `"github.com/qdm12/golibs/crypto"` for encryption, randomness and checksum functions
 - `"github.com/qdm12/golibs/files"` to interact with the filesystem
 - `"github.com/qdm12/golibs/format"` to format things to strings
 - `"github.com/qdm12/golibs/logging"` for logging functions with a global Zap logger
-- `"github.com/qdm12/golibs/network"` for HTTP requests, IP address processing and connectivity checks
 - `"github.com/qdm12/golibs/os"` for OS related operations like file manipulation.
 - `"github.com/qdm12/golibs/params"` for parsing and verifying parameters from environment variables
 - `"github.com/qdm12/golibs/redis"` for basic initialization of a Redis database pool of connections
