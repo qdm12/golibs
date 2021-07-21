@@ -13,7 +13,6 @@
 
 Simply import one of the following libraries in your Go code:
 
-- `"github.com/qdm12/golibs/admin"` for supervising your application, it contains a Gotify client
 - `"github.com/qdm12/golibs/command"` for interacting the shell command line
 - `"github.com/qdm12/golibs/crypto"` for encryption, randomness and checksum functions
 - `"github.com/qdm12/golibs/files"` to interact with the filesystem
