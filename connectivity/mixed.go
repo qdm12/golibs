@@ -2,12 +2,15 @@ package connectivity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 )
 
 var _ Checker = new(MixedChecker)
 var _ SingleChecker = new(MixedChecker)
+
+var ErrOneOrMoreChecksFailed = errors.New("one or more checks failed")
 
 // NewMixedChecker creates a new mixed checker using the given checkers.
 func NewMixedChecker(checkers []Checker) *MixedChecker {
@@ -53,6 +56,6 @@ func (c *MixedChecker) Check(ctx context.Context, url string) (err error) {
 		return nil
 	}
 
-	return fmt.Errorf("for URL " + url + ": " +
-		strings.Join(errStrings, "; "))
+	return fmt.Errorf("%w: for URL %s: %s",
+		ErrOneOrMoreChecksFailed, url, strings.Join(errStrings, "; "))
 }

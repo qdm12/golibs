@@ -3,6 +3,7 @@ package params
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -58,11 +59,11 @@ func Test_Get(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "key"`),
+			err:           ErrNoValue,
 		},
 		"bad options": {
 			optionSetters: []OptionSetter{Compulsory(), Default("a")},
-			err:           fmt.Errorf(`environment variable "key": cannot set default value for environment variable value which is compulsory`), //nolint:lll
+			err:           fmt.Errorf("option error: cannot set a default for a compulsory environment variable value"),
 		},
 		"retro key used": {
 			env: map[string]string{
@@ -100,7 +101,7 @@ func Test_Get(t *testing.T) {
 				[]string{"retro1"},
 				func(oldKey string, newKey string) {},
 			), Compulsory()},
-			err: fmt.Errorf(`no value found for environment variable "key"`),
+			err: ErrNoValue,
 		},
 	}
 	for name, tc := range tests {
@@ -145,11 +146,11 @@ func Test_GetInt(t *testing.T) {
 		"key with int value": {envValue: "0"},
 		"key with float value": {
 			envValue: "0.00",
-			err:      fmt.Errorf(`environment variable "any" value "0.00" is not a valid integer`),
+			err:      fmt.Errorf("value is not an integer: 0.00"),
 		},
 		"key with string value": {
 			envValue: "a",
-			err:      fmt.Errorf(`environment variable "any" value "a" is not a valid integer`),
+			err:      fmt.Errorf("value is not an integer: a"),
 		},
 		"key without value and default": {
 			optionSetters: []OptionSetter{Default("1")},
@@ -157,7 +158,8 @@ func Test_GetInt(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`)},
+			err:           ErrNoValue,
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -199,19 +201,19 @@ func Test_GetIntRange(t *testing.T) {
 			envValue: "a",
 			lower:    0,
 			upper:    1,
-			err:      fmt.Errorf(`environment variable "any" value "a" is not a valid integer`),
+			err:      fmt.Errorf("value is not an integer: a"),
 		},
 		"key with int value below lower": {
 			envValue: "0",
 			lower:    1,
 			upper:    2,
-			err:      fmt.Errorf(`environment variable "any" value 0 is not between 1 and 2`),
+			err:      fmt.Errorf("value is not in range: 0 is not between 1 and 2"),
 		},
 		"key with int value above upper": {
 			envValue: "2",
 			lower:    0,
 			upper:    1,
-			err:      fmt.Errorf(`environment variable "any" value 2 is not between 0 and 1`),
+			err:      fmt.Errorf("value is not in range: 2 is not between 0 and 1"),
 		},
 		"key without value and default": {
 			lower:         0,
@@ -223,12 +225,13 @@ func Test_GetIntRange(t *testing.T) {
 			lower:         0,
 			upper:         1,
 			optionSetters: []OptionSetter{Default("2")},
-			err:           fmt.Errorf(`environment variable "any" value 2 is not between 0 and 1`)},
+			err:           fmt.Errorf("value is not in range: 2 is not between 0 and 1")},
 		"key without value and compulsory": {
 			lower:         0,
 			upper:         1,
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`)},
+			err:           ErrNoValue,
+		},
 	}
 	for name, tc := range tests {
 		tc := tc
@@ -251,7 +254,7 @@ func Test_GetIntRange(t *testing.T) {
 	}
 }
 
-func Test_YesNo(t *testing.T) { //nolint:dupl
+func Test_YesNo(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -267,18 +270,18 @@ func Test_YesNo(t *testing.T) { //nolint:dupl
 			envValue: "no",
 		},
 		"key without value": {
-			err: fmt.Errorf(`environment variable "any" value is "" and can only be "yes" or "no"`)},
+			err: fmt.Errorf(`value can only be 'yes' or 'no': `)},
 		"key without value and default": {
 			optionSetters: []OptionSetter{Default("yes")},
 			yes:           true,
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 		"key with invalid value": {
 			envValue: "a",
-			err:      fmt.Errorf(`environment variable "any" value is "a" and can only be "yes" or "no"`),
+			err:      fmt.Errorf(`value can only be 'yes' or 'no': a`),
 		},
 	}
 	for name, tc := range tests {
@@ -302,7 +305,7 @@ func Test_YesNo(t *testing.T) { //nolint:dupl
 	}
 }
 
-func Test_OnOff(t *testing.T) { //nolint:dupl
+func Test_OnOff(t *testing.T) {
 	t.Parallel()
 	tests := map[string]struct {
 		envValue      string
@@ -317,7 +320,7 @@ func Test_OnOff(t *testing.T) { //nolint:dupl
 			envValue: "off",
 		},
 		"key without value": {
-			err: fmt.Errorf(`environment variable "any" value is "" and can only be "on" or "off"`),
+			err: fmt.Errorf(`value can only be 'on' or 'off': `),
 		},
 		"key without value and default": {
 			optionSetters: []OptionSetter{Default("on")},
@@ -325,11 +328,11 @@ func Test_OnOff(t *testing.T) { //nolint:dupl
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 		"key with invalid value": {
 			envValue: "a",
-			err:      fmt.Errorf(`environment variable "any" value is "a" and can only be "on" or "off"`),
+			err:      fmt.Errorf(`value can only be 'on' or 'off': a`),
 		},
 	}
 	for name, tc := range tests {
@@ -387,12 +390,12 @@ func Test_Inside(t *testing.T) {
 			possibilities: []string{"A", "b"},
 			envValue:      "a",
 			optionSetters: []OptionSetter{CaseSensitiveValue()},
-			err:           fmt.Errorf(`environment variable "any" value is "a" and can only be one of: A, b`),
+			err:           fmt.Errorf("value is not within the accepted values: a: it can only be one of: A, b"),
 		},
 		"key with value not in possibilities": {
 			possibilities: []string{"a", "b"},
 			envValue:      "c",
-			err:           fmt.Errorf(`environment variable "any" value is "c" and can only be one of: a, b`),
+			err:           fmt.Errorf("value is not within the accepted values: c: it can only be one of: a, b"),
 		},
 		"key without value": {
 			possibilities: []string{"a", "b"},
@@ -401,7 +404,7 @@ func Test_Inside(t *testing.T) {
 		"key without value compulsory": {
 			possibilities: []string{"a", "b"},
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 		"key without value and default": {
 			possibilities: []string{"a", "b"},
@@ -411,7 +414,7 @@ func Test_Inside(t *testing.T) {
 		"key without value and compulsory": {
 			possibilities: []string{"a", "b"},
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 	}
 	for name, tc := range tests {
@@ -447,12 +450,12 @@ func Test_CSVInside(t *testing.T) {
 		"empty string": {},
 		"empty string compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 		"single comma": {
 			envValue: ",",
 			err: fmt.Errorf(
-				`environment variable "any": invalid values found: value "" at position 1, value "" at position 2: possible values are: `), //nolint:lll
+				`at least one value is not within the accepted values: invalid values found: value "" at position 1, value "" at position 2; possible values are: `), //nolint:lll
 		},
 		"single valid": {
 			possibilities: []string{"a", "b", "c"},
@@ -469,7 +472,7 @@ func Test_CSVInside(t *testing.T) {
 			possibilities: []string{"a", "b", "c"},
 			envValue:      "B",
 			optionSetters: []OptionSetter{CaseSensitiveValue()},
-			err:           fmt.Errorf(`environment variable "any": invalid values found: value "B" at position 1: possible values are: a, b, c`), //nolint:lll
+			err:           fmt.Errorf(`at least one value is not within the accepted values: invalid values found: value "B" at position 1; possible values are: a, b, c`), //nolint:lll
 		},
 		"two valid": {
 			possibilities: []string{"a", "b", "c"},
@@ -479,7 +482,7 @@ func Test_CSVInside(t *testing.T) {
 		"one valid and one invalid": {
 			possibilities: []string{"a", "b", "c"},
 			envValue:      "b,d",
-			err:           fmt.Errorf(`environment variable "any": invalid values found: value "d" at position 2: possible values are: a, b, c`), //nolint:lll
+			err:           fmt.Errorf(`at least one value is not within the accepted values: invalid values found: value "d" at position 2; possible values are: a, b, c`), //nolint:lll
 		},
 	}
 	for name, tc := range tests {
@@ -513,18 +516,18 @@ func Test_Duration(t *testing.T) {
 	}{
 		"key with non integer value": {
 			envValue: "a",
-			err:      fmt.Errorf(`environment variable "any" duration value is malformed: time: invalid duration "a"`),
+			err:      fmt.Errorf(`duration is malformed: a: time: invalid duration "a"`),
 		},
 		"key without unit": {
 			envValue: "1",
-			err:      fmt.Errorf(`environment variable "any" duration value is malformed: time: missing unit in duration "1"`),
+			err:      fmt.Errorf(`duration is malformed: 1: time: missing unit in duration "1"`),
 		},
 		"key with 0 integer value": {
 			envValue: "0",
 		},
 		"key with negative duration": {
 			envValue: "-1s",
-			err:      fmt.Errorf(`environment variable "any" duration value cannot be lower than 0`),
+			err:      fmt.Errorf(`duration is negative: -1s`),
 		},
 		"key without value": {},
 		"key without value and default": {
@@ -533,7 +536,7 @@ func Test_Duration(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 	}
 	for name, tc := range tests {
@@ -574,7 +577,7 @@ func Test_ListeningAddress(t *testing.T) {
 		"env get error": {
 			envValue: "",
 			options:  []OptionSetter{Compulsory()},
-			err:      errors.New(`no value found for environment variable "LISTENING_ADDRESS"`),
+			err:      ErrNoValue,
 		},
 		"split host port error": {
 			envValue: "0.0.0.0",
@@ -638,7 +641,7 @@ func Test_ListeningPort(t *testing.T) {
 		"key without value": {
 			envValue:      "",
 			listeningPort: 0,
-			err:           fmt.Errorf(`port "" is not a valid integer`),
+			err:           fmt.Errorf("port is not an integer: "),
 		},
 		"key without value and default": {
 			optionSetters: []OptionSetter{Default("9000")},
@@ -646,7 +649,7 @@ func Test_ListeningPort(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "LISTENING_PORT"`),
+			err:           ErrNoValue,
 		},
 	}
 	for name, tc := range tests {
@@ -745,7 +748,7 @@ func Test_RootURL(t *testing.T) {
 		},
 		"key with invalid value": {
 			envValue: "/a?",
-			err:      fmt.Errorf(`environment variable ROOT_URL value "/a?" is not valid`),
+			err:      fmt.Errorf("root URL is not valid: /a?"),
 		},
 		"key without value": {},
 		"key without value and default": {
@@ -754,7 +757,7 @@ func Test_RootURL(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`environment variable "ROOT_URL": cannot make environment variable value compulsory with a default value`), //nolint:lll
+			err:           fmt.Errorf("option error: cannot make environment variable value compulsory with a default value"),
 		},
 	}
 	for name, tc := range tests {
@@ -784,24 +787,32 @@ func Test_Path(t *testing.T) {
 	tests := map[string]struct {
 		envValue      string
 		optionSetters []OptionSetter
-		absPath       string
-		absErr        error
+		fpAbs         func(p string) (string, error)
 		path          string
 		err           error
 	}{
 		"valid path": {
 			envValue: "/path",
-			absPath:  "/real/path",
-			path:     "/real/path",
+			fpAbs: func(p string) (string, error) {
+				return "/real/path", nil
+			},
+			path: "/real/path",
+		},
+		"using filepath.Abs": {
+			envValue: "/path",
+			fpAbs:    filepath.Abs,
+			path:     "/path",
 		},
 		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           errors.New(`no value found for environment variable "key"`),
+			err:           ErrNoValue,
 		},
 		"abs error": {
 			envValue: "/path",
-			absErr:   errors.New("abs error"),
-			err:      errors.New(`invalid filepath: for environment variable key: abs error`),
+			fpAbs: func(p string) (string, error) {
+				return "", errors.New("abs error")
+			},
+			err: errors.New(`invalid filepath: : abs error`),
 		},
 	}
 	for name, tc := range tests {
@@ -812,9 +823,7 @@ func Test_Path(t *testing.T) {
 				getenv: func(key string) string {
 					return tc.envValue
 				},
-				fpAbs: func(s string) (string, error) {
-					return tc.absPath, tc.absErr
-				},
+				fpAbs: tc.fpAbs,
 			}
 			path, err := e.Path("key", tc.optionSetters...)
 			if tc.err != nil {
@@ -847,12 +856,12 @@ func Test_LogCaller(t *testing.T) {
 		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
 			caller:        logging.CallerHidden,
-			err:           errors.New(`no value found for environment variable "LOG_CALLER"`),
+			err:           ErrNoValue,
 		},
 		"invalid value": {
 			envValue: "bla",
 			caller:   logging.CallerHidden,
-			err:      errors.New(`environment variable LOG_CALLER: unknown log caller "bla", can only be one of: hidden, short`),
+			err:      errors.New("unknown log caller: bla: can be one of: hidden, short"),
 		},
 	}
 	for name, tc := range tests {
@@ -903,12 +912,12 @@ func Test_LogLevel(t *testing.T) {
 		"get error": {
 			optionSetters: []OptionSetter{Compulsory()},
 			level:         logging.LevelInfo,
-			err:           errors.New(`no value found for environment variable "LOG_LEVEL"`),
+			err:           ErrNoValue,
 		},
 		"invalid value": {
 			envValue: "bla",
 			level:    logging.LevelInfo,
-			err:      errors.New(`environment variable LOG_LEVEL: unknown log level "bla", can only be one of: debug, info, warning, error`), //nolint:lll
+			err:      errors.New("unknown log level: bla: can be one of: debug, info, warning, error"),
 		},
 	}
 	for name, tc := range tests {
@@ -941,10 +950,12 @@ func Test_URL(t *testing.T) {
 		err           error
 	}{
 		"key with URL value": {"https://google.com", nil, "https://google.com", nil},
-		// "key with invalid value":           {"please help finding me", nil, "", fmt.Errorf("")},
+		"key with invalid value": {
+			envValue: string([]byte{0}),
+			err:      fmt.Errorf("url is not valid: \x00: parse \"\\x00\": net/url: invalid control character in URL")},
 		"key with non HTTP value": {
 			envValue: "google.com",
-			err:      fmt.Errorf(`environment variable "any" URL value "google.com" is not HTTP(s)`),
+			err:      fmt.Errorf("url is not http(s): google.com"),
 		},
 		"key without value": {},
 		"key without value and default": {
@@ -953,7 +964,7 @@ func Test_URL(t *testing.T) {
 		},
 		"key without value and compulsory": {
 			optionSetters: []OptionSetter{Compulsory()},
-			err:           fmt.Errorf(`no value found for environment variable "any"`),
+			err:           ErrNoValue,
 		},
 	}
 	for name, tc := range tests {

@@ -3,6 +3,7 @@ package random
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"errors"
 	"fmt"
 )
 
@@ -47,13 +48,15 @@ func NewRandom() *Random {
 	}
 }
 
+var ErrRandReadBytesUnexpected = errors.New("read an unexpected number of random bytes")
+
 func randReader(b []byte) error {
-	l := len(b)
 	n, err := rand.Read(b)
 	if err != nil {
 		return err
-	} else if l != n {
-		return fmt.Errorf("read %d random bytes instead of expected %d bytes", n, l)
+	} else if len(b) != n {
+		return fmt.Errorf("%w: %d bytes instead of expected %d bytes",
+			ErrRandReadBytesUnexpected, n, len(b))
 	}
 	return nil
 }

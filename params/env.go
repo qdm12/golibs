@@ -70,11 +70,16 @@ type envOptions struct {
 // OptionSetter is a setter for options to Get functions.
 type OptionSetter func(options *envOptions) error
 
+var (
+	ErrCompulsoryConflictWithDefault = errors.New("cannot make environment variable value compulsory with a default value")
+	ErrDefaultConflictWithCompulsory = errors.New("cannot set a default for a compulsory environment variable value")
+)
+
 // Compulsory forces the environment variable to contain a value.
 func Compulsory() OptionSetter {
 	return func(options *envOptions) error {
 		if len(options.defaultValue) > 0 {
-			return fmt.Errorf("cannot make environment variable value compulsory with a default value")
+			return ErrCompulsoryConflictWithDefault
 		}
 		options.compulsory = true
 		return nil
@@ -85,7 +90,7 @@ func Compulsory() OptionSetter {
 func Default(defaultValue string) OptionSetter {
 	return func(options *envOptions) error {
 		if options.compulsory {
-			return fmt.Errorf("cannot set default value for environment variable value which is compulsory")
+			return ErrDefaultConflictWithCompulsory
 		}
 		options.defaultValue = defaultValue
 		return nil
@@ -119,6 +124,11 @@ func RetroKeys(keys []string, onRetro func(oldKey, newKey string)) OptionSetter 
 	}
 }
 
+var (
+	ErrOption  = errors.New("option error")
+	ErrNoValue = errors.New("no value found")
+)
+
 // Get returns the value stored for a named environment variable,
 // and a default if no value is found.
 func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string, err error) {
@@ -133,7 +143,7 @@ func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string
 	}()
 	for _, setter := range optionSetters {
 		if err := setter(&options); err != nil {
-			return "", fmt.Errorf("environment variable %q: %w", key, err)
+			return "", fmt.Errorf("%w: %s", ErrOption, err)
 		}
 	}
 	value = e.getenv(key)
@@ -148,7 +158,7 @@ func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string
 	}
 	if len(value) == 0 {
 		if options.compulsory {
-			return "", fmt.Errorf("no value found for environment variable %q", key)
+			return "", ErrNoValue
 		}
 		value = options.defaultValue
 	}
@@ -157,6 +167,10 @@ func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string
 	}
 	return value, nil
 }
+
+var (
+	ErrNotAnInteger = errors.New("value is not an integer")
+)
 
 // Int returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
@@ -168,10 +182,14 @@ func (e *envParams) Int(key string, optionSetters ...OptionSetter) (n int, err e
 	}
 	n, err = strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("environment variable %q value %q is not a valid integer", key, s)
+		return 0, fmt.Errorf("%w: %s", ErrNotAnInteger, s)
 	}
 	return n, nil
 }
+
+var (
+	ErrNotInRange = errors.New("value is not in range")
+)
 
 // IntRange returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
@@ -183,13 +201,15 @@ func (e *envParams) IntRange(key string, lower, upper int, optionSetters ...Opti
 	}
 	n, err = strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("environment variable %q value %q is not a valid integer", key, s)
+		return 0, fmt.Errorf("%w: %s", ErrNotAnInteger, s)
 	}
 	if n < lower || n > upper {
-		return 0, fmt.Errorf("environment variable %q value %d is not between %d and %d", key, n, lower, upper)
+		return 0, fmt.Errorf("%w: %d is not between %d and %d", ErrNotInRange, n, lower, upper)
 	}
 	return n, nil
 }
+
+var ErrNotYesNo = errors.New("value can only be 'yes' or 'no'")
 
 // YesNo obtains the value stored for a named environment variable and returns:
 // if the value is 'yes', it returns true
@@ -207,9 +227,11 @@ func (e *envParams) YesNo(key string, optionSetters ...OptionSetter) (yes bool, 
 	case "no":
 		return false, nil
 	default:
-		return false, fmt.Errorf(`environment variable %q value is %q and can only be "yes" or "no"`, key, s)
+		return false, fmt.Errorf("%w: %s", ErrNotYesNo, s)
 	}
 }
+
+var ErrNotOnOff = errors.New("value can only be 'on' or 'off'")
 
 // OnOff obtains the value stored for a named environment variable and returns:
 // if the value is 'on', it returns true
@@ -227,9 +249,11 @@ func (e *envParams) OnOff(key string, optionSetters ...OptionSetter) (on bool, e
 	case "off":
 		return false, nil
 	default:
-		return false, fmt.Errorf(`environment variable %q value is %q and can only be "on" or "off"`, key, s)
+		return false, fmt.Errorf("%w: %s", ErrNotOnOff, s)
 	}
 }
+
+var ErrNotOneOf = errors.New("value is not within the accepted values")
 
 // Inside obtains the value stored for a named environment variable if it is part of a
 // list of possible values. You can optionally specify a defaultValue.
@@ -253,7 +277,7 @@ func (e *envParams) Inside(key string, possibilities []string, optionSetters ...
 		}
 	}
 	csvPossibilities := strings.Join(possibilities, ", ")
-	return "", fmt.Errorf("environment variable %q value is %q and can only be one of: %s", key, s, csvPossibilities)
+	return "", fmt.Errorf("%w: %s: it can only be one of: %s", ErrNotOneOf, s, csvPossibilities)
 }
 
 func (e *envParams) CSV(key string, optionSetters ...OptionSetter) (values []string, err error) {
@@ -270,6 +294,8 @@ func (e *envParams) CSV(key string, optionSetters ...OptionSetter) (values []str
 	}
 	return strings.Split(csv, ","), nil
 }
+
+var ErrInvalidValueFound = errors.New("at least one value is not within the accepted values")
 
 func (e *envParams) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	values []string, err error) {
@@ -314,12 +340,18 @@ func (e *envParams) CSVInside(key string, possibilities []string, optionSetters 
 		for i := range invalidValues {
 			invalidMessages[i] = fmt.Sprintf("value %q at position %d", invalidValues[i].value, invalidValues[i].position)
 		}
+		csvInvalidMessages := strings.Join(invalidMessages, ", ")
 		csvPossibilities := strings.Join(possibilities, ", ")
-		return nil, fmt.Errorf("environment variable %q: invalid values found: %s: possible values are: %s",
-			key, strings.Join(invalidMessages, ", "), csvPossibilities)
+		return nil, fmt.Errorf("%w: invalid values found: %s; possible values are: %s",
+			ErrInvalidValueFound, csvInvalidMessages, csvPossibilities)
 	}
 	return values, nil
 }
+
+var (
+	ErrDurationMalformed = errors.New("duration is malformed")
+	ErrDurationNegative  = errors.New("duration is negative")
+)
 
 // Duration gets the duration from the environment variable corresponding to the key provided.
 func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error) {
@@ -332,9 +364,9 @@ func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duratio
 	duration, err = time.ParseDuration(s)
 	switch {
 	case err != nil:
-		return 0, fmt.Errorf("environment variable %q duration value is malformed: %w", key, err)
+		return 0, fmt.Errorf("%w: %s: %s", ErrDurationMalformed, s, err)
 	case duration < 0:
-		return 0, fmt.Errorf("environment variable %q duration value cannot be lower than 0", key)
+		return 0, fmt.Errorf("%w: %s", ErrDurationNegative, duration.String())
 	default:
 		return duration, nil
 	}
@@ -415,6 +447,8 @@ func (e *envParams) checkListeningPort(port uint16) (warning string, err error) 
 	return warning, err
 }
 
+var ErrRootURLNotValid = errors.New("root URL is not valid")
+
 // RootURL obtains and checks the root URL from the environment variable specified by key.
 func (e *envParams) RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error) {
 	optionSetters = append([]OptionSetter{Default("/")}, optionSetters...)
@@ -424,7 +458,7 @@ func (e *envParams) RootURL(key string, optionSetters ...OptionSetter) (rootURL 
 	}
 	rootURL = path.Clean(rootURL)
 	if !e.regex.MatchRootURL(rootURL) {
-		return "", fmt.Errorf("environment variable ROOT_URL value %q is not valid", rootURL)
+		return "", fmt.Errorf("%w: %s", ErrRootURLNotValid, rootURL)
 	}
 	rootURL = strings.TrimSuffix(rootURL, "/") // already have / from paths of router
 	return rootURL, nil
@@ -442,9 +476,7 @@ func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string
 	}
 	path, err = e.fpAbs(s)
 	if err != nil {
-		return "", fmt.Errorf(
-			"%w: for environment variable %s: %s",
-			ErrInvalidPath, key, err)
+		return "", fmt.Errorf("%w: %s: %s", ErrInvalidPath, path, err)
 	}
 	return path, nil
 }
@@ -462,9 +494,7 @@ func (e *envParams) LogCaller(key string, optionSetters ...OptionSetter) (caller
 	case "short":
 		return logging.CallerShort, nil
 	}
-	return caller, fmt.Errorf(
-		"environment variable %s: %w %q, can only be one of: hidden, short",
-		key, ErrUnknownLogCaller, s)
+	return caller, fmt.Errorf("%w: %s: can be one of: hidden, short", ErrUnknownLogCaller, s)
 }
 
 var ErrUnknownLogLevel = errors.New("unknown log level")
@@ -485,11 +515,15 @@ func (e *envParams) LogLevel(key string, optionSetters ...OptionSetter) (level l
 	case "error":
 		return logging.LevelError, nil
 	default:
-		return level, fmt.Errorf(
-			"environment variable %s: %w %q, can only be one of: debug, info, warning, error",
-			key, ErrUnknownLogLevel, s)
+		return level, fmt.Errorf("%w: %s: can be one of: debug, info, warning, error",
+			ErrUnknownLogLevel, s)
 	}
 }
+
+var (
+	ErrURLNotValid = errors.New("url is not valid")
+	ErrURLNotHTTP  = errors.New("url is not http(s)")
+)
 
 // URL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
@@ -501,12 +535,14 @@ func (e *envParams) URL(key string, optionSetters ...OptionSetter) (url *liburl.
 	} else if s == "" {
 		return nil, nil
 	}
+
 	url, err = liburl.Parse(s)
-	if err != nil { // never happens
-		return nil, fmt.Errorf("environment variable %q URL value: %w", key, err)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s: %s", ErrURLNotValid, s, err)
 	}
+
 	if url.Scheme != "http" && url.Scheme != "https" {
-		return nil, fmt.Errorf("environment variable %q URL value %q is not HTTP(s)", key, url.String())
+		return nil, fmt.Errorf("%w: %s", ErrURLNotHTTP, url.String())
 	}
 	return url, nil
 }

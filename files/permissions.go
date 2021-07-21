@@ -40,9 +40,9 @@ func (f *fileManager) GetOthersPermissions(filePath string) (read, write, execut
 func (f *fileManager) SetUserPermissions(filepath string, mod os.FileMode) error {
 	exists, err := f.FileExists(filepath)
 	if err != nil {
-		return fmt.Errorf("cannot set user permissions: %w", err)
+		return err
 	} else if !exists {
-		return fmt.Errorf("file %q does not exist", filepath)
+		return ErrFileNotExist
 	}
 	return f.chmod(filepath, mod)
 }

@@ -64,17 +64,17 @@ func Test_Dechecksumize(t *testing.T) {
 		"data with bad checksum": {
 			[]byte{0xe7, 0xa8, 0xfb, 0xb3, 0x7, 0xd7, 0x80, 0x94, 0x3b, 0x16, 0x90, 0x87},
 			nil,
-			errors.New("checksum verification failed ([59 22 144 135] and [95 138 74 156])"),
+			errors.New("checkum mismatch: expected [59 22 144 135] but got [95 138 74 156]"),
 		},
 		"data not long enough": {
 			[]byte{0xe7, 0xe7, 0xe7},
 			nil,
-			errors.New("checksumed data [231 231 231] not long enough to contain the checksum"),
+			errors.New("checksum is not long enough: expected at least 4 bytes and got only 3: [231 231 231]"),
 		},
 		"empty data": {
 			[]byte{},
 			nil,
-			errors.New("checksumed data [] not long enough to contain the checksum"),
+			errors.New("checksum is not long enough: expected at least 4 bytes and got only 0: []"),
 		},
 	}
 	for name, tc := range tests {

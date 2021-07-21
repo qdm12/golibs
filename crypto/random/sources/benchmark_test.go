@@ -11,7 +11,7 @@ import (
 
 func Benchmark_MapHash(b *testing.B) {
 	source := maphash.New()
-	benchPerCoreConfigs(b, func(b *testing.B) {
+	benchPerCoreConfigs(b, func(b *testing.B) { //nolint:thelper
 		b.RunParallel(func(b *testing.PB) {
 			for b.Next() {
 				out := int(source.Int63())
@@ -26,7 +26,7 @@ func Benchmark_MapHash(b *testing.B) {
 
 func Benchmark_SyncPool(b *testing.B) {
 	source := syncpool.New()
-	benchPerCoreConfigs(b, func(b *testing.B) {
+	benchPerCoreConfigs(b, func(b *testing.B) { //nolint:thelper
 		b.RunParallel(func(b *testing.PB) {
 			for b.Next() {
 				out := int(source.Int63())

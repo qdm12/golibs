@@ -6,7 +6,7 @@ import (
 
 // Constants used for convenience so "os" does not have to be imported
 
-//nolint:golint
+//nolint:revive
 const (
 	O_CREATE = nativeos.O_CREATE
 	O_TRUNC  = nativeos.O_TRUNC

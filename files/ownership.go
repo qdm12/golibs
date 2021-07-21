@@ -1,7 +1,6 @@
 package files
 
 import (
-	"fmt"
 	"syscall"
 )
 
@@ -10,7 +9,7 @@ import (
 func (f *fileManager) GetOwnership(filePath string) (userID, groupID int, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
-		return 0, 0, fmt.Errorf("cannot get ownership: %w", err)
+		return 0, 0, err
 	}
 	stat, ok := info.Sys().(*syscall.Stat_t) // TODO change to use stat directly
 	if !ok {

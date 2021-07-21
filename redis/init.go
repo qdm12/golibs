@@ -1,7 +1,9 @@
 package redis
 
 import (
+	"errors"
 	"fmt"
+	"net"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -23,7 +25,14 @@ func NewDB(hostname, port, password string) (db *DB, err error) {
 	return db, nil
 }
 
-func newPool(hostname, port, password string) *redis.Pool {
+var (
+	ErrConnection = errors.New("cannot connect to Redis")
+	ErrAuth       = errors.New("authentication failed")
+	ErrNotPong    = errors.New("message received is not expected PONG")
+)
+
+func newPool(host, port, password string) *redis.Pool {
+	address := net.JoinHostPort(host, port)
 	pool := new(redis.Pool)
 	pool.MaxIdle = 7
 	pool.MaxActive = 29 // max number of connections
@@ -32,20 +41,21 @@ func newPool(hostname, port, password string) *redis.Pool {
 	pool.Wait = true
 	pool.MaxConnLifetime = 0 // never close connection based on age
 	pool.Dial = func() (redis.Conn, error) {
-		c, err := redis.Dial("tcp", hostname+":"+port)
+		c, err := redis.Dial("tcp", address)
 		if err != nil {
-			return nil, fmt.Errorf("connecting to Redis: %w", err)
+			return nil, fmt.Errorf("%w: at address %s: %s",
+				ErrConnection, address, err)
 		}
 		if password != "" {
 			reply, err := c.Do("AUTH", password)
 			if err != nil {
-				c.Close()
-				return nil, fmt.Errorf("connecting to Redis: %w", err)
+				_ = c.Close()
+				return nil, fmt.Errorf("%w: %s", ErrAuth, err)
 			}
 			err = CheckOKString(reply)
 			if err != nil {
-				c.Close()
-				return nil, fmt.Errorf("connecting to Redis: %w", err)
+				_ = c.Close()
+				return nil, fmt.Errorf("%w: %s", ErrAuth, err)
 			}
 		}
 		return c, nil
@@ -59,14 +69,14 @@ func (db *DB) Ping() error {
 	defer c.Close()
 	reply, err := c.Do("PING")
 	if err != nil {
-		return fmt.Errorf("ping Redis: %w", err)
+		return fmt.Errorf("%w: %s", ErrDoCommand, err)
 	}
-	s, err := CheckString(reply)
+
+	s, err := redis.String(reply, nil)
 	if err != nil {
-		return fmt.Errorf("ping Redis: %w", err)
-	}
-	if s != "PONG" {
-		return fmt.Errorf("ping Redis: %w", err)
+		return err
+	} else if s != "PONG" {
+		return fmt.Errorf("%w: %s", ErrNotPong, s)
 	}
 	return nil
 }

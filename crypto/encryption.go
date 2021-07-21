@@ -3,6 +3,7 @@ package crypto
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"errors"
 	"fmt"
 )
 
@@ -21,12 +22,15 @@ func (c *crypto) EncryptAES256(plaintext []byte, key [32]byte) (ciphertext []byt
 	return ciphertext, nil
 }
 
+var ErrCiphertextTooSmall = errors.New("ciphertext is too small")
+
 // DecryptAES256 decrypts some ciphertext with a key using AES and returns the plaintext.
 func (c *crypto) DecryptAES256(ciphertext []byte, key [32]byte) (plaintext []byte, err error) {
 	block, _ := aes.NewCipher(key[:])
 	if len(ciphertext) < aes.BlockSize {
 		return nil,
-			fmt.Errorf("DecryptAES: cipher size %d should be bigger than block size %d", len(ciphertext), aes.BlockSize)
+			fmt.Errorf("%w: is only %d bytes and must be at the %d bytes",
+				ErrCiphertextTooSmall, len(ciphertext), aes.BlockSize)
 	}
 	iv := ciphertext[:aes.BlockSize]
 	plaintext = ciphertext[aes.BlockSize:]

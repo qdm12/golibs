@@ -74,13 +74,13 @@ func Test_DecryptAES(t *testing.T) {
 			ciphertext: []byte{},
 			key:        [32]byte{12, 32, 77, 57, 96, 15, 221, 211, 241, 242, 12, 168, 0, 126, 145, 199, 208, 41, 59, 28, 195, 145, 10, 59, 248, 178, 230, 29, 160, 242, 107, 202},
 			plaintext:  nil,
-			err:        fmt.Errorf("DecryptAES: cipher size 0 should be bigger than block size 16"),
+			err:        fmt.Errorf("ciphertext is too small: is only 0 bytes and must be at the 16 bytes"),
 		},
 		"data too short": {
 			ciphertext: []byte{45, 156, 61},
 			key:        [32]byte{12, 32, 77, 57, 96, 15, 221, 211, 241, 242, 12, 168, 0, 126, 145, 199, 208, 41, 59, 28, 195, 145, 10, 59, 248, 178, 230, 29, 160, 242, 107, 202},
 			plaintext:  nil,
-			err:        fmt.Errorf("DecryptAES: cipher size 3 should be bigger than block size 16"),
+			err:        fmt.Errorf("ciphertext is too small: is only 3 bytes and must be at the 16 bytes"),
 		},
 	}
 	for name, tc := range tests {

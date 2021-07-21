@@ -23,29 +23,32 @@ linters:
     - gocritic
     - gocyclo
     - godot
+    - goerr113
     - goheader
     - goimports
-    - golint
     - gomnd
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    - importas
     - ineffassign
-    - interfacer
     - lll
-    - maligned
     - misspell
     - nakedret
     - nestif
+    - nilerr
     - noctx
     - nolintlint
     - prealloc
+    - predeclared
+    - revive
     - rowserrcheck
-    - scopelint
     - sqlclosecheck
     - staticcheck
     - structcheck
+    - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
@@ -55,6 +58,11 @@ linters:
 
 issues:
   exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+        - maligned
+        - goerr113
     - path: os/alias\.go
       linters:
         - gochecknoglobals
