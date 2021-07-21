@@ -28,7 +28,6 @@ jobs:
           test-container \
           go test \
           -race \
-          -coverpkg=./... \
           -coverprofile=coverage.txt \
           -covermode=atomic \
           ./...
