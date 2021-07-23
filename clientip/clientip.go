@@ -6,57 +6,23 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Extractor
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . HTTPRequestParser
 
-type Extractor interface {
-	HTTPRequest(r *http.Request) net.IP
+type HTTPRequestParser interface {
+	ParseHTTPRequest(r *http.Request) net.IP
 }
 
-type extractor struct {
+type Parser struct {
 	privateIPNets [8]net.IPNet
 }
 
-//nolint:gomnd
-func NewExtractor() Extractor {
-	return &extractor{
-		privateIPNets: [8]net.IPNet{
-			{ // localhost
-				IP:   net.IP{127, 0, 0, 0},
-				Mask: net.IPv4Mask(255, 0, 0, 0),
-			},
-			{ // 24-bit block
-				IP:   net.IP{10, 0, 0, 0},
-				Mask: net.IPv4Mask(255, 0, 0, 0),
-			},
-			{ // 20-bit block
-				IP:   net.IP{172, 16, 0, 0},
-				Mask: net.IPv4Mask(255, 240, 0, 0),
-			},
-			{ // 16-bit block
-				IP:   net.IP{192, 168, 0, 0},
-				Mask: net.IPv4Mask(255, 255, 0, 0),
-			},
-			{ // link local address
-				IP:   net.IP{169, 254, 0, 0},
-				Mask: net.IPv4Mask(255, 255, 0, 0),
-			},
-			{ // localhost IPv6
-				IP:   net.IP{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-				Mask: net.IPMask{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
-			},
-			{ // unique local address IPv6
-				IP:   net.IP{0xfc, 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Mask: net.IPMask{254, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			},
-			{ // link local address IPv6
-				IP:   net.IP{0xfe, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				Mask: net.IPMask{255, 192, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			},
-		},
+func NewParser() *Parser {
+	return &Parser{
+		privateIPNets: privateIPNets(),
 	}
 }
 
-func (e *extractor) HTTPRequest(r *http.Request) net.IP {
+func (p *Parser) ParseHTTPRequest(r *http.Request) net.IP {
 	if r == nil {
 		return nil
 	}
@@ -76,7 +42,7 @@ func (e *extractor) HTTPRequest(r *http.Request) net.IP {
 	// remoteAddress is the last proxy server forwarding the traffic
 	// so we look into the HTTP headers to get the client IP
 	xForwardedIPs := parseIPs(xForwardedFor)
-	publicXForwardedIPs := e.extractPublicIPs(xForwardedIPs)
+	publicXForwardedIPs := p.extractPublicIPs(xForwardedIPs)
 	if len(publicXForwardedIPs) > 0 {
 		// first public XForwardedIP should be the client IP
 		return publicXForwardedIPs[0]

@@ -6,17 +6,19 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_NewParser(t *testing.T) {
 	t.Parallel()
-	e := NewExtractor()
-	_, ok := e.(*extractor)
-	require.True(t, ok)
+	expectedParser := &Parser{
+		privateIPNets: privateIPNets(),
+	}
+
+	parser := NewParser()
+	assert.Equal(t, expectedParser, parser)
 }
 
-func Test_ParseHTTPRequest(t *testing.T) {
+func Test_Parser_ParseHTTPRequest(t *testing.T) {
 	t.Parallel()
 
 	makeHeader := func(keyValues map[string][]string) http.Header {
@@ -122,8 +124,8 @@ func Test_ParseHTTPRequest(t *testing.T) {
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			extractor := NewExtractor()
-			ip := extractor.HTTPRequest(testCase.r)
+			parser := NewParser()
+			ip := parser.ParseHTTPRequest(testCase.r)
 			assert.Equal(t, testCase.ip, ip)
 		})
 	}
