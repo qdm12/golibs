@@ -63,14 +63,14 @@ func (l *stdLogger) NewChild(settings Settings) ParentLogger {
 	}
 }
 
-func (l *stdLogger) log(logLevel Level, args ...interface{}) {
+func (l *stdLogger) log(logLevel Level, s string) {
 	if l.settings.Level > logLevel {
 		return
 	}
 
 	// Line is computed here to avoid blocking child loggers with its
 	// computing and the eventual preprocess function.
-	line := logLevel.String() + " " + formatWithSettings(l.settings, args...)
+	line := logLevel.String() + " " + formatWithSettings(l.settings, s)
 
 	if l.isConcurrent {
 		l.writerMutex.Lock()
@@ -81,7 +81,7 @@ func (l *stdLogger) log(logLevel Level, args ...interface{}) {
 	_ = l.logImpl.Output(callDepth, line)
 }
 
-func (l *stdLogger) Debug(args ...interface{}) { l.log(LevelDebug, args...) }
-func (l *stdLogger) Info(args ...interface{})  { l.log(LevelInfo, args...) }
-func (l *stdLogger) Warn(args ...interface{})  { l.log(LevelWarn, args...) }
-func (l *stdLogger) Error(args ...interface{}) { l.log(LevelError, args...) }
+func (l *stdLogger) Debug(s string) { l.log(LevelDebug, s) }
+func (l *stdLogger) Info(s string)  { l.log(LevelInfo, s) }
+func (l *stdLogger) Warn(s string)  { l.log(LevelWarn, s) }
+func (l *stdLogger) Error(s string) { l.log(LevelError, s) }

@@ -3,14 +3,14 @@ package logging
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Logger,ParentLogger
 
 type Logger interface {
-	// Debug formats and logs with the Debug level.
-	Debug(args ...interface{})
-	// Info formats and logs with the Info level.
-	Info(args ...interface{})
-	// Warnf formats and logs with the Warning level.
-	Warn(args ...interface{})
-	// Error formats and logs with the Error level.
-	Error(args ...interface{})
+	// Debug logs with the Debug level.
+	Debug(s string)
+	// Info logs with the Info level.
+	Info(s string)
+	// Warnf logs with the Warning level.
+	Warn(s string)
+	// Error logs with the Error level.
+	Error(s string)
 }
 
 type ParentLogger interface {

@@ -1,12 +1,6 @@
 package logging
 
-import (
-	"github.com/qdm12/golibs/format"
-)
-
-func formatWithSettings(settings Settings, args ...interface{}) (s string) {
-	s = format.ArgsToString(args...)
-
+func formatWithSettings(settings Settings, s string) (formatted string) {
 	if settings.Color != nil {
 		s = settings.Color().Sprintf(s)
 	}

@@ -27,7 +27,7 @@ func Test_stdLog_Debug(t *testing.T) {
 		Prefix:     "server: ",
 	})
 
-	logger.Debug("isn't this %q...", "function")
+	logger.Debug("isn't this \"function\"...")
 	logger.Debug("...fun?")
 
 	result := buffer.String()
