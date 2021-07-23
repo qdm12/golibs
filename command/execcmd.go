@@ -2,10 +2,10 @@ package command
 
 import "io"
 
-//go:generate mockgen -destination=cmd_mock_test.go -package=command . Cmd
+//go:generate mockgen -destination=execcmd_mock_test.go -package=command . ExecCmd
 
-// Cmd is the interface for exec.Cmd.
-type Cmd interface {
+// ExecCmd is the interface for exec.Cmd.
+type ExecCmd interface {
 	CombinedOutput() ([]byte, error)
 	StdoutPipe() (io.ReadCloser, error)
 	StderrPipe() (io.ReadCloser, error)

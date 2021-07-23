@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_commander_Run(t *testing.T) {
+func Test_Cmder_Run(t *testing.T) {
 	t.Parallel()
 
 	errDummy := errors.New("dummy")
@@ -36,12 +36,12 @@ func Test_commander_Run(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 
-			commander := &commander{}
-			mockCmd := NewMockCmd(ctrl)
+			cmder := &Cmder{}
+			mockCmd := NewMockExecCmd(ctrl)
 
 			mockCmd.EXPECT().CombinedOutput().Return(testCase.stdout, testCase.cmdErr)
 
-			output, err := commander.Run(mockCmd)
+			output, err := cmder.Run(mockCmd)
 
 			if testCase.err != nil {
 				require.Error(t, err)

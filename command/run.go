@@ -4,9 +4,15 @@ import (
 	"strings"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Runner
+
+type Runner interface {
+	Run(cmd ExecCmd) (output string, err error)
+}
+
 // Run runs a command in a blocking manner, returning its output and
 // an error if it failed.
-func (c *commander) Run(cmd Cmd) (output string, err error) {
+func (c *Cmder) Run(cmd ExecCmd) (output string, err error) {
 	stdout, err := cmd.CombinedOutput()
 	output = string(stdout)
 	output = strings.TrimSuffix(output, "\n")

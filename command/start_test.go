@@ -64,8 +64,8 @@ func Test_commander_Start(t *testing.T) {
 			stdout := linesToReadCloser(testCase.stdout)
 			stderr := linesToReadCloser(testCase.stderr)
 
-			commander := &commander{}
-			mockCmd := NewMockCmd(ctrl)
+			cmder := &Cmder{}
+			mockCmd := NewMockExecCmd(ctrl)
 
 			mockCmd.EXPECT().StdoutPipe().
 				Return(stdout, testCase.stdoutPipeErr)
@@ -79,7 +79,7 @@ func Test_commander_Start(t *testing.T) {
 				}
 			}
 
-			stdoutLines, stderrLines, waitError, err := commander.Start(mockCmd)
+			stdoutLines, stderrLines, waitError, err := cmder.Start(mockCmd)
 
 			if testCase.err != nil {
 				require.Error(t, err)

@@ -8,12 +8,19 @@ import (
 	"sync"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Starter
+
+type Starter interface {
+	Start(cmd ExecCmd) (stdoutLines, stderrLines chan string,
+		waitError chan error, err error)
+}
+
 // Start launches a command and streams stdout and stderr to channels.
 // All the channels returned should be closed when an error,
 // nil or not, is received in the waitError channel.
 // The channels should NOT be closed if an error is returned directly
 // with err, as they will already be closed internally by the function.
-func (c *commander) Start(cmd Cmd) (
+func (c *Cmder) Start(cmd ExecCmd) (
 	stdoutLines, stderrLines chan string, waitError chan error, err error) {
 	wg := &sync.WaitGroup{}
 
