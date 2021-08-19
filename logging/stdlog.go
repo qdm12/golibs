@@ -44,12 +44,14 @@ func NewParent(settings Settings) ParentLogger {
 }
 
 func (l *stdLogger) NewChild(settings Settings) ParentLogger {
-	settings.setDefaults()
+	newSettings := l.settings
+	newSettings.setEmptyValuesWith(settings)
+	newSettings.setDefaults()
 
 	l.isConcurrent = true
 
 	flags := log.Ldate | log.Ltime
-	if settings.Caller == CallerShort {
+	if newSettings.Caller == CallerShort {
 		flags |= log.Lshortfile
 	}
 
@@ -57,7 +59,7 @@ func (l *stdLogger) NewChild(settings Settings) ParentLogger {
 
 	return &stdLogger{
 		logImpl:      logImpl,
-		settings:     settings,
+		settings:     newSettings,
 		isConcurrent: true,
 		writerMutex:  l.writerMutex,
 	}

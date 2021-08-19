@@ -27,3 +27,23 @@ func (s *Settings) setDefaults() {
 		s.Writer = os.Stdout
 	}
 }
+
+// setEmptyValuesWith set each field value with the corresponding value
+// in the other Settings if the field is set to its zero value.
+func (s *Settings) setEmptyValuesWith(other Settings) {
+	if s.Level == 0 {
+		s.Level = other.Level
+	}
+	if s.Caller == 0 {
+		s.Caller = other.Caller
+	}
+	if s.Prefix == "" {
+		s.Prefix = other.Prefix
+	}
+	if s.Writer == nil {
+		s.Writer = other.Writer
+	}
+	if s.PreProcess == nil {
+		s.PreProcess = other.PreProcess
+	}
+}
