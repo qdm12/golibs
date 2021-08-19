@@ -6,14 +6,9 @@ import (
 )
 
 type stdLogger struct {
-	logImpl  *log.Logger
-	settings Settings
-	// isConcurrent and writerMutex are only used
-	// when more loggers are created using the
-	// NewChild method to avoid writing to the
-	// same writer at the same time.
-	isConcurrent bool
-	writerMutex  *sync.Mutex
+	logImpl     *log.Logger
+	settings    Settings
+	writerMutex *sync.Mutex
 }
 
 // New creates a new logger using the standard library logger.
@@ -48,8 +43,6 @@ func (l *stdLogger) NewChild(settings Settings) ParentLogger {
 	newSettings.setEmptyValuesWith(settings)
 	newSettings.setDefaults()
 
-	l.isConcurrent = true
-
 	flags := log.Ldate | log.Ltime
 	if newSettings.Caller == CallerShort {
 		flags |= log.Lshortfile
@@ -58,10 +51,9 @@ func (l *stdLogger) NewChild(settings Settings) ParentLogger {
 	logImpl := log.New(l.logImpl.Writer(), "", flags)
 
 	return &stdLogger{
-		logImpl:      logImpl,
-		settings:     newSettings,
-		isConcurrent: true,
-		writerMutex:  l.writerMutex,
+		logImpl:     logImpl,
+		settings:    newSettings,
+		writerMutex: l.writerMutex,
 	}
 }
 
@@ -74,10 +66,8 @@ func (l *stdLogger) log(logLevel Level, s string) {
 	// computing and the eventual preprocess function.
 	line := logLevel.String() + " " + formatWithSettings(l.settings, s)
 
-	if l.isConcurrent {
-		l.writerMutex.Lock()
-		defer l.writerMutex.Unlock()
-	}
+	l.writerMutex.Lock()
+	defer l.writerMutex.Unlock()
 
 	const callDepth = 3
 	_ = l.logImpl.Output(callDepth, line)
