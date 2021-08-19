@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_stdLog_Debug(t *testing.T) {
+func Test_StdLog_Debug(t *testing.T) {
 	t.Parallel()
 
 	buffer := bytes.NewBuffer(nil)

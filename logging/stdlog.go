@@ -5,7 +5,10 @@ import (
 	"sync"
 )
 
-type stdLogger struct {
+var _ ParentLogger = (*StdLogger)(nil)
+var _ Logger = (*StdLogger)(nil)
+
+type StdLogger struct {
 	logImpl     *log.Logger
 	settings    Settings
 	writerMutex *sync.Mutex
@@ -13,16 +16,10 @@ type stdLogger struct {
 
 // New creates a new logger using the standard library logger.
 // It should only be called once at most per writer (settings.Writer).
-func New(settings Settings) Logger {
-	return NewParent(settings)
-}
-
-// NewParent creates a new logger using the standard library logger.
-// It should only be called once at most per writer (settings.Writer).
 // If you want to create more loggers with different settings for the
 // same writer, child loggers can be created using the NewChild method,
 // to ensure thread safety on the same writer.
-func NewParent(settings Settings) ParentLogger {
+func New(settings Settings) *StdLogger {
 	flags := log.Ldate | log.Ltime
 	if settings.Caller == CallerShort {
 		flags |= log.Lshortfile
@@ -31,14 +28,14 @@ func NewParent(settings Settings) ParentLogger {
 
 	logImpl := log.New(settings.Writer, "", flags)
 
-	return &stdLogger{
+	return &StdLogger{
 		logImpl:     logImpl,
 		settings:    settings,
 		writerMutex: &sync.Mutex{},
 	}
 }
 
-func (l *stdLogger) NewChild(settings Settings) ParentLogger {
+func (l *StdLogger) NewChild(settings Settings) ParentLogger {
 	newSettings := l.settings
 	newSettings.setEmptyValuesWith(settings)
 	newSettings.setDefaults()
@@ -50,14 +47,14 @@ func (l *stdLogger) NewChild(settings Settings) ParentLogger {
 
 	logImpl := log.New(l.logImpl.Writer(), "", flags)
 
-	return &stdLogger{
+	return &StdLogger{
 		logImpl:     logImpl,
 		settings:    newSettings,
 		writerMutex: l.writerMutex,
 	}
 }
 
-func (l *stdLogger) log(logLevel Level, s string) {
+func (l *StdLogger) log(logLevel Level, s string) {
 	if l.settings.Level > logLevel {
 		return
 	}
@@ -73,7 +70,7 @@ func (l *stdLogger) log(logLevel Level, s string) {
 	_ = l.logImpl.Output(callDepth, line)
 }
 
-func (l *stdLogger) Debug(s string) { l.log(LevelDebug, s) }
-func (l *stdLogger) Info(s string)  { l.log(LevelInfo, s) }
-func (l *stdLogger) Warn(s string)  { l.log(LevelWarn, s) }
-func (l *stdLogger) Error(s string) { l.log(LevelError, s) }
+func (l *StdLogger) Debug(s string) { l.log(LevelDebug, s) }
+func (l *StdLogger) Info(s string)  { l.log(LevelInfo, s) }
+func (l *StdLogger) Warn(s string)  { l.log(LevelWarn, s) }
+func (l *StdLogger) Error(s string) { l.log(LevelError, s) }
