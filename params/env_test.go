@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_NewEnv(t *testing.T) {
+func Test_New(t *testing.T) {
 	t.Parallel()
-	e := NewEnv()
-	assert.NotNil(t, e)
+	env := New()
+	assert.NotNil(t, env)
 }

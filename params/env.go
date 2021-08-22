@@ -12,8 +12,9 @@ type Env struct {
 	fpAbs  func(s string) (string, error)
 }
 
-// NewEnv returns a new Env object.
-func NewEnv() *Env {
+// New returns a new Env object which will read
+// environment variables using os.GetEnv.
+func New() *Env {
 	return &Env{
 		getuid: os.Getuid,
 		getenv: os.Getenv,
