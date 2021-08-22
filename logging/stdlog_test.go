@@ -52,3 +52,41 @@ func Test_StdLog_Debug(t *testing.T) {
 		assert.Equal(t, expectedLinesWithoutPrefix[i], line)
 	}
 }
+
+func Test_StdLogger_PatchLevel(t *testing.T) {
+	t.Parallel()
+
+	buffer := bytes.NewBuffer(nil)
+
+	logger := New(Settings{
+		Level:  LevelError,
+		Writer: buffer,
+	})
+
+	logger.PatchLevel(LevelInfo)
+
+	expectedSettings := Settings{
+		Level:  LevelInfo,
+		Writer: buffer,
+	}
+	assert.Equal(t, expectedSettings, logger.settings)
+}
+
+func Test_StdLogger_PatchPrefix(t *testing.T) {
+	t.Parallel()
+
+	buffer := bytes.NewBuffer(nil)
+
+	logger := New(Settings{
+		Prefix: "prefix",
+		Writer: buffer,
+	})
+
+	logger.PatchPrefix("new prefix")
+
+	expectedSettings := Settings{
+		Prefix: "new prefix",
+		Writer: buffer,
+	}
+	assert.Equal(t, expectedSettings, logger.settings)
+}

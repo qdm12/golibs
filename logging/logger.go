@@ -11,6 +11,10 @@ type Logger interface {
 	Warn(s string)
 	// Error logs with the Error level.
 	Error(s string)
+	// PatchLevel changes the level of the logger.
+	PatchLevel(level Level)
+	// PatchPrefix changes the prefix of the logger.
+	PatchPrefix(prefix string)
 }
 
 type ParentLogger interface {

@@ -70,6 +70,30 @@ func (mr *MockLoggerMockRecorder) Info(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Info", reflect.TypeOf((*MockLogger)(nil).Info), arg0)
 }
 
+// PatchLevel mocks base method.
+func (m *MockLogger) PatchLevel(arg0 logging.Level) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "PatchLevel", arg0)
+}
+
+// PatchLevel indicates an expected call of PatchLevel.
+func (mr *MockLoggerMockRecorder) PatchLevel(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchLevel", reflect.TypeOf((*MockLogger)(nil).PatchLevel), arg0)
+}
+
+// PatchPrefix mocks base method.
+func (m *MockLogger) PatchPrefix(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "PatchPrefix", arg0)
+}
+
+// PatchPrefix indicates an expected call of PatchPrefix.
+func (mr *MockLoggerMockRecorder) PatchPrefix(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPrefix", reflect.TypeOf((*MockLogger)(nil).PatchPrefix), arg0)
+}
+
 // Warn mocks base method.
 func (m *MockLogger) Warn(arg0 string) {
 	m.ctrl.T.Helper()
@@ -153,6 +177,30 @@ func (m *MockParentLogger) NewChild(arg0 logging.Settings) logging.ParentLogger 
 func (mr *MockParentLoggerMockRecorder) NewChild(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewChild", reflect.TypeOf((*MockParentLogger)(nil).NewChild), arg0)
+}
+
+// PatchLevel mocks base method.
+func (m *MockParentLogger) PatchLevel(arg0 logging.Level) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "PatchLevel", arg0)
+}
+
+// PatchLevel indicates an expected call of PatchLevel.
+func (mr *MockParentLoggerMockRecorder) PatchLevel(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchLevel", reflect.TypeOf((*MockParentLogger)(nil).PatchLevel), arg0)
+}
+
+// PatchPrefix mocks base method.
+func (m *MockParentLogger) PatchPrefix(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "PatchPrefix", arg0)
+}
+
+// PatchPrefix indicates an expected call of PatchPrefix.
+func (mr *MockParentLoggerMockRecorder) PatchPrefix(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PatchPrefix", reflect.TypeOf((*MockParentLogger)(nil).PatchPrefix), arg0)
 }
 
 // Warn mocks base method.

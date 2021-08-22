@@ -9,9 +9,9 @@ var _ ParentLogger = (*StdLogger)(nil)
 var _ Logger = (*StdLogger)(nil)
 
 type StdLogger struct {
-	logImpl     *log.Logger
-	settings    Settings
-	writerMutex *sync.Mutex
+	logImpl  *log.Logger
+	settings Settings
+	mutex    *sync.Mutex
 }
 
 // New creates a new logger using the standard library logger.
@@ -29,9 +29,9 @@ func New(settings Settings) *StdLogger {
 	logImpl := log.New(settings.Writer, "", flags)
 
 	return &StdLogger{
-		logImpl:     logImpl,
-		settings:    settings,
-		writerMutex: &sync.Mutex{},
+		logImpl:  logImpl,
+		settings: settings,
+		mutex:    &sync.Mutex{},
 	}
 }
 
@@ -47,13 +47,16 @@ func (l *StdLogger) NewChild(settings Settings) ParentLogger {
 	logImpl := log.New(l.logImpl.Writer(), "", flags)
 
 	return &StdLogger{
-		logImpl:     logImpl,
-		settings:    settings,
-		writerMutex: l.writerMutex,
+		logImpl:  logImpl,
+		settings: settings,
+		mutex:    l.mutex,
 	}
 }
 
 func (l *StdLogger) log(logLevel Level, s string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
 	if l.settings.Level > logLevel {
 		return
 	}
@@ -61,9 +64,6 @@ func (l *StdLogger) log(logLevel Level, s string) {
 	// Line is computed here to avoid blocking child loggers with its
 	// computing and the eventual preprocess function.
 	line := logLevel.String() + " " + formatWithSettings(l.settings, s)
-
-	l.writerMutex.Lock()
-	defer l.writerMutex.Unlock()
 
 	const callDepth = 3
 	_ = l.logImpl.Output(callDepth, line)
@@ -73,3 +73,21 @@ func (l *StdLogger) Debug(s string) { l.log(LevelDebug, s) }
 func (l *StdLogger) Info(s string)  { l.log(LevelInfo, s) }
 func (l *StdLogger) Warn(s string)  { l.log(LevelWarn, s) }
 func (l *StdLogger) Error(s string) { l.log(LevelError, s) }
+
+// PatchLevel changes the level of the logger.
+// Note it does not change the level of child loggers.
+func (l *StdLogger) PatchLevel(level Level) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	l.settings.Level = level
+}
+
+// PatchPrefix changes the prefix of the logger.
+// Note it does not change the prefix of child loggers.
+func (l *StdLogger) PatchPrefix(prefix string) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+
+	l.settings.Prefix = prefix
+}
