@@ -36,12 +36,11 @@ func New(settings Settings) *StdLogger {
 }
 
 func (l *StdLogger) NewChild(settings Settings) ParentLogger {
-	newSettings := l.settings
-	newSettings.setEmptyValuesWith(settings)
-	newSettings.setDefaults()
+	settings.setEmptyValuesWith(l.settings)
+	settings.setDefaults()
 
 	flags := log.Ldate | log.Ltime
-	if newSettings.Caller == CallerShort {
+	if settings.Caller == CallerShort {
 		flags |= log.Lshortfile
 	}
 
@@ -49,7 +48,7 @@ func (l *StdLogger) NewChild(settings Settings) ParentLogger {
 
 	return &StdLogger{
 		logImpl:     logImpl,
-		settings:    newSettings,
+		settings:    settings,
 		writerMutex: l.writerMutex,
 	}
 }
