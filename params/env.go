@@ -16,30 +16,7 @@ import (
 	"github.com/qdm12/golibs/verification"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Env
-
-// Env has functions to obtain values from environment variables.
-type Env interface {
-	Get(key string, optionSetters ...OptionSetter) (value string, err error)
-	Int(key string, optionSetters ...OptionSetter) (n int, err error)
-	IntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error)
-	YesNo(key string, optionSetters ...OptionSetter) (yes bool, err error)
-	OnOff(key string, optionSetters ...OptionSetter) (on bool, err error)
-	Inside(key string, possibilities []string, optionSetters ...OptionSetter) (value string, err error)
-	CSV(key string, optionSetters ...OptionSetter) (values []string, err error)
-	CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (values []string, err error)
-	Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error)
-	Port(key string, optionSetters ...OptionSetter) (port uint16, err error)
-	ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error)
-	ListeningAddress(key string, optionSetters ...OptionSetter) (address, warning string, err error)
-	RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error)
-	Path(key string, optionSetters ...OptionSetter) (path string, err error)
-	LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error)
-	LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error)
-	URL(key string, optionSetters ...OptionSetter) (URL *liburl.URL, err error)
-}
-
-type envParams struct {
+type Env struct {
 	getuid func() int
 	getenv func(key string) string
 	regex  verification.Regex
@@ -48,8 +25,8 @@ type envParams struct {
 }
 
 // NewEnv returns a new Env object.
-func NewEnv() Env {
-	return &envParams{
+func NewEnv() *Env {
+	return &Env{
 		getuid: os.Getuid,
 		getenv: os.Getenv,
 		regex:  verification.NewRegex(),
@@ -131,7 +108,7 @@ var (
 
 // Get returns the value stored for a named environment variable,
 // and a default if no value is found.
-func (e *envParams) Get(key string, optionSetters ...OptionSetter) (value string, err error) {
+func (e *Env) Get(key string, optionSetters ...OptionSetter) (value string, err error) {
 	options := envOptions{}
 	defer func() {
 		if options.unset {
@@ -175,7 +152,7 @@ var (
 // Int returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer, an error is returned.
-func (e *envParams) Int(key string, optionSetters ...OptionSetter) (n int, err error) {
+func (e *Env) Int(key string, optionSetters ...OptionSetter) (n int, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return n, err
@@ -194,7 +171,7 @@ var (
 // IntRange returns the value stored for a named environment variable,
 // and a default if no value is found. If the value is not a valid
 // integer in the range specified, an error is returned.
-func (e *envParams) IntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error) {
+func (e *Env) IntRange(key string, lower, upper int, optionSetters ...OptionSetter) (n int, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return n, err
@@ -216,7 +193,7 @@ var ErrNotYesNo = errors.New("value can only be 'yes' or 'no'")
 // if the value is 'no', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParams) YesNo(key string, optionSetters ...OptionSetter) (yes bool, err error) {
+func (e *Env) YesNo(key string, optionSetters ...OptionSetter) (yes bool, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return false, err
@@ -238,7 +215,7 @@ var ErrNotOnOff = errors.New("value can only be 'on' or 'off'")
 // if the value is 'off', it returns false
 // if it is unset, it returns the default value
 // otherwise, an error is returned.
-func (e *envParams) OnOff(key string, optionSetters ...OptionSetter) (on bool, err error) {
+func (e *Env) OnOff(key string, optionSetters ...OptionSetter) (on bool, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return false, err
@@ -257,7 +234,7 @@ var ErrNotOneOf = errors.New("value is not within the accepted values")
 
 // Inside obtains the value stored for a named environment variable if it is part of a
 // list of possible values. You can optionally specify a defaultValue.
-func (e *envParams) Inside(key string, possibilities []string, optionSetters ...OptionSetter) (
+func (e *Env) Inside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	value string, err error) {
 	options := envOptions{}
 	for _, setter := range optionSetters {
@@ -280,7 +257,7 @@ func (e *envParams) Inside(key string, possibilities []string, optionSetters ...
 	return "", fmt.Errorf("%w: %s: it can only be one of: %s", ErrNotOneOf, s, csvPossibilities)
 }
 
-func (e *envParams) CSV(key string, optionSetters ...OptionSetter) (values []string, err error) {
+func (e *Env) CSV(key string, optionSetters ...OptionSetter) (values []string, err error) {
 	options := envOptions{}
 	for _, setter := range optionSetters {
 		_ = setter(&options) // error is checked in e.Get
@@ -297,7 +274,7 @@ func (e *envParams) CSV(key string, optionSetters ...OptionSetter) (values []str
 
 var ErrInvalidValueFound = errors.New("at least one value is not within the accepted values")
 
-func (e *envParams) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
+func (e *Env) CSVInside(key string, possibilities []string, optionSetters ...OptionSetter) (
 	values []string, err error) {
 	values, err = e.CSV(key, optionSetters...)
 	if err != nil {
@@ -354,7 +331,7 @@ var (
 )
 
 // Duration gets the duration from the environment variable corresponding to the key provided.
-func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error) {
+func (e *Env) Duration(key string, optionSetters ...OptionSetter) (duration time.Duration, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return 0, err
@@ -374,7 +351,7 @@ func (e *envParams) Duration(key string, optionSetters ...OptionSetter) (duratio
 
 // Port obtains and checks a port number from the
 // environment variable corresponding to the key provided.
-func (e *envParams) Port(key string, optionSetters ...OptionSetter) (port uint16, err error) {
+func (e *Env) Port(key string, optionSetters ...OptionSetter) (port uint16, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return 0, err
@@ -384,7 +361,7 @@ func (e *envParams) Port(key string, optionSetters ...OptionSetter) (port uint16
 
 var ErrInvalidPort = errors.New("invalid port")
 
-func (e *envParams) ListeningAddress(key string, optionSetters ...OptionSetter) (
+func (e *Env) ListeningAddress(key string, optionSetters ...OptionSetter) (
 	address, warning string, err error) {
 	hostport, err := e.Get(key, optionSetters...)
 	if err != nil {
@@ -408,7 +385,7 @@ func (e *envParams) ListeningAddress(key string, optionSetters ...OptionSetter) 
 
 // ListeningPort obtains and checks a port from an environment variable
 // and returns a warning depending on the port and user ID running the program.
-func (e *envParams) ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error) {
+func (e *Env) ListeningPort(key string, optionSetters ...OptionSetter) (port uint16, warning string, err error) {
 	port, err = e.Port(key, optionSetters...)
 	if err != nil {
 		return 0, "", err
@@ -420,7 +397,7 @@ func (e *envParams) ListeningPort(key string, optionSetters ...OptionSetter) (po
 var ErrReservedListeningPort = errors.New(
 	"listening port cannot be in the reserved system ports range (1 to 1023) when running without root")
 
-func (e *envParams) checkListeningPort(port uint16) (warning string, err error) {
+func (e *Env) checkListeningPort(port uint16) (warning string, err error) {
 	const (
 		maxPrivilegedPort = 1023
 		minDynamicPort    = 49151
@@ -450,7 +427,7 @@ func (e *envParams) checkListeningPort(port uint16) (warning string, err error) 
 var ErrRootURLNotValid = errors.New("root URL is not valid")
 
 // RootURL obtains and checks the root URL from the environment variable specified by key.
-func (e *envParams) RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error) {
+func (e *Env) RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error) {
 	optionSetters = append([]OptionSetter{Default("/")}, optionSetters...)
 	rootURL, err = e.Get(key, optionSetters...)
 	if err != nil {
@@ -469,7 +446,7 @@ var ErrInvalidPath = errors.New("invalid filepath")
 // Path obtains a path from the environment variable corresponding
 // to key, and verifies it is valid. If it is a relative path,
 // it is converted to an absolute path.
-func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string, err error) {
+func (e *Env) Path(key string, optionSetters ...OptionSetter) (path string, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return "", err
@@ -483,7 +460,7 @@ func (e *envParams) Path(key string, optionSetters ...OptionSetter) (path string
 
 var ErrUnknownLogCaller = errors.New("unknown log caller")
 
-func (e *envParams) LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error) {
+func (e *Env) LogCaller(key string, optionSetters ...OptionSetter) (caller logging.Caller, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return caller, err
@@ -500,7 +477,7 @@ func (e *envParams) LogCaller(key string, optionSetters ...OptionSetter) (caller
 var ErrUnknownLogLevel = errors.New("unknown log level")
 
 // LogLevel obtains the log level from an environment variable.
-func (e *envParams) LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error) {
+func (e *Env) LogLevel(key string, optionSetters ...OptionSetter) (level logging.Level, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return level, err
@@ -528,7 +505,7 @@ var (
 // URL obtains the HTTP URL for the environment variable for the key given.
 // It returns the URL of defaultValue if defaultValue is not empty.
 // If no defaultValue is given, it returns nil.
-func (e *envParams) URL(key string, optionSetters ...OptionSetter) (url *liburl.URL, err error) {
+func (e *Env) URL(key string, optionSetters ...OptionSetter) (url *liburl.URL, err error) {
 	s, err := e.Get(key, optionSetters...)
 	if err != nil {
 		return nil, err

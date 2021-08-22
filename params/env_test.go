@@ -119,7 +119,7 @@ func Test_Get(t *testing.T) {
 				return nil
 			}
 
-			e := &envParams{
+			e := &Env{
 				getenv: getenv,
 				unset:  unset,
 			}
@@ -165,7 +165,7 @@ func Test_GetInt(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -237,7 +237,7 @@ func Test_GetIntRange(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -288,7 +288,7 @@ func Test_YesNo(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -339,7 +339,7 @@ func Test_OnOff(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -421,7 +421,7 @@ func Test_Inside(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -489,7 +489,7 @@ func Test_CSVInside(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -543,7 +543,7 @@ func Test_Duration(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -597,7 +597,7 @@ func Test_ListeningAddress(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -657,7 +657,7 @@ func Test_ListeningPort(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			const expectedUID = 1000
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -713,7 +713,7 @@ func Test_checkListeningPort(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			e := &envParams{
+			e := &Env{
 				getuid: func() int {
 					return tc.uid
 				},
@@ -764,7 +764,7 @@ func Test_RootURL(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -819,7 +819,7 @@ func Test_Path(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -868,7 +868,7 @@ func Test_LogCaller(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -924,7 +924,7 @@ func Test_LogLevel(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
@@ -971,7 +971,7 @@ func Test_URL(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			e := &envParams{
+			e := &Env{
 				getenv: func(key string) string {
 					return tc.envValue
 				},
