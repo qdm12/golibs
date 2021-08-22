@@ -22,3 +22,15 @@ func New() *Env {
 		fpAbs:  filepath.Abs,
 	}
 }
+
+// NewFromEnviron returns a new Env object using the env provided
+// which has each element in the form "key=value". Note that env
+// can be obtained from os.Environ().
+func NewFromEnviron(environ []string) *Env {
+	return &Env{
+		kv:     parseEnviron(environ),
+		getuid: os.Getuid,
+		unset:  os.Unsetenv,
+		fpAbs:  filepath.Abs,
+	}
+}
