@@ -47,9 +47,7 @@ func Test_Path(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv:    map[string]string{"key": tc.envValue},
 				fpAbs: tc.fpAbs,
 			}
 			path, err := e.Path("key", tc.optionSetters...)

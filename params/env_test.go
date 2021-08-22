@@ -10,4 +10,5 @@ func Test_New(t *testing.T) {
 	t.Parallel()
 	env := New()
 	assert.NotNil(t, env)
+	assert.NotNil(t, env.kv)
 }

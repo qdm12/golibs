@@ -46,9 +46,7 @@ func Test_ListeningAddress(t *testing.T) {
 			t.Parallel()
 
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{key: tc.envValue},
 				getuid: func() int {
 					const uid = 1000
 					return uid

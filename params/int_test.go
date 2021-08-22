@@ -39,11 +39,9 @@ func Test_GetInt(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"key": tc.envValue},
 			}
-			n, err := e.Int("any", tc.optionSetters...)
+			n, err := e.Int("key", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
@@ -111,11 +109,9 @@ func Test_GetIntRange(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"key": tc.envValue},
 			}
-			n, err := e.IntRange("any", tc.lower, tc.upper, tc.optionSetters...)
+			n, err := e.IntRange("key", tc.lower, tc.upper, tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

@@ -3,6 +3,7 @@ package params
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -28,10 +29,15 @@ func (e *Env) Get(key string, optionSetters ...OptionSetter) (value string, err 
 			return "", fmt.Errorf("%w: %s", ErrOption, err)
 		}
 	}
-	value = e.getenv(key)
+
+	value, ok := e.kv[key]
+	if !ok {
+		value = e.getEnv(key) // read from OS environment
+	}
+
 	if len(value) == 0 {
 		for _, retroKey := range options.retroKeys {
-			value = e.getenv(retroKey)
+			value = e.getEnv(retroKey)
 			if len(value) > 0 {
 				options.onRetro(retroKey, key)
 				break
@@ -48,4 +54,12 @@ func (e *Env) Get(key string, optionSetters ...OptionSetter) (value string, err 
 		value = strings.ToLower(value)
 	}
 	return value, nil
+}
+
+func (e *Env) getEnv(key string) (value string) {
+	value, ok := e.kv[key]
+	if ok {
+		return value
+	}
+	return os.Getenv(key)
 }

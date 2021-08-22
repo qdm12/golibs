@@ -41,9 +41,7 @@ func Test_LogCaller(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"LOG_CALLER": tc.envValue},
 			}
 			caller, err := e.LogCaller("LOG_CALLER", tc.optionSetters...)
 			if tc.err != nil {
@@ -97,9 +95,7 @@ func Test_LogLevel(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"LOG_LEVEL": tc.envValue},
 			}
 			level, err := e.LogLevel("LOG_LEVEL", tc.optionSetters...)
 			if tc.err != nil {

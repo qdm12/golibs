@@ -6,8 +6,8 @@ import (
 )
 
 type Env struct {
+	kv     map[string]string
 	getuid func() int
-	getenv func(key string) string
 	unset  func(k string) error
 	fpAbs  func(s string) (string, error)
 }
@@ -16,8 +16,8 @@ type Env struct {
 // environment variables using os.GetEnv.
 func New() *Env {
 	return &Env{
+		kv:     make(map[string]string),
 		getuid: os.Getuid,
-		getenv: os.Getenv,
 		unset:  os.Unsetenv,
 		fpAbs:  filepath.Abs,
 	}

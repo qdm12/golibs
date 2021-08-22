@@ -46,14 +46,12 @@ func Test_ListeningPort(t *testing.T) {
 			t.Parallel()
 			const expectedUID = 1000
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"key": tc.envValue},
 				getuid: func() int {
 					return expectedUID
 				},
 			}
-			listeningPort, warning, err := e.ListeningPort("LISTENING_PORT", tc.optionSetters...)
+			listeningPort, warning, err := e.ListeningPort("key", tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())

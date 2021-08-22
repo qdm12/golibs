@@ -43,9 +43,7 @@ func Test_RootURL(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"ROOT_URL": tc.envValue},
 			}
 			rootURL, err := e.RootURL("ROOT_URL", tc.optionSetters...)
 			if tc.err != nil {

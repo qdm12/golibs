@@ -2,6 +2,7 @@ package params
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -99,8 +100,6 @@ func Test_Get(t *testing.T) {
 			t.Parallel()
 			const keyArg = "key"
 
-			getenv := func(key string) string { return tc.env[key] }
-
 			unsetIndex := 0
 			unset := func(key string) error {
 				assert.Equal(t, tc.unsetCalls[unsetIndex], key)
@@ -109,8 +108,8 @@ func Test_Get(t *testing.T) {
 			}
 
 			e := &Env{
-				getenv: getenv,
-				unset:  unset,
+				kv:    tc.env,
+				unset: unset,
 			}
 			value, err := e.Get(keyArg, tc.optionSetters...)
 			if tc.err != nil {
@@ -122,4 +121,27 @@ func Test_Get(t *testing.T) {
 			assert.Equal(t, tc.value, value)
 		})
 	}
+}
+
+func Test_getEnv(t *testing.T) {
+	t.Parallel()
+
+	const someEnvKey = "TESTREMOVEME32932"
+
+	env := &Env{
+		kv: map[string]string{"a": "value1"},
+	}
+
+	value := env.getEnv("a")
+	assert.Equal(t, "value1", value)
+
+	err := os.Setenv(someEnvKey, "value2")
+	require.NoError(t, err)
+	defer func() {
+		err := os.Unsetenv(someEnvKey)
+		assert.NoError(t, err)
+	}()
+
+	value = env.getEnv(someEnvKey)
+	assert.Equal(t, "value2", value)
 }

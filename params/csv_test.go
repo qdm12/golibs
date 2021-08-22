@@ -60,9 +60,7 @@ func Test_CSVInside(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"any": tc.envValue},
 			}
 			values, err := e.CSVInside("any", tc.possibilities, tc.optionSetters...)
 			if tc.err != nil {

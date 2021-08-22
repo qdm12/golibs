@@ -43,9 +43,7 @@ func Test_YesNo(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"any": tc.envValue},
 			}
 			yes, err := e.YesNo("any", tc.optionSetters...)
 			if tc.err != nil {
@@ -94,9 +92,7 @@ func Test_OnOff(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"any": tc.envValue},
 			}
 			on, err := e.OnOff("any", tc.optionSetters...)
 			if tc.err != nil {

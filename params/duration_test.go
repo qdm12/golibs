@@ -47,9 +47,7 @@ func Test_Duration(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"any": tc.envValue},
 			}
 			duration, err := e.Duration("any", tc.optionSetters...)
 			if tc.err != nil {

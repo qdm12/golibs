@@ -74,11 +74,9 @@ func Test_Inside(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			e := &Env{
-				getenv: func(key string) string {
-					return tc.envValue
-				},
+				kv: map[string]string{"key": tc.envValue},
 			}
-			value, err := e.Inside("any", tc.possibilities, tc.optionSetters...)
+			value, err := e.Inside("key", tc.possibilities, tc.optionSetters...)
 			if tc.err != nil {
 				require.Error(t, err)
 				assert.Equal(t, tc.err.Error(), err.Error())
