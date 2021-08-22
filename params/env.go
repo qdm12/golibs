@@ -8,18 +8,17 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/qdm12/golibs/logging"
-	"github.com/qdm12/golibs/verification"
 )
 
 type Env struct {
 	getuid func() int
 	getenv func(key string) string
-	regex  verification.Regex
 	unset  func(k string) error
 	fpAbs  func(s string) (string, error)
 }
@@ -29,7 +28,6 @@ func NewEnv() *Env {
 	return &Env{
 		getuid: os.Getuid,
 		getenv: os.Getenv,
-		regex:  verification.NewRegex(),
 		unset:  os.Unsetenv,
 		fpAbs:  filepath.Abs,
 	}
@@ -290,7 +288,31 @@ func (e *Env) Port(key string, optionSetters ...OptionSetter) (port uint16, err 
 	if err != nil {
 		return 0, err
 	}
-	return verification.ParsePort(s)
+	return ParsePort(s)
+}
+
+var (
+	ErrPortIsNotInteger = errors.New("port is not an integer")
+	ErrPortLowerThanOne = errors.New("port cannot be lower than 1")
+	ErrPortTooHigh      = errors.New("port cannot be higher than 65535")
+)
+
+// ParsePort verifies a port number string is valid and
+// returns the port as an uint16.
+func ParsePort(s string) (port uint16, err error) {
+	const minPort = 1
+	const maxPort = 65535
+	portInt, err := strconv.Atoi(s)
+	switch {
+	case err != nil:
+		return 0, fmt.Errorf("%w: %s", ErrPortIsNotInteger, s)
+	case portInt < minPort:
+		return 0, fmt.Errorf("%w: %d", ErrPortLowerThanOne, portInt)
+	case portInt > maxPort:
+		return 0, fmt.Errorf("%w: %d", ErrPortTooHigh, portInt)
+	default:
+		return uint16(portInt), nil
+	}
 }
 
 var ErrInvalidPort = errors.New("invalid port")
@@ -360,6 +382,8 @@ func (e *Env) checkListeningPort(port uint16) (warning string, err error) {
 
 var ErrRootURLNotValid = errors.New("root URL is not valid")
 
+var rootURLRegex = regexp.MustCompile(`^\/[a-zA-Z0-9\-_/\+]*$`)
+
 // RootURL obtains and checks the root URL from the environment variable specified by key.
 func (e *Env) RootURL(key string, optionSetters ...OptionSetter) (rootURL string, err error) {
 	optionSetters = append([]OptionSetter{Default("/")}, optionSetters...)
@@ -368,7 +392,7 @@ func (e *Env) RootURL(key string, optionSetters ...OptionSetter) (rootURL string
 		return rootURL, err
 	}
 	rootURL = path.Clean(rootURL)
-	if !e.regex.MatchRootURL(rootURL) {
+	if !rootURLRegex.MatchString(rootURL) {
 		return "", fmt.Errorf("%w: %s", ErrRootURLNotValid, rootURL)
 	}
 	rootURL = strings.TrimSuffix(rootURL, "/") // already have / from paths of router

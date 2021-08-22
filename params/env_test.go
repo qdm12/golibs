@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/qdm12/golibs/logging"
-	"github.com/qdm12/golibs/verification"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -768,7 +767,6 @@ func Test_RootURL(t *testing.T) {
 				getenv: func(key string) string {
 					return tc.envValue
 				},
-				regex: verification.NewRegex(),
 			}
 			rootURL, err := e.RootURL("ROOT_URL", tc.optionSetters...)
 			if tc.err != nil {
