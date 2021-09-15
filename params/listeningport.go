@@ -2,7 +2,6 @@ package params
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 )
 
@@ -13,14 +12,14 @@ func (e *Env) ListeningPort(key string, optionSetters ...OptionSetter) (port uin
 	if err != nil {
 		return 0, "", err
 	}
-	warning, err = e.checkListeningPort(port)
+	warning = e.checkListeningPort(port)
 	return port, warning, err
 }
 
 var ErrReservedListeningPort = errors.New(
 	"listening port cannot be in the reserved system ports range (1 to 1023) when running without root")
 
-func (e *Env) checkListeningPort(port uint16) (warning string, err error) {
+func (e *Env) checkListeningPort(port uint16) (warning string) {
 	const (
 		maxPrivilegedPort = 1023
 		minDynamicPort    = 49151
@@ -28,21 +27,23 @@ func (e *Env) checkListeningPort(port uint16) (warning string, err error) {
 	if port <= maxPrivilegedPort {
 		switch e.getuid() {
 		case 0:
-			warning = "listening port " +
+			return "listening port " +
 				strconv.Itoa(int(port)) +
 				" allowed to be in the reserved system ports range as you are running as root"
 		case -1:
-			warning = "listening port " +
+			return "listening port " +
 				strconv.Itoa(int(port)) +
 				" allowed to be in the reserved system ports range as you are running in Windows"
 		default:
-			err = fmt.Errorf("%w: port %d", ErrReservedListeningPort, port)
+			return "listening port " +
+				strconv.Itoa(int(port)) +
+				" should not be in the reserved system ports range (1 to 1023) when running without root"
 		}
 	} else if port > minDynamicPort {
 		// dynamic and/or private ports.
-		warning = "listening port " +
+		return "listening port " +
 			strconv.Itoa(int(port)) +
 			" is in the dynamic/private ports range (above 49151)"
 	}
-	return warning, err
+	return ""
 }

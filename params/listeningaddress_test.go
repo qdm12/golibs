@@ -37,7 +37,8 @@ func Test_ListeningAddress(t *testing.T) {
 		},
 		"reserved port error": {
 			envValue: "0.0.0.0:100",
-			err:      errors.New(`invalid port: listening port cannot be in the reserved system ports range (1 to 1023) when running without root: port 100`), //nolint:lll
+			address:  "0.0.0.0:100",
+			warning:  "listening port 100 should not be in the reserved system ports range (1 to 1023) when running without root", //nolint:lll
 		},
 	}
 	for name, tc := range tests {

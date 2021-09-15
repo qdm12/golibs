@@ -23,10 +23,9 @@ func (e *Env) ListeningAddress(key string, optionSetters ...OptionSetter) (
 	if err != nil {
 		return "", "", fmt.Errorf("%w: %s", ErrInvalidPort, err)
 	}
-	warning, err = e.checkListeningPort(uint16(p))
-	if err != nil {
-		return "", warning, fmt.Errorf("%w: %s", ErrInvalidPort, err)
-	}
+
+	warning = e.checkListeningPort(uint16(p))
+
 	address = host + ":" + port
 	return address, warning, nil
 }
