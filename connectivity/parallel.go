@@ -12,6 +12,7 @@ type indexedError struct {
 func parallelChecks(ctx context.Context, checker SingleChecker,
 	urls []string) (errs []error) {
 	indexToURL := make(map[int]string, len(urls))
+	errs = make([]error, len(urls))
 	for i, url := range urls {
 		indexToURL[i] = url
 	}
