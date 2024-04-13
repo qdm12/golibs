@@ -4,10 +4,6 @@ import (
 	"strings"
 )
 
-type Runner interface {
-	Run(cmd ExecCmd) (output string, err error)
-}
-
 // Run runs a command in a blocking manner, returning its output and
 // an error if it failed.
 func (c *Cmder) Run(cmd ExecCmd) (output string, err error) {

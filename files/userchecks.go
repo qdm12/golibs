@@ -10,19 +10,19 @@ const (
 	executable accessible = "executable"
 )
 
-func (f *fileManager) IsReadable(filePath string, uid, gid int) (bool, error) {
+func (f *FileManager) IsReadable(filePath string, uid, gid int) (bool, error) {
 	return f.isAccessible(filePath, uid, gid, readable)
 }
 
-func (f *fileManager) IsWritable(filePath string, uid, gid int) (bool, error) {
+func (f *FileManager) IsWritable(filePath string, uid, gid int) (bool, error) {
 	return f.isAccessible(filePath, uid, gid, writable)
 }
 
-func (f *fileManager) IsExecutable(filePath string, uid, gid int) (bool, error) {
+func (f *FileManager) IsExecutable(filePath string, uid, gid int) (bool, error) {
 	return f.isAccessible(filePath, uid, gid, executable)
 }
 
-func (f *fileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (
+func (f *FileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (
 	accessible bool, err error) {
 	errPrefix := fmt.Sprintf("%s is not %s for user with uid %d and gid %d", filePath, accessibility, uid, gid)
 	ownerUID, ownerGID, err := f.GetOwnership(filePath)

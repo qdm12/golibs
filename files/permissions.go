@@ -8,7 +8,7 @@ import (
 )
 
 // GetUserPermissions obtains the permissions of the user owning the file.
-func (f *fileManager) GetUserPermissions(filePath string) (read, write, execute bool, err error) {
+func (f *FileManager) GetUserPermissions(filePath string) (read, write, execute bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
 		return false, false, false, fmt.Errorf("cannot get permissions: %w", err)
@@ -18,7 +18,7 @@ func (f *fileManager) GetUserPermissions(filePath string) (read, write, execute 
 }
 
 // GetGroupPermissions obtains the permissions of the group owning the file path.
-func (f *fileManager) GetGroupPermissions(filePath string) (read, write, execute bool, err error) {
+func (f *FileManager) GetGroupPermissions(filePath string) (read, write, execute bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
 		return false, false, false, fmt.Errorf("cannot get permissions: %w", err)
@@ -28,7 +28,7 @@ func (f *fileManager) GetGroupPermissions(filePath string) (read, write, execute
 }
 
 // GetOthersPermissions obtains the permissions for users and groups not owning the file path.
-func (f *fileManager) GetOthersPermissions(filePath string) (read, write, execute bool, err error) {
+func (f *FileManager) GetOthersPermissions(filePath string) (read, write, execute bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
 		return false, false, false, fmt.Errorf("cannot get permissions: %w", err)
@@ -37,7 +37,7 @@ func (f *fileManager) GetOthersPermissions(filePath string) (read, write, execut
 	return permissions.OtherRead(), permissions.OtherWrite(), permissions.OtherExecute(), nil
 }
 
-func (f *fileManager) SetUserPermissions(filepath string, mod os.FileMode) error {
+func (f *FileManager) SetUserPermissions(filepath string, mod os.FileMode) error {
 	exists, err := f.FileExists(filepath)
 	if err != nil {
 		return err

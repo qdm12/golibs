@@ -6,10 +6,6 @@ import (
 	"strings"
 )
 
-type HTTPRequestParser interface {
-	ParseHTTPRequest(r *http.Request) net.IP
-}
-
 type Parser struct {
 	privateIPNets [8]net.IPNet
 }

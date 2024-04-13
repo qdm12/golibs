@@ -22,7 +22,7 @@ var (
 )
 
 // CopyDirectory copies all files, directories and symlinks recursively to another path.
-func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
+func (f *FileManager) CopyDirectory(fromPath, toPath string) error {
 	entries, err := f.readDir(fromPath)
 	if err != nil {
 		return fmt.Errorf("%w: %s", ErrReadDirectory, err)
@@ -84,7 +84,7 @@ var (
 )
 
 // CopyFile copies a file from a path to another path.
-func (f *fileManager) CopyFile(fromPath, toPath string) (err error) {
+func (f *FileManager) CopyFile(fromPath, toPath string) (err error) {
 	out, err := f.create(toPath)
 	if err != nil {
 		return fmt.Errorf("%w: path %s: %s", ErrCreateFile, toPath, err)
@@ -124,7 +124,7 @@ var (
 )
 
 // CopySymLink copies a symlink to another path.
-func (f *fileManager) CopySymLink(fromPath, toPath string) error {
+func (f *FileManager) CopySymLink(fromPath, toPath string) error {
 	link, err := f.readlink(fromPath)
 	if err != nil {
 		return fmt.Errorf("%w: at path %s: %s", ErrReadSymlink, fromPath, err)

@@ -10,7 +10,7 @@ var (
 	ErrBytesReadUnexpected    = errors.New("number of bytes read is unexpected")
 )
 
-func (c *crypto) ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, err error) {
+func (c *Crypto) ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, err error) {
 	buf := make([]byte, shakeSum256DigestSize)
 	shakeHash := c.shakeHashFactory()
 	n, err := shakeHash.Write(data)
@@ -31,7 +31,7 @@ func (c *crypto) ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, e
 	return digest, nil
 }
 
-func (c *crypto) Argon2ID(data []byte, time, memory uint32) (digest [argon2IDDigestSize]byte) {
+func (c *Crypto) Argon2ID(data []byte, time, memory uint32) (digest [argon2IDDigestSize]byte) {
 	buf := c.argon2ID(data, nil, time, memory, 1, argon2IDDigestSize)
 	copy(digest[:], buf)
 	return digest

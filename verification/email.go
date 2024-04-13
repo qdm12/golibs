@@ -12,7 +12,7 @@ var (
 )
 
 // ValidateEmail verifies the format and the existence of an email address with a MX lookup.
-func (v *verifier) ValidateEmail(email string) error {
+func (v *Verifier) ValidateEmail(email string) error {
 	if !v.Regex.MatchEmail(email) {
 		return ErrEmailFormatNotValid
 	}

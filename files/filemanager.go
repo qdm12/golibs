@@ -6,54 +6,7 @@ import (
 	"path/filepath"
 )
 
-// FileManager contains methods to interact with files and the file system.
-type FileManager interface {
-	// FilepathExists returns true if the file or directory exists, false otherwise
-	FilepathExists(filePath string) (exists bool, err error)
-	// FileExists returns true if the path is an existing file, false otherwise
-	FileExists(filePath string) (exists bool, err error)
-	// DirectoryExists returns true if the path is an existing directory, false otherwise
-	DirectoryExists(filePath string) (exists bool, err error)
-	// GetOwnership obtains the user ID and group ID for a file or directory
-	GetOwnership(filePath string) (userID, groupID int, err error)
-	// SetOwnership sets the user ID and group ID for a file or directory
-	SetOwnership(filePath string, userID, groupID int) error
-	// GetUserPermissions obtains the permissions for a file or directory
-	GetUserPermissions(filePath string) (read, write, execute bool, err error)
-	// GetGroupPermissions obtains the permissions of the group owning the file path
-	GetGroupPermissions(filePath string) (read, write, execute bool, err error)
-	// GetOthersPermissions obtains the permissions for users and groups not owning the file path
-	GetOthersPermissions(filePath string) (read, write, execute bool, err error)
-	// SetUserPermissions sets the permissions for a file or directory
-	SetUserPermissions(filepath string, mod os.FileMode) error
-	// ReadFile reads an entire file and returns its data
-	ReadFile(filePath string) (data []byte, err error)
-	// WriteLinesToFile writes some lines to a file
-	WriteLinesToFile(filePath string, lines []string, setters ...WriteOptionSetter) error
-	// Touch creates a file at the specified file path
-	Touch(filePath string, setters ...WriteOptionSetter) error
-	// WriteToFile writes some data to a file
-	WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error
-	// CreateDir creates a directory at the file path specified
-	CreateDir(filePath string, setters ...WriteOptionSetter) error
-	// Remove removes a file or directory at the file path specified
-	Remove(filePath string) (err error)
-	// IsFile returns true if the path points to a file
-	IsFile(filePath string) (bool, error)
-	// IsDirectory returns true if the path points to a directory
-	IsDirectory(filePath string) (bool, error)
-	// CopyDirectory copies all files, directories and symlinks recursively to another path
-	CopyDirectory(fromPath, toPath string) error
-	// CopyFile copies a file from a path to another path
-	CopyFile(fromPath, toPath string) (err error)
-	// CopySymLink copies a symlink to another path
-	CopySymLink(fromPath, toPath string) error
-	IsReadable(filePath string, uid, gid int) (readable bool, err error)
-	IsWritable(filePath string, uid, gid int) (writable bool, err error)
-	IsExecutable(filePath string, uid, gid int) (executable bool, err error)
-}
-
-type fileManager struct {
+type FileManager struct {
 	fileStat    func(name string) (os.FileInfo, error)
 	isNotExist  func(err error) bool
 	readFile    func(filename string) ([]byte, error)
@@ -70,8 +23,8 @@ type fileManager struct {
 	readDir     func(dirname string) ([]fs.DirEntry, error)
 }
 
-func NewFileManager() FileManager {
-	return &fileManager{
+func NewFileManager() *FileManager {
+	return &FileManager{
 		fileStat:    os.Stat,
 		isNotExist:  os.IsNotExist,
 		readFile:    os.ReadFile,

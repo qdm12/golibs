@@ -8,11 +8,6 @@ import (
 	"sync"
 )
 
-type Starter interface {
-	Start(cmd ExecCmd) (stdoutLines, stderrLines chan string,
-		waitError chan error, err error)
-}
-
 // Start launches a command and streams stdout and stderr to channels.
 // All the channels returned should be closed when an error,
 // nil or not, is received in the waitError channel.

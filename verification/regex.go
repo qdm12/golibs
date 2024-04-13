@@ -2,22 +2,7 @@ package verification
 
 import "regexp"
 
-type Regex interface {
-	MatchEmail(s string) bool
-	MatchPhoneIntl(s string) bool
-	MatchPhoneLocal(s string) bool
-	MatchDomain(s string) bool
-	MatchHostname(s string) bool
-	MatchRootURL(s string) bool
-	Match64BytesHex(s string) bool
-	MatchMD5String(s string) bool
-	SearchIPv4(s string) (results []string)
-	SearchIPv6(s string) (results []string)
-	SearchEmail(s string) (results []string)
-	SearchPhone(s string) (results []string)
-}
-
-type regex struct {
+type Regex struct {
 	searchIPv4      *regexp.Regexp
 	searchIPv6      *regexp.Regexp
 	searchEmail     *regexp.Regexp
@@ -32,7 +17,7 @@ type regex struct {
 	match64BytesHex *regexp.Regexp
 }
 
-func NewRegex() Regex {
+func NewRegex() *Regex {
 	//nolint:lll
 	const (
 		regexIPv4        = `(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}`
@@ -47,7 +32,7 @@ func NewRegex() Regex {
 		regex32BytesHex  = `[a-fA-F0-9]{32}`
 		regex64BytesHex  = `[a-fA-F0-9]{64}`
 	)
-	return &regex{
+	return &Regex{
 		searchIPv4:      regexp.MustCompile(regexIPv4),
 		searchIPv6:      regexp.MustCompile(regexIPv6),
 		searchPhone:     regexp.MustCompile(regexPhoneSearch),
@@ -67,40 +52,40 @@ func matchRegex(regex string) *regexp.Regexp {
 	return regexp.MustCompile("^" + regex + "$")
 }
 
-func (r *regex) MatchEmail(s string) bool {
+func (r *Regex) MatchEmail(s string) bool {
 	return r.matchEmail.MatchString(s)
 }
-func (r *regex) MatchPhoneIntl(s string) bool {
+func (r *Regex) MatchPhoneIntl(s string) bool {
 	return r.matchPhoneIntl.MatchString(s)
 }
-func (r *regex) MatchPhoneLocal(s string) bool {
+func (r *Regex) MatchPhoneLocal(s string) bool {
 	return r.matchPhoneLocal.MatchString(s)
 }
-func (r *regex) MatchDomain(s string) bool {
+func (r *Regex) MatchDomain(s string) bool {
 	return r.matchDomain.MatchString(s)
 }
-func (r *regex) MatchHostname(s string) bool {
+func (r *Regex) MatchHostname(s string) bool {
 	return r.matchHostname.MatchString(s)
 }
-func (r *regex) MatchRootURL(s string) bool {
+func (r *Regex) MatchRootURL(s string) bool {
 	return r.matchRootURL.MatchString(s)
 }
-func (r *regex) Match64BytesHex(s string) bool {
+func (r *Regex) Match64BytesHex(s string) bool {
 	return r.match64BytesHex.MatchString(s)
 }
-func (r *regex) MatchMD5String(s string) bool {
+func (r *Regex) MatchMD5String(s string) bool {
 	return r.match32BytesHex.MatchString(s)
 }
 
-func (r *regex) SearchIPv4(s string) (results []string) {
+func (r *Regex) SearchIPv4(s string) (results []string) {
 	return r.searchIPv4.FindAllString(s, -1)
 }
-func (r *regex) SearchIPv6(s string) (results []string) {
+func (r *Regex) SearchIPv6(s string) (results []string) {
 	return r.searchIPv6.FindAllString(s, -1)
 }
-func (r *regex) SearchEmail(s string) (results []string) {
+func (r *Regex) SearchEmail(s string) (results []string) {
 	return r.searchEmail.FindAllString(s, -1)
 }
-func (r *regex) SearchPhone(s string) (results []string) {
+func (r *Regex) SearchPhone(s string) (results []string) {
 	return r.searchPhone.FindAllString(s, -1)
 }

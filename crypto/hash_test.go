@@ -117,7 +117,7 @@ func Test_Shake256_Mocked(t *testing.T) {
 				mockShakeHash.EXPECT().Read(make([]byte, shakeSum256DigestSize)).
 					Return(tc.shakehashRead.n, tc.shakehashRead.err).Times(1)
 			}
-			c := crypto{shakeHashFactory: func() sha3.ShakeHash { return mockShakeHash }}
+			c := Crypto{shakeHashFactory: func() sha3.ShakeHash { return mockShakeHash }}
 			digest, err := c.ShakeSum256(tc.data)
 			if tc.err != nil {
 				require.Error(t, err)

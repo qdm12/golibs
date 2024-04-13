@@ -19,21 +19,6 @@ const (
 	maxInt63      = 9223372036854775807
 )
 
-// Randomer has methods to generate random values from the cryptographic
-// randomness reader. All should be considered slow and thread safe.
-type Randomer interface {
-	// GenerateRandomBytes generates a byte slice of n random bytes
-	GenerateRandomBytes(n int) ([]byte, error)
-	// GenerateRandomInt63 generates a random 64 bits signed integer
-	GenerateRandomInt63() int64
-	// GenerateRandomInt generates a random signed integer
-	GenerateRandomInt(n int) int
-	// GenerateRandomAlphaNum generates a random alphanumeric string of n characters
-	GenerateRandomAlphaNum(n uint64) string
-	// GenerateRandomNum generates a random numeric string of n characters
-	GenerateRandomNum(n uint64) string
-}
-
 // Random implements Randomer.
 type Random struct {
 	randReader func(b []byte) error

@@ -6,7 +6,7 @@ import (
 
 // GetOwnership obtains the user ID and group ID owning the file or directory
 // or returns 0 and 0 if running in Windows (no IDs).
-func (f *fileManager) GetOwnership(filePath string) (userID, groupID int, err error) {
+func (f *FileManager) GetOwnership(filePath string) (userID, groupID int, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
 		return 0, 0, err
@@ -20,6 +20,6 @@ func (f *fileManager) GetOwnership(filePath string) (userID, groupID int, err er
 
 // SetOwnership sets the ownership of a file or directory with
 // the user ID and group ID given.
-func (f *fileManager) SetOwnership(filePath string, userID, groupID int) error {
+func (f *FileManager) SetOwnership(filePath string, userID, groupID int) error {
 	return f.chown(filePath, userID, groupID)
 }

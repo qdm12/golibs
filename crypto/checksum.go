@@ -7,7 +7,7 @@ import (
 )
 
 // Checksumize adds a Shake 256 checksum to some data.
-func (c *crypto) Checksumize(data []byte) (checksumedData []byte, err error) {
+func (c *Crypto) Checksumize(data []byte) (checksumedData []byte, err error) {
 	digest, err := c.ShakeSum256(data)
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ var (
 )
 
 // Dechecksumize verifies the Shake 256 checksum of some data.
-func (c *crypto) Dechecksumize(checksumData []byte) (data []byte, err error) {
+func (c *Crypto) Dechecksumize(checksumData []byte) (data []byte, err error) {
 	L := len(checksumData)
 	if L < checksumLength {
 		return nil, fmt.Errorf("%w: expected at least %d bytes and got only %d: %v",
