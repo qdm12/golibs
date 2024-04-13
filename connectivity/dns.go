@@ -7,9 +7,6 @@ import (
 	urlpkg "net/url"
 )
 
-var _ Checker = new(DNSChecker)
-var _ SingleChecker = new(DNSChecker)
-
 var errDNSResolveNoIP = errors.New("DNS resolution resulted in no IP address")
 
 // NewDNSChecker creates a new DNS checker.

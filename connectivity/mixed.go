@@ -7,9 +7,6 @@ import (
 	"strings"
 )
 
-var _ Checker = new(MixedChecker)
-var _ SingleChecker = new(MixedChecker)
-
 var ErrOneOrMoreChecksFailed = errors.New("one or more checks failed")
 
 // NewMixedChecker creates a new mixed checker using the given checkers.

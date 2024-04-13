@@ -1,7 +1,5 @@
 package command
 
-var _ RunStarter = (*Cmder)(nil)
-
 type RunStarter interface {
 	Runner
 	Starter

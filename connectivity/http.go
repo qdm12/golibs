@@ -8,9 +8,6 @@ import (
 	urlpkg "net/url"
 )
 
-var _ Checker = new(HTTPGetChecker)
-var _ SingleChecker = new(HTTPGetChecker)
-
 // NewHTTPGetChecker creates a new HTTPs checker which expects
 // the HTTP status given when doing an HTTP GET request.
 func NewHTTPGetChecker(client *http.Client, expectedStatus int) *HTTPGetChecker {
