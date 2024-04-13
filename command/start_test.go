@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -15,7 +14,7 @@ import (
 
 func linesToReadCloser(lines []string) io.ReadCloser {
 	s := strings.Join(lines, "\n")
-	return ioutil.NopCloser(bytes.NewBufferString(s))
+	return io.NopCloser(bytes.NewBufferString(s))
 }
 
 func Test_commander_Start(t *testing.T) {

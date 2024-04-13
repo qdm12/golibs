@@ -1,7 +1,7 @@
 package files
 
 import (
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
@@ -67,17 +67,17 @@ type fileManager struct {
 	open        func(name string) (*os.File, error)
 	readlink    func(name string) (string, error)
 	symlink     func(oldName, newName string) error
-	readDir     func(dirname string) ([]os.FileInfo, error)
+	readDir     func(dirname string) ([]fs.DirEntry, error)
 }
 
 func NewFileManager() FileManager {
 	return &fileManager{
 		fileStat:    os.Stat,
 		isNotExist:  os.IsNotExist,
-		readFile:    ioutil.ReadFile,
+		readFile:    os.ReadFile,
 		filepathDir: filepath.Dir,
 		mkdirAll:    os.MkdirAll,
-		writeFile:   ioutil.WriteFile,
+		writeFile:   os.WriteFile,
 		chown:       os.Chown,
 		chmod:       os.Chmod,
 		rm:          os.RemoveAll,
@@ -85,6 +85,6 @@ func NewFileManager() FileManager {
 		open:        os.Open,
 		readlink:    os.Readlink,
 		symlink:     os.Symlink,
-		readDir:     ioutil.ReadDir,
+		readDir:     os.ReadDir,
 	}
 }

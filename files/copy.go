@@ -30,7 +30,7 @@ func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
 	for _, entry := range entries {
 		subFromPath := filepath.Join(fromPath, entry.Name())
 		subToPath := filepath.Join(toPath, entry.Name())
-		fileInfo, err := os.Stat(subFromPath)
+		fileInfo, err := entry.Info()
 		if err != nil {
 			return fmt.Errorf("%w: for path %s: %s",
 				ErrStatFile, subFromPath, err)
@@ -65,8 +65,9 @@ func (f *fileManager) CopyDirectory(fromPath, toPath string) error {
 		if err := os.Lchown(subToPath, int(stat.Uid), int(stat.Gid)); err != nil {
 			return fmt.Errorf("%w: path %s: %s", ErrChown, subToPath, err)
 		}
-		if isSymlink := entry.Mode()&os.ModeSymlink != 0; !isSymlink {
-			if err := os.Chmod(subToPath, entry.Mode()); err != nil {
+
+		if isSymlink := fileInfo.Mode()&os.ModeSymlink != 0; !isSymlink {
+			if err := os.Chmod(subToPath, fileInfo.Mode()); err != nil {
 				return fmt.Errorf("%w: path %s: %s", ErrChmod, subToPath, err)
 			}
 		}
