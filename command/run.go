@@ -4,8 +4,6 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Runner
-
 type Runner interface {
 	Run(cmd ExecCmd) (output string, err error)
 }

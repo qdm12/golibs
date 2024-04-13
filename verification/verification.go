@@ -2,8 +2,6 @@ package verification
 
 import "net"
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Verifier
-
 type Verifier interface {
 	// VerifyPort verifies a port number is valid
 	VerifyPort(port string) error

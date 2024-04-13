@@ -6,8 +6,6 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Crypto
-
 // Crypto contains methods to run cryptographic operations.
 type Crypto interface {
 	// EncryptAES256 uses the AES algorithm with a 256 bits key to encrypt a plaintext and returns a ciphertext

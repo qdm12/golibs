@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . HTTPRequestParser
-
 type HTTPRequestParser interface {
 	ParseHTTPRequest(r *http.Request) net.IP
 }

@@ -2,8 +2,6 @@ package command
 
 var _ RunStarter = (*Cmder)(nil)
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . RunStarter
-
 type RunStarter interface {
 	Runner
 	Starter

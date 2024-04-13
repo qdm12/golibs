@@ -8,8 +8,6 @@ import (
 	"sync"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Starter
-
 type Starter interface {
 	Start(cmd ExecCmd) (stdoutLines, stderrLines chan string,
 		waitError chan error, err error)

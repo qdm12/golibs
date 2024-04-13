@@ -7,8 +7,6 @@ import (
 	"fmt"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Randomer
-
 const (
 	lowercase     = "abcdefghijklmnopqrstuvwxyz"
 	uppercase     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
