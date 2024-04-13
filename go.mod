@@ -4,7 +4,6 @@ go 1.22
 
 require (
 	github.com/golang/mock v1.6.0
-	github.com/mr-tron/base58 v1.2.0
 	github.com/phayes/permbits v0.0.0-20190612203442-39d7c581d2ee
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
