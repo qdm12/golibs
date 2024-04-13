@@ -27,7 +27,7 @@ func Test_Random_GenerateRandomBytes(t *testing.T) {
 		// TODO add test case
 		"error": {
 			0,
-			func(b []byte) error {
+			func(_ []byte) error {
 				return fmt.Errorf("error")
 			},
 			fmt.Errorf("error"),
@@ -65,7 +65,7 @@ func Test_Random_GenerateRandomInt63(t *testing.T) {
 	t.Run("panics from rand.Read error", func(t *testing.T) {
 		t.Parallel()
 		r := &Random{
-			randReader: func(b []byte) error {
+			randReader: func(_ []byte) error {
 				return fmt.Errorf("error")
 			},
 		}

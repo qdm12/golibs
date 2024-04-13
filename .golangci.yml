@@ -1,6 +1,4 @@
 linters-settings:
-  maligned:
-    suggest-new: true
   misspell:
     locale: US
 
@@ -9,7 +7,6 @@ linters:
   enable:
     - asciicheck
     - bodyclose
-    - deadcode
     - dogsled
     - dupl
     - errcheck
@@ -46,14 +43,12 @@ linters:
     - rowserrcheck
     - sqlclosecheck
     - staticcheck
-    - structcheck
     - thelper
     - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
     - whitespace
 
 issues:
@@ -61,7 +56,6 @@ issues:
     - path: _test\.go
       linters:
         - dupl
-        - maligned
         - goerr113
     - path: os/alias\.go
       linters:

@@ -23,14 +23,14 @@ func Test_ValidateEmail(t *testing.T) {
 		},
 		"Valid email format but not existing": {
 			"aa@aa.aa",
-			func(name string) ([]*net.MX, error) {
+			func(_ string) ([]*net.MX, error) {
 				return nil, errors.New("not existing")
 			},
 			errors.New("email host is not reachable: for host aa.aa: not existing"),
 		},
 		"Valid email format and existing": {
 			"aa@aa.aa",
-			func(name string) ([]*net.MX, error) {
+			func(_ string) ([]*net.MX, error) {
 				return nil, nil
 			},
 			nil,
