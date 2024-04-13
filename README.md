@@ -1,6 +1,6 @@
-# Golibs
+# **Experimental** Go libraries
 
-*Golang libraries I use across my projects*
+When a Go library has a stable API and is useful across multiple projects, I extract it from this repository as a standalone repository.
 
 <img height="250" src="https://raw.githubusercontent.com/qdm12/golibs/master/title.svg">
 
@@ -11,25 +11,9 @@
 
 ## Setup
 
-Simply import one of the following libraries in your Go code:
-
-- `"github.com/qdm12/golibs/command"` for interacting with other subprograms
-- `"github.com/qdm12/golibs/connectivity"` for checking for connectivity (DNS resolution, HTTP requests etc.)
-- `"github.com/qdm12/golibs/crypto"` for encryption, randomness and checksum functions
-- `"github.com/qdm12/golibs/files"` to interact with the filesystem
-- `"github.com/qdm12/golibs/format"` to format things to strings
-- `"github.com/qdm12/golibs/logging"` for logging functions with a global Zap logger
-- `"github.com/qdm12/golibs/params"` for parsing and verifying parameters from environment variables
-- `"github.com/qdm12/golibs/redis"` for basic initialization of a Redis database pool of connections
-- `"github.com/qdm12/golibs/verification"` for verification functions such as email checking or regex based checking.
-
-For each package, some mocks are generated using [mockgen](https://github.com/golang/mock#running-mockgen) and can be imported with, for example
-
-```go
-import github.com/qdm12/golibs/verification/mock_verification
+```sh
+go get github.com/qdm12/golibs
 ```
-
-and used with [gomock](https://github.com/golang/mock#building-mocks) for testing.
 
 ## Development
 
@@ -63,25 +47,21 @@ and used with [gomock](https://github.com/golang/mock#building-mocks) for testin
 1. Commands available:
 
     ```sh
-    # Build the binary
-    go build cmd/app/main.go
+    # Lint the code
+    golangci-lint run
     # Test the code
     go test ./...
     # Regenerate mocks for tests
-    go generate ./...
-    # Lint the code
-    golangci-lint run
-    # Build the Docker image to run tests and linting
-    docker build .
+    go generate -run "mockgen" ./...
+    # Tidy modules dependencies
+    go mod tidy
+    # Run the CI steps with different Docker build targets:
+    docker build --target lint .
+    docker build --target test .
+    docker build --target tidy .
     ```
 
 1. See [Contributing](https://github.com/qdm12/golibs/master/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
-
-## TODOs
-
-- Test ed25519 signatures
-- HTTP server/client unit tests
-- Server rework to write unique request ID (see timesheet)
 
 ## License
 
