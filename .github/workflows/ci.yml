@@ -14,8 +14,8 @@ jobs:
       - name: Linting
         run: docker build --target lint .
 
-      - name: Go mod tidy check
-        run: docker build --target tidy .
+      - name: Up to date files
+        run: docker build --target uptodate .
 
       - name: Build test image
         run: docker build --target test -t test-container .
