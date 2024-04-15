@@ -64,8 +64,3 @@ issues:
     - text: "mnd: Magic number: 0700*"
       linters:
         - gomnd
-
-run:
-  skip-dirs:
-    - .devcontainer
-    - .github
