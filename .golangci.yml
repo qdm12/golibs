@@ -3,13 +3,11 @@ linters-settings:
     locale: US
 
 linters:
-  disable-all: true
   enable:
     - asciicheck
     - bodyclose
     - dogsled
     - dupl
-    - errcheck
     - exhaustive
     - exportloopref
     - gci
@@ -26,10 +24,7 @@ linters:
     - gomnd
     - goprintffuncname
     - gosec
-    - gosimple
-    - govet
     - importas
-    - ineffassign
     - lll
     - misspell
     - nakedret
@@ -42,13 +37,11 @@ linters:
     - revive
     - rowserrcheck
     - sqlclosecheck
-    - staticcheck
     - thelper
     - tparallel
     - typecheck
     - unconvert
     - unparam
-    - unused
     - whitespace
 
 issues:
