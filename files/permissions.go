@@ -2,6 +2,7 @@ package files
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 )
 
@@ -9,7 +10,7 @@ import (
 func (f *FileManager) GetUserPermissions(filePath string) (read, write, execute bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
-		return false, false, false, fmt.Errorf("cannot get permissions: %w", err)
+		return false, false, false, err
 	}
 	mode := info.Mode()
 	perm := mode.Perm()
@@ -20,7 +21,7 @@ func (f *FileManager) GetUserPermissions(filePath string) (read, write, execute 
 func (f *FileManager) GetGroupPermissions(filePath string) (read, write, execute bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
-		return false, false, false, fmt.Errorf("cannot get permissions: %w", err)
+		return false, false, false, err
 	}
 	mode := info.Mode()
 	perm := mode.Perm()
@@ -31,7 +32,7 @@ func (f *FileManager) GetGroupPermissions(filePath string) (read, write, execute
 func (f *FileManager) GetOthersPermissions(filePath string) (read, write, execute bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
-		return false, false, false, fmt.Errorf("cannot get permissions: %w", err)
+		return false, false, false, err
 	}
 	mode := info.Mode()
 	perm := mode.Perm()
@@ -41,9 +42,9 @@ func (f *FileManager) GetOthersPermissions(filePath string) (read, write, execut
 func (f *FileManager) SetUserPermissions(filepath string, mod os.FileMode) error {
 	exists, err := f.FileExists(filepath)
 	if err != nil {
-		return err
+		return fmt.Errorf("checking file existence: %w", err)
 	} else if !exists {
-		return ErrFileNotExist
+		return fmt.Errorf("%w: %s", fs.ErrNotExist, filepath)
 	}
 	return f.chmod(filepath, mod)
 }

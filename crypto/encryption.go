@@ -13,10 +13,10 @@ func (c *Crypto) EncryptAES256(plaintext []byte, key [32]byte) (ciphertext []byt
 	ciphertext = make([]byte, aes.BlockSize+len(plaintext))
 	iv := ciphertext[:aes.BlockSize]
 	randBytes, err := c.random.GenerateRandomBytes(len(iv))
-	copy(iv, randBytes)
 	if err != nil {
-		return nil, fmt.Errorf("EncryptAES: %w", err)
+		return nil, fmt.Errorf("generating random iv bytes: %w", err)
 	}
+	copy(iv, randBytes)
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
 	return ciphertext, nil

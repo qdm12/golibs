@@ -3,6 +3,7 @@ package command
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -21,7 +22,7 @@ func (c *Cmder) Start(cmd ExecCmd) (
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, fmt.Errorf("creating stdout pipe: %w", err)
 	}
 	wg.Add(1)
 	stdoutLines = make(chan string)
@@ -32,7 +33,7 @@ func (c *Cmder) Start(cmd ExecCmd) (
 		_ = stdout.Close()
 		close(stdoutLines)
 		wg.Wait()
-		return nil, nil, nil, err
+		return nil, nil, nil, fmt.Errorf("creating stderr pipe: %w", err)
 	}
 	wg.Add(1)
 	stderrLines = make(chan string)

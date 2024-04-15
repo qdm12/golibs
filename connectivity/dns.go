@@ -3,11 +3,12 @@ package connectivity
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	urlpkg "net/url"
 )
 
-var errDNSResolveNoIP = errors.New("DNS resolution resulted in no IP address")
+var ErrDNSResolveNoIP = errors.New("DNS resolution resulted in no IP address")
 
 // NewDNSChecker creates a new DNS checker.
 func NewDNSChecker(resolver *net.Resolver) *DNSChecker {
@@ -36,16 +37,16 @@ func (c *DNSChecker) ParallelChecks(ctx context.Context, urls []string) (errs []
 func (c *DNSChecker) Check(ctx context.Context, url string) error {
 	u, err := urlpkg.Parse(url)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing url: %w", err)
 	}
 
 	domain := u.Hostname()
 	ips, err := c.resolver.LookupIP(ctx, "ip", domain)
 	if err != nil {
-		return err
+		return fmt.Errorf("resolving domain: %w", err)
 	} else if len(ips) == 0 {
-		return errDNSResolveNoIP
+		return fmt.Errorf("%w: for domain %s", ErrDNSResolveNoIP, domain)
 	}
 
-	return err
+	return nil
 }

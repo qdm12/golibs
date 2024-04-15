@@ -11,9 +11,9 @@ func (f *FileManager) GetOwnership(filePath string) (userID, groupID int, err er
 	if err != nil {
 		return 0, 0, err
 	}
-	stat, ok := info.Sys().(*syscall.Stat_t) // TODO change to use stat directly
+	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
-		return 0, 0, nil // Windows
+		panic("file does not have syscall stat")
 	}
 	return int(stat.Uid), int(stat.Gid), nil
 }

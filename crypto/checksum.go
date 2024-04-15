@@ -32,7 +32,7 @@ func (c *Crypto) Dechecksumize(checksumData []byte) (data []byte, err error) {
 	data = checksumData[:L-4]
 	digest, err := c.ShakeSum256(data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("computing checksum: %w", err)
 	}
 	checksum2 := digest[:4]
 	if !bytes.Equal(checksum, checksum2) {

@@ -3,6 +3,7 @@ package files
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"strings"
 )
@@ -23,8 +24,6 @@ func (f *FileManager) Touch(filePath string, options ...WriteOptionSetter) error
 	return f.WriteToFile(filePath, nil, options...)
 }
 
-var ErrFileExistsAtPath = errors.New("a file exists at this path")
-
 func (f *FileManager) CreateDir(filePath string, setters ...WriteOptionSetter) error {
 	const defaultPermissions os.FileMode = 0700
 	options := newWriteOptions(defaultPermissions)
@@ -41,22 +40,22 @@ func (f *FileManager) CreateDir(filePath string, setters ...WriteOptionSetter) e
 		if err != nil {
 			return err
 		} else if isFile {
-			return ErrFileExistsAtPath
+			return fmt.Errorf("%w: %s", fs.ErrExist, filePath)
 		}
 		err = f.SetUserPermissions(filePath, options.permissions)
 		if err != nil {
-			return err
+			return fmt.Errorf("setting file permissions: %w", err)
 		}
 	} else {
 		err = f.mkdirAll(filePath, options.permissions)
 		if err != nil {
-			return err
+			return fmt.Errorf("creating directory: %w", err)
 		}
 	}
 	if options.ownership != nil {
 		err = f.chown(filePath, options.ownership.UID, options.ownership.GID)
 		if err != nil {
-			return err
+			return fmt.Errorf("setting file permissions: %w", err)
 		}
 	}
 	return nil
@@ -95,13 +94,14 @@ func (f *FileManager) WriteToFile(filePath string, data []byte,
 
 	err = f.writeFile(filePath, data, options.permissions)
 	if err != nil {
-		return err
+		return fmt.Errorf("writing file: %w", err)
 	}
 
 	if options.ownership != nil {
 		err = f.chown(filePath, options.ownership.UID, options.ownership.GID)
 		if err != nil {
-			return err
+			return fmt.Errorf("changing ownership of %s to %d:%d: %w",
+				filePath, options.ownership.UID, options.ownership.GID, err)
 		}
 	}
 

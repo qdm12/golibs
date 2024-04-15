@@ -43,7 +43,7 @@ func (f *FileManager) isAccessible(filePath string, uid, gid int, accessibility 
 	ok bool, err error) {
 	info, err := f.fileStat(filePath)
 	if err != nil {
-		return false, fmt.Errorf("getting file info: %w", err)
+		return false, err
 	}
 	mode := info.Mode()
 	perm := mode.Perm()

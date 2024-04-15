@@ -14,7 +14,7 @@ var (
 // ValidateEmail verifies the format and the existence of an email address with a MX lookup.
 func (v *Verifier) ValidateEmail(email string) error {
 	if !v.Regex.MatchEmail(email) {
-		return ErrEmailFormatNotValid
+		return fmt.Errorf("%w: %s", ErrEmailFormatNotValid, email)
 	}
 	i := strings.LastIndexByte(email, '@')
 	host := email[i+1:]

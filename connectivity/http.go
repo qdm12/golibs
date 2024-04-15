@@ -39,31 +39,31 @@ func (c *HTTPGetChecker) ParallelChecks(ctx context.Context, urls []string) (err
 func (c *HTTPGetChecker) Check(ctx context.Context, url string) error {
 	u, err := urlpkg.Parse(url)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing url: %w", err)
 	}
 
 	u.Scheme = "http"
 	return httpGetCheck(ctx, c.client, u.String(), c.expectedStatus)
 }
 
-var errHTTPStatusUnexpected = errors.New("unexpected HTTP status received")
+var ErrHTTPStatusUnexpected = errors.New("unexpected HTTP status received")
 
 func httpGetCheck(ctx context.Context, client *http.Client,
 	url string, expectedStatus int) error {
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("creating request: %w", err)
 	}
 
 	response, err := client.Do(request)
 	if err != nil {
-		return err
+		return fmt.Errorf("doing request: %w", err)
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != expectedStatus {
 		return fmt.Errorf("%w: expected %d and received %s",
-			errHTTPStatusUnexpected, expectedStatus, response.Status)
+			ErrHTTPStatusUnexpected, expectedStatus, response.Status)
 	}
 
 	return nil

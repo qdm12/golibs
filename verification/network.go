@@ -12,8 +12,8 @@ var (
 	ErrPortTooHigh      = errors.New("port cannot be higher than 65535")
 )
 
-func (v *Verifier) VerifyPort(port string) error {
-	_, err := ParsePort(port)
+func (v *Verifier) VerifyPort(port string) (err error) {
+	_, err = ParsePort(port)
 	return err
 }
 

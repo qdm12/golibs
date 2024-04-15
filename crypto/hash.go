@@ -21,14 +21,14 @@ func (c *Crypto) ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, e
 		return digest, fmt.Errorf("%w: %d bytes written instead of %d",
 			ErrBytesWrittenUnexpected, n, len(data))
 	} else if err != nil {
-		return digest, err
+		return digest, fmt.Errorf("writing data to hash: %w", err)
 	}
 	n, err = shakeHash.Read(buf)
 	if n != shakeSum256DigestSize {
 		return digest, fmt.Errorf("%w: %d bytes read instead of %d",
 			ErrBytesReadUnexpected, n, shakeSum256DigestSize)
 	} else if err != nil {
-		return digest, err
+		return digest, fmt.Errorf("reading hash digest: %w", err)
 	}
 	copy(digest[:], buf)
 	return digest, nil

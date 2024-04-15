@@ -2,6 +2,7 @@ package connectivity
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	urlpkg "net/url"
 )
@@ -36,7 +37,7 @@ func (c *HTTPSGetChecker) ParallelChecks(ctx context.Context, urls []string) (er
 func (c *HTTPSGetChecker) Check(ctx context.Context, url string) error {
 	u, err := urlpkg.Parse(url)
 	if err != nil {
-		return err
+		return fmt.Errorf("parsing url: %w", err)
 	}
 
 	u.Scheme = "https"
