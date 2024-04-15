@@ -41,7 +41,7 @@ func (f *FileManager) CopyDirectory(fromPath, toPath string) error {
 		}
 
 		mode := fileInfo.Mode() & os.ModeType
-		switch mode {
+		switch mode { //nolint:exhaustive
 		case os.ModeDir:
 			const defaultPermissions os.FileMode = 0700
 			if err := f.CreateDir(subToPath, Permissions(defaultPermissions)); err != nil {
