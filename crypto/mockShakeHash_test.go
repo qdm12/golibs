@@ -34,6 +34,20 @@ func (m *MockShakeHash) EXPECT() *MockShakeHashMockRecorder {
 	return m.recorder
 }
 
+// BlockSize mocks base method.
+func (m *MockShakeHash) BlockSize() int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BlockSize")
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// BlockSize indicates an expected call of BlockSize.
+func (mr *MockShakeHashMockRecorder) BlockSize() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BlockSize", reflect.TypeOf((*MockShakeHash)(nil).BlockSize))
+}
+
 // Clone mocks base method.
 func (m *MockShakeHash) Clone() sha3.ShakeHash {
 	m.ctrl.T.Helper()
@@ -73,6 +87,34 @@ func (m *MockShakeHash) Reset() {
 func (mr *MockShakeHashMockRecorder) Reset() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reset", reflect.TypeOf((*MockShakeHash)(nil).Reset))
+}
+
+// Size mocks base method.
+func (m *MockShakeHash) Size() int {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Size")
+	ret0, _ := ret[0].(int)
+	return ret0
+}
+
+// Size indicates an expected call of Size.
+func (mr *MockShakeHashMockRecorder) Size() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Size", reflect.TypeOf((*MockShakeHash)(nil).Size))
+}
+
+// Sum mocks base method.
+func (m *MockShakeHash) Sum(arg0 []byte) []byte {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Sum", arg0)
+	ret0, _ := ret[0].([]byte)
+	return ret0
+}
+
+// Sum indicates an expected call of Sum.
+func (mr *MockShakeHashMockRecorder) Sum(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Sum", reflect.TypeOf((*MockShakeHash)(nil).Sum), arg0)
 }
 
 // Write mocks base method.
