@@ -3,6 +3,8 @@ package crypto
 import (
 	"errors"
 	"fmt"
+
+	"golang.org/x/crypto/sha3"
 )
 
 var (
@@ -12,7 +14,7 @@ var (
 
 func (c *Crypto) ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, err error) {
 	buf := make([]byte, shakeSum256DigestSize)
-	shakeHash := c.shakeHashFactory()
+	shakeHash := sha3.NewShake256()
 	n, err := shakeHash.Write(data)
 	if n != len(data) {
 		return digest, fmt.Errorf("%w: %d bytes written instead of %d",

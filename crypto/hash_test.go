@@ -1,13 +1,10 @@
 package crypto
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/sha3"
 )
 
 func Test_Shake256(t *testing.T) {
@@ -40,95 +37,6 @@ func Test_Shake256(t *testing.T) {
 				assert.Equal(t, tc.err.Error(), err.Error())
 			} else {
 				assert.NoError(t, err)
-			}
-			assert.Equal(t, tc.digest, digest)
-		})
-	}
-}
-
-//go:generate mockgen -destination=mockShakeHash_test.go -package=crypto golang.org/x/crypto/sha3 ShakeHash
-func Test_Shake256_Mocked(t *testing.T) {
-	t.Parallel()
-
-	errTest := errors.New("test")
-
-	type mockShakehashWrite struct {
-		call bool
-		n    int
-		err  error
-	}
-	type mockShakehashRead struct {
-		call bool
-		n    int
-		err  error
-	}
-	tests := map[string]struct {
-		shakehashWrite mockShakehashWrite
-		shakehashRead  mockShakehashRead
-		data           []byte
-		digest         [shakeSum256DigestSize]byte
-		errWrapped     error
-		errMessage     string
-	}{
-		"shakehash wrong written number": {
-			shakehashWrite: mockShakehashWrite{call: true, n: 5},
-			shakehashRead:  mockShakehashRead{},
-			data:           []byte("data"),
-			digest:         [shakeSum256DigestSize]byte{},
-			errWrapped:     ErrBytesWrittenUnexpected,
-			errMessage:     "number of bytes written is unexpected: 5 bytes written instead of 4",
-		},
-		"shakehash write error": {
-			shakehashWrite: mockShakehashWrite{call: true, n: 4, err: errTest},
-			shakehashRead:  mockShakehashRead{},
-			data:           []byte("data"),
-			digest:         [shakeSum256DigestSize]byte{},
-			errWrapped:     errTest,
-			errMessage:     "test",
-		},
-		"shakehash wrong read number": {
-			shakehashWrite: mockShakehashWrite{call: true, n: 4},
-			shakehashRead:  mockShakehashRead{call: true, n: 4},
-			data:           []byte("data"),
-			digest:         [shakeSum256DigestSize]byte{},
-			errWrapped:     ErrBytesReadUnexpected,
-			errMessage:     "number of bytes read is unexpected: 4 bytes read instead of 64",
-		},
-		"shakehash read error": {
-			shakehashWrite: mockShakehashWrite{call: true, n: 4},
-			shakehashRead:  mockShakehashRead{call: true, n: 64, err: errTest},
-			data:           []byte("data"),
-			digest:         [shakeSum256DigestSize]byte{},
-			errWrapped:     errTest,
-			errMessage:     "test",
-		},
-		"shakehash success": {
-			shakehashWrite: mockShakehashWrite{call: true, n: 4},
-			shakehashRead:  mockShakehashRead{call: true, n: 64},
-			data:           []byte("data"),
-			digest:         [shakeSum256DigestSize]byte{},
-		},
-	}
-	for name, tc := range tests {
-		tc := tc
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-			mockShakeHash := NewMockShakeHash(mockCtrl)
-			if tc.shakehashWrite.call {
-				mockShakeHash.EXPECT().Write(tc.data).
-					Return(tc.shakehashWrite.n, tc.shakehashWrite.err).Times(1)
-			}
-			if tc.shakehashRead.call {
-				mockShakeHash.EXPECT().Read(make([]byte, shakeSum256DigestSize)).
-					Return(tc.shakehashRead.n, tc.shakehashRead.err).Times(1)
-			}
-			c := Crypto{shakeHashFactory: func() sha3.ShakeHash { return mockShakeHash }}
-			digest, err := c.ShakeSum256(tc.data)
-			assert.ErrorIs(t, err, tc.errWrapped)
-			if tc.errWrapped != nil {
-				assert.EqualError(t, err, tc.errMessage)
 			}
 			assert.Equal(t, tc.digest, digest)
 		})
