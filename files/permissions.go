@@ -1,8 +1,6 @@
 package files
 
 import (
-	"fmt"
-	"io/fs"
 	"os"
 )
 
@@ -37,14 +35,4 @@ func (f *FileManager) GetOthersPermissions(filePath string) (read, write, execut
 	mode := info.Mode()
 	perm := mode.Perm()
 	return perm&0004 != 0, perm&0002 != 0, perm&0001 != 0, nil
-}
-
-func (f *FileManager) SetUserPermissions(filepath string, mod os.FileMode) error {
-	exists, err := f.FileExists(filepath)
-	if err != nil {
-		return fmt.Errorf("checking file existence: %w", err)
-	} else if !exists {
-		return fmt.Errorf("%w: %s", fs.ErrNotExist, filepath)
-	}
-	return os.Chmod(filepath, mod)
 }

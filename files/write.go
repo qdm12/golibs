@@ -43,7 +43,7 @@ func (f *FileManager) CreateDir(filePath string, setters ...WriteOptionSetter) e
 		} else if isFile {
 			return fmt.Errorf("%w: %s", fs.ErrExist, filePath)
 		}
-		err = f.SetUserPermissions(filePath, options.permissions)
+		err = os.Chmod(filePath, options.permissions)
 		if err != nil {
 			return fmt.Errorf("setting file permissions: %w", err)
 		}
@@ -87,7 +87,7 @@ func (f *FileManager) WriteToFile(filePath string, data []byte,
 		}
 	} else {
 		parentDir := filepath.Dir(filePath)
-		err = os.MkdirAll(parentDir, 0700)
+		err = f.CreateDir(parentDir)
 		if err != nil {
 			return fmt.Errorf("creating parent directory: %w", err)
 		}

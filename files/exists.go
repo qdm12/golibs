@@ -1,7 +1,6 @@
 package files
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -17,25 +16,30 @@ func (f *FileManager) FilepathExists(filePath string) (exists bool, err error) {
 }
 
 // FileExists returns true if a file exists at the path given.
+// If a directory is at the path, it returns false.
 func (f *FileManager) FileExists(filePath string) (exists bool, err error) {
-	exists, err = f.FilepathExists(filePath)
-	if err != nil {
-		return false, err
-	} else if !exists {
+	info, err := os.Stat(filePath)
+	switch {
+	case os.IsNotExist(err):
 		return false, nil
+	case err != nil:
+		return false, err
+	default:
+		return !info.IsDir(), nil
 	}
-	return f.IsFile(filePath)
 }
 
 // DirectoryExists returns true if a directory exists.
 func (f *FileManager) DirectoryExists(filePath string) (exists bool, err error) {
-	exists, err = f.FilepathExists(filePath)
-	if err != nil {
-		return false, err
-	} else if !exists {
+	info, err := os.Stat(filePath)
+	switch {
+	case os.IsNotExist(err):
 		return false, nil
+	case err != nil:
+		return false, err
+	default:
+		return info.IsDir(), nil
 	}
-	return f.IsDirectory(filePath)
 }
 
 // IsFile returns true if the path points to a file.
@@ -48,7 +52,7 @@ func (f *FileManager) IsFile(filePath string) (bool, error) {
 func (f *FileManager) IsDirectory(filePath string) (bool, error) {
 	info, err := os.Stat(filePath)
 	if err != nil {
-		return false, fmt.Errorf("stating file: %w", err)
+		return false, err
 	}
 	return info.IsDir(), nil
 }
