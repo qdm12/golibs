@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -34,7 +35,7 @@ func (c *Crypto) ShakeSum256(data []byte) (digest [shakeSum256DigestSize]byte, e
 }
 
 func (c *Crypto) Argon2ID(data []byte, time, memory uint32) (digest [argon2IDDigestSize]byte) {
-	buf := c.argon2ID(data, nil, time, memory, 1, argon2IDDigestSize)
+	buf := argon2.IDKey(data, nil, time, memory, 1, argon2IDDigestSize)
 	copy(digest[:], buf)
 	return digest
 }
