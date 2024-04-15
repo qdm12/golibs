@@ -23,32 +23,74 @@ func Test_commander_Start(t *testing.T) {
 	errDummy := errors.New("dummy")
 
 	testCases := map[string]struct {
-		stdout        []string
-		stdoutPipeErr error
-		stderr        []string
-		stderrPipeErr error
-		startErr      error
-		waitErr       error
-		err           error
+		makeExecCmd func(ctrl *gomock.Controller) *MockExecCmd
+		stdout      []string
+		stderr      []string
+		startErr    error
+		waitErr     error
+		err         error
 	}{
-		"no output": {},
+		"no_output": {
+			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
+				cmd := NewMockExecCmd(ctrl)
+				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().StderrPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().Start().Return(nil)
+				cmd.EXPECT().Wait().Return(nil)
+				return cmd
+			},
+		},
 		"success": {
+			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
+				cmd := NewMockExecCmd(ctrl)
+				cmd.EXPECT().StdoutPipe().
+					Return(linesToReadCloser([]string{"hello", "world"}), nil)
+				cmd.EXPECT().StderrPipe().
+					Return(linesToReadCloser([]string{"some", "error"}), nil)
+				cmd.EXPECT().Start().Return(nil)
+				cmd.EXPECT().Wait().Return(nil)
+				return cmd
+			},
 			stdout: []string{"hello", "world"},
 			stderr: []string{"some", "error"},
 		},
-		"stdout pipe error": {
-			stdoutPipeErr: errDummy,
-			err:           errDummy,
+		"stdout_pipe_error": {
+			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
+				cmd := NewMockExecCmd(ctrl)
+				cmd.EXPECT().StdoutPipe().Return(nil, errDummy)
+				return cmd
+			},
+			err: errDummy,
 		},
-		"stderr pipe error": {
-			stderrPipeErr: errDummy,
-			err:           errDummy,
+		"stderr_pipe_error": {
+			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
+				cmd := NewMockExecCmd(ctrl)
+				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().StderrPipe().Return(nil, errDummy)
+				return cmd
+			},
+			err: errDummy,
 		},
 		"start error": {
+			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
+				cmd := NewMockExecCmd(ctrl)
+				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().StderrPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().Start().Return(errDummy)
+				return cmd
+			},
 			startErr: errDummy,
 			err:      errDummy,
 		},
 		"wait error": {
+			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
+				cmd := NewMockExecCmd(ctrl)
+				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().StderrPipe().Return(linesToReadCloser(nil), nil)
+				cmd.EXPECT().Start().Return(nil)
+				cmd.EXPECT().Wait().Return(errDummy)
+				return cmd
+			},
 			waitErr: errDummy,
 		},
 	}
@@ -57,32 +99,15 @@ func Test_commander_Start(t *testing.T) {
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-
 			ctrl := gomock.NewController(t)
 
-			stdout := linesToReadCloser(testCase.stdout)
-			stderr := linesToReadCloser(testCase.stderr)
-
 			cmder := &Cmder{}
-			mockCmd := NewMockExecCmd(ctrl)
-
-			mockCmd.EXPECT().StdoutPipe().
-				Return(stdout, testCase.stdoutPipeErr)
-			if testCase.stdoutPipeErr == nil {
-				mockCmd.EXPECT().StderrPipe().Return(stderr, testCase.stderrPipeErr)
-				if testCase.stderrPipeErr == nil {
-					mockCmd.EXPECT().Start().Return(testCase.startErr)
-					if testCase.startErr == nil {
-						mockCmd.EXPECT().Wait().Return(testCase.waitErr)
-					}
-				}
-			}
+			mockCmd := testCase.makeExecCmd(ctrl)
 
 			stdoutLines, stderrLines, waitError, err := cmder.Start(mockCmd)
 
+			assert.ErrorIs(t, err, testCase.err)
 			if testCase.err != nil {
-				require.Error(t, err)
-				assert.Equal(t, testCase.err.Error(), err.Error())
 				assert.Nil(t, stdoutLines)
 				assert.Nil(t, stderrLines)
 				assert.Nil(t, waitError)
@@ -92,7 +117,6 @@ func Test_commander_Start(t *testing.T) {
 			require.NoError(t, err)
 
 			var stdoutIndex, stderrIndex int
-
 			done := false
 			for !done {
 				select {
@@ -103,15 +127,7 @@ func Test_commander_Start(t *testing.T) {
 					assert.Equal(t, testCase.stderr[stderrIndex], line)
 					stderrIndex++
 				case err := <-waitError:
-					if testCase.waitErr != nil {
-						require.Error(t, err)
-						assert.Equal(t, testCase.waitErr.Error(), err.Error())
-					} else {
-						assert.NoError(t, err)
-					}
-					close(stdoutLines)
-					close(stderrLines)
-					close(waitError)
+					assert.ErrorIs(t, err, testCase.waitErr)
 					done = true
 				}
 			}

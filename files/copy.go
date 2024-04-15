@@ -4,15 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
-	"syscall"
 )
 
 var (
 	ErrReadDirectory   = errors.New("cannot read directory")
 	ErrStatFile        = errors.New("cannot stat file")
-	ErrSyscallStat     = errors.New("file does not have syscall stat")
 	ErrCreateDirectory = errors.New("cannot create directory")
 	ErrCopyDirectory   = errors.New("cannot copy directory")
 	ErrCopySymLink     = errors.New("cannot copy symlink")
@@ -25,52 +24,55 @@ var (
 func (f *FileManager) CopyDirectory(fromPath, toPath string) error {
 	entries, err := f.readDir(fromPath)
 	if err != nil {
-		return fmt.Errorf("%w: %s", ErrReadDirectory, err)
+		return fmt.Errorf("%w: %w", ErrReadDirectory, err)
 	}
 	for _, entry := range entries {
-		subFromPath := filepath.Join(fromPath, entry.Name())
-		subToPath := filepath.Join(toPath, entry.Name())
-		fileInfo, err := entry.Info()
+		err = f.copyDirEntry(fromPath, toPath, entry)
 		if err != nil {
-			return fmt.Errorf("%w: for path %s: %s",
-				ErrStatFile, subFromPath, err)
+			return err
 		}
-		stat, ok := fileInfo.Sys().(*syscall.Stat_t)
-		if !ok {
-			return fmt.Errorf("%w: for path %s", ErrSyscallStat, subFromPath)
-		}
+	}
+	return nil
+}
 
-		mode := fileInfo.Mode() & os.ModeType
-		switch mode { //nolint:exhaustive
-		case os.ModeDir:
-			const defaultPermissions os.FileMode = 0700
-			if err := f.CreateDir(subToPath, Permissions(defaultPermissions)); err != nil {
-				return fmt.Errorf("%w: %s", ErrCreateDirectory, err)
-			}
-			if err := f.CopyDirectory(subFromPath, subToPath); err != nil {
-				return fmt.Errorf("%w: from %s to %s: %s",
-					ErrCopyDirectory, subFromPath, subToPath, err)
-			}
-		case os.ModeSymlink:
-			if err := f.CopySymLink(subFromPath, subToPath); err != nil {
-				return fmt.Errorf("%w: from %s to %s: %s",
-					ErrCopySymLink, subFromPath, subToPath, err)
-			}
-		default:
-			if err := f.CopyFile(subFromPath, subToPath); err != nil {
-				return fmt.Errorf("%w: from %s to %s: %s",
-					ErrCopyFile, subFromPath, subToPath, err)
-			}
-		}
-		if err := os.Lchown(subToPath, int(stat.Uid), int(stat.Gid)); err != nil {
-			return fmt.Errorf("%w: path %s: %s", ErrChown, subToPath, err)
-		}
+func (f *FileManager) copyDirEntry(fromPath, toPath string, entry fs.DirEntry) (err error) {
+	subFromPath := filepath.Join(fromPath, entry.Name())
+	subToPath := filepath.Join(toPath, entry.Name())
+	fileInfo, err := entry.Info()
+	if err != nil {
+		return fmt.Errorf("%w: for path %s: %w",
+			ErrStatFile, subFromPath, err)
+	}
 
-		if isSymlink := fileInfo.Mode()&os.ModeSymlink != 0; !isSymlink {
-			if err := os.Chmod(subToPath, fileInfo.Mode()); err != nil {
-				return fmt.Errorf("%w: path %s: %s", ErrChmod, subToPath, err)
-			}
+	switch {
+	case fileInfo.Mode()&os.ModeDir != 0:
+		const defaultPermissions os.FileMode = 0700
+		err = f.CreateDir(subToPath, Permissions(defaultPermissions))
+		if err != nil {
+			return fmt.Errorf("%w: %w", ErrCreateDirectory, err)
 		}
+		err = f.CopyDirectory(subFromPath, subToPath)
+		if err != nil {
+			return fmt.Errorf("%w: from %s to %s: %w",
+				ErrCopyDirectory, subFromPath, subToPath, err)
+		}
+	case fileInfo.Mode()&os.ModeSymlink != 0:
+		err = f.CopySymLink(subFromPath, subToPath)
+		if err != nil {
+			return fmt.Errorf("%w: from %s to %s: %w",
+				ErrCopySymLink, subFromPath, subToPath, err)
+		}
+	default:
+		err = f.CopyFile(subFromPath, subToPath)
+		if err != nil {
+			return fmt.Errorf("%w: from %s to %s: %w",
+				ErrCopyFile, subFromPath, subToPath, err)
+		}
+	}
+
+	err = os.Chmod(subToPath, fileInfo.Mode())
+	if err != nil {
+		return fmt.Errorf("%w: path %s: %w", ErrChmod, subToPath, err)
 	}
 	return nil
 }
@@ -87,32 +89,32 @@ var (
 func (f *FileManager) CopyFile(fromPath, toPath string) (err error) {
 	out, err := f.create(toPath)
 	if err != nil {
-		return fmt.Errorf("%w: path %s: %s", ErrCreateFile, toPath, err)
+		return fmt.Errorf("%w: path %s: %w", ErrCreateFile, toPath, err)
 	}
 
 	defer func() {
 		closeErr := out.Close()
 		if err == nil && closeErr != nil {
-			err = fmt.Errorf("%w: path %s: %s",
+			err = fmt.Errorf("%w: path %s: %w",
 				ErrCloseDestinationFile, toPath, closeErr)
 		}
 	}()
 
 	in, err := f.open(fromPath)
 	if err != nil {
-		return fmt.Errorf("%w: path %s: %s", ErrOpenFile, fromPath, err)
+		return fmt.Errorf("%w: path %s: %w", ErrOpenFile, fromPath, err)
 	}
 
 	defer func() {
 		closeErr := in.Close()
 		if err == nil && closeErr != nil {
-			err = fmt.Errorf("%w: path %s: %s",
+			err = fmt.Errorf("%w: path %s: %w",
 				ErrCloseSourceFile, fromPath, closeErr)
 		}
 	}()
 
 	if _, err := io.Copy(out, in); err != nil {
-		return fmt.Errorf("%w: %s", ErrCopyData, err)
+		return fmt.Errorf("%w: %w", ErrCopyData, err)
 	}
 
 	return nil
@@ -127,11 +129,11 @@ var (
 func (f *FileManager) CopySymLink(fromPath, toPath string) error {
 	link, err := f.readlink(fromPath)
 	if err != nil {
-		return fmt.Errorf("%w: at path %s: %s", ErrReadSymlink, fromPath, err)
+		return fmt.Errorf("%w: at path %s: %w", ErrReadSymlink, fromPath, err)
 	}
 
 	if err := f.symlink(link, toPath); err != nil {
-		return fmt.Errorf("%w: at path %s: %s", ErrReadSymlink, toPath, err)
+		return fmt.Errorf("%w: at path %s: %w", ErrReadSymlink, toPath, err)
 	}
 
 	return nil

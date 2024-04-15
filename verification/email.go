@@ -20,7 +20,7 @@ func (v *Verifier) ValidateEmail(email string) error {
 	host := email[i+1:]
 	_, err := v.mxLookup(host)
 	if err != nil {
-		return fmt.Errorf("%w: for host %s: %s",
+		return fmt.Errorf("%w: for host %s: %w",
 			ErrEmailHostUnreachable, host, err)
 	}
 	return nil

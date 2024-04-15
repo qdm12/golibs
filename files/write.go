@@ -2,6 +2,7 @@ package files
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -60,36 +61,44 @@ var ErrIsDirectory = errors.New("path is a directory")
 
 // WriteToFile writes data bytes to a file, and creates any
 // directory not existing in the file path if necessary.
-func (f *FileManager) WriteToFile(filePath string, data []byte, setters ...WriteOptionSetter) error {
+func (f *FileManager) WriteToFile(filePath string, data []byte,
+	setters ...WriteOptionSetter) (err error) {
 	const defaultPermissions os.FileMode = 0600
 	options := newWriteOptions(defaultPermissions)
 	for _, setter := range setters {
 		setter(&options)
 	}
 	exists, err := f.FileExists(filePath)
-	switch {
-	case err != nil:
-		return err
-	case exists: // verify it is not a directory
+	if err != nil {
+		return fmt.Errorf("checking if file exists: %w", err)
+	}
+
+	if exists {
 		isDir, err := f.IsDirectory(filePath)
 		if err != nil {
-			return err
+			return fmt.Errorf("checking if path is a directory: %w", err)
 		} else if isDir {
-			return ErrIsDirectory
+			return fmt.Errorf("%w: %s", ErrIsDirectory, filePath)
 		}
-	case !exists: // create directories recursively
+	} else {
 		parentDir := f.filepathDir(filePath)
-		if err := f.mkdirAll(parentDir, 0700); err != nil {
-			return err
+		err = f.mkdirAll(parentDir, 0700)
+		if err != nil {
+			return fmt.Errorf("creating parent directory: %w", err)
 		}
 	}
-	if err := f.writeFile(filePath, data, options.permissions); err != nil {
+
+	err = f.writeFile(filePath, data, options.permissions)
+	if err != nil {
 		return err
 	}
+
 	if options.ownership != nil {
-		if err := f.chown(filePath, options.ownership.UID, options.ownership.GID); err != nil {
+		err = f.chown(filePath, options.ownership.UID, options.ownership.GID)
+		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }

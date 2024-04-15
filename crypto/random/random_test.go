@@ -2,35 +2,34 @@ package random
 
 import (
 	"crypto/rand"
-	"fmt"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_Random_GenerateRandomBytes(t *testing.T) {
 	t.Parallel()
+	errTest := errors.New("test")
+
 	tests := map[string]struct {
 		n          int
 		randReader func(b []byte) error
 		err        error
 	}{
 		"no error": {
-			10,
-			func(b []byte) error {
+			n: 10,
+			randReader: func(b []byte) error {
 				_, err := rand.Read(b)
 				return err
 			},
-			nil,
 		},
 		// TODO add test case
 		"error": {
-			0,
-			func(_ []byte) error {
-				return fmt.Errorf("error")
+			randReader: func(_ []byte) error {
+				return errTest
 			},
-			fmt.Errorf("error"),
+			err: errTest,
 		},
 	}
 	for name, tc := range tests {
@@ -41,12 +40,7 @@ func Test_Random_GenerateRandomBytes(t *testing.T) {
 				randReader: tc.randReader,
 			}
 			out, err := r.GenerateRandomBytes(tc.n)
-			if tc.err != nil {
-				require.Error(t, err)
-				assert.Equal(t, tc.err.Error(), err.Error())
-			} else {
-				require.NoError(t, err)
-			}
+			assert.ErrorIs(t, err, tc.err)
 			assert.Len(t, out, tc.n)
 		})
 	}
@@ -66,7 +60,7 @@ func Test_Random_GenerateRandomInt63(t *testing.T) {
 		t.Parallel()
 		r := &Random{
 			randReader: func(_ []byte) error {
-				return fmt.Errorf("error")
+				return errors.New("error")
 			},
 		}
 		assert.PanicsWithValue(t, "error", func() { r.GenerateRandomInt63() })

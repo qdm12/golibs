@@ -1,6 +1,10 @@
 package files
 
-import "fmt"
+import (
+	"fmt"
+	"io/fs"
+	"syscall"
+)
 
 type accessible string
 
@@ -9,6 +13,19 @@ const (
 	writable   accessible = "writable"
 	executable accessible = "executable"
 )
+
+func (a accessible) toBitMode() (bit fs.FileMode) {
+	switch a {
+	case readable:
+		return 4 //nolint:gomnd
+	case writable:
+		return 2 //nolint:gomnd
+	case executable:
+		return 1
+	default:
+		return 0
+	}
+}
 
 func (f *FileManager) IsReadable(filePath string, uid, gid int) (bool, error) {
 	return f.isAccessible(filePath, uid, gid, readable)
@@ -23,57 +40,36 @@ func (f *FileManager) IsExecutable(filePath string, uid, gid int) (bool, error) 
 }
 
 func (f *FileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (
-	accessible bool, err error) {
-	errPrefix := fmt.Sprintf("%s is not %s for user with uid %d and gid %d", filePath, accessibility, uid, gid)
-	ownerUID, ownerGID, err := f.GetOwnership(filePath)
+	ok bool, err error) {
+	info, err := f.fileStat(filePath)
 	if err != nil {
-		return false, fmt.Errorf("%s: %w", errPrefix, err)
+		return false, fmt.Errorf("getting file info: %w", err)
 	}
-	accessible = false
-	switch accessibility {
-	case readable:
-		accessible, _, _, err = f.GetOthersPermissions(filePath)
-	case writable:
-		_, accessible, _, err = f.GetOthersPermissions(filePath)
-	case executable:
-		_, _, accessible, err = f.GetOthersPermissions(filePath)
+	mode := info.Mode()
+	perm := mode.Perm()
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		panic(fmt.Sprintf("file %s does not have syscall stat", filePath))
 	}
-	if err != nil {
-		return false, fmt.Errorf("%s: %w", errPrefix, err)
-	} else if accessible {
+
+	relevantBit := accessibility.toBitMode()
+
+	// Others
+	if perm&relevantBit != 0 {
 		return true, nil
 	}
-	if gid == ownerGID {
-		accessible := false
-		switch accessibility {
-		case readable:
-			accessible, _, _, err = f.GetGroupPermissions(filePath)
-		case writable:
-			_, accessible, _, err = f.GetGroupPermissions(filePath)
-		case executable:
-			_, _, accessible, err = f.GetGroupPermissions(filePath)
-		}
-		if err != nil {
-			return false, fmt.Errorf("%s: %w", errPrefix, err)
-		} else if accessible {
-			return true, nil
-		}
+
+	// Group
+	relevantBit *= 8
+	if gid == int(stat.Gid) && perm&relevantBit != 0 {
+		return true, nil
 	}
-	if uid == ownerUID {
-		accessible := false
-		switch accessibility {
-		case readable:
-			accessible, _, _, err = f.GetUserPermissions(filePath)
-		case writable:
-			_, accessible, _, err = f.GetUserPermissions(filePath)
-		case executable:
-			_, _, accessible, err = f.GetUserPermissions(filePath)
-		}
-		if err != nil {
-			return false, fmt.Errorf("%s: %w", errPrefix, err)
-		} else if accessible {
-			return true, nil
-		}
+
+	// User
+	relevantBit *= 8
+	if uid == int(stat.Uid) && perm&relevantBit != 0 {
+		return true, nil
 	}
+
 	return false, nil
 }

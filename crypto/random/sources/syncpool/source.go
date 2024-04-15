@@ -1,6 +1,7 @@
 package syncpool
 
 import (
+	"fmt"
 	"math/rand"
 	"sync"
 )
@@ -22,7 +23,10 @@ type Source struct {
 }
 
 func (s *Source) Int63() int64 {
-	generator := s.pool.Get().(*generator)
+	generator, ok := s.pool.Get().(*generator)
+	if !ok {
+		panic(fmt.Sprintf("unexpected type %T", generator))
+	}
 
 	v := generator.uint64()
 
