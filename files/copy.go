@@ -10,7 +10,7 @@ import (
 
 // CopyDirectory copies all files, directories and symlinks recursively to another path.
 func (f *FileManager) CopyDirectory(fromPath, toPath string) error {
-	entries, err := f.readDir(fromPath)
+	entries, err := os.ReadDir(fromPath)
 	if err != nil {
 		return fmt.Errorf("reading directory: %w", err)
 	}
@@ -63,7 +63,7 @@ func (f *FileManager) copyDirEntry(fromPath, toPath string, entry fs.DirEntry) (
 
 // CopyFile copies a file from a path to another path.
 func (f *FileManager) CopyFile(fromPath, toPath string) (err error) {
-	out, err := f.create(toPath)
+	out, err := os.Create(toPath)
 	if err != nil {
 		return fmt.Errorf("creating file: %w", err)
 	}
@@ -75,7 +75,7 @@ func (f *FileManager) CopyFile(fromPath, toPath string) (err error) {
 		}
 	}()
 
-	in, err := f.open(fromPath)
+	in, err := os.Open(fromPath)
 	if err != nil {
 		return fmt.Errorf("opening file: %w", err)
 	}
@@ -97,12 +97,12 @@ func (f *FileManager) CopyFile(fromPath, toPath string) (err error) {
 
 // CopySymLink copies a symlink to another path.
 func (f *FileManager) CopySymLink(fromPath, toPath string) error {
-	link, err := f.readlink(fromPath)
+	link, err := os.Readlink(fromPath)
 	if err != nil {
 		return fmt.Errorf("reading source symlink: %w", err)
 	}
 
-	err = f.symlink(link, toPath)
+	err = os.Symlink(link, toPath)
 	if err != nil {
 		return fmt.Errorf("creating desstination symlink: %w", err)
 	}

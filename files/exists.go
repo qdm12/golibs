@@ -1,13 +1,16 @@
 package files
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // FilepathExists returns true if a file path exists.
 func (f *FileManager) FilepathExists(filePath string) (exists bool, err error) {
-	_, err = f.fileStat(filePath)
+	_, err = os.Stat(filePath)
 	if err == nil {
 		return true, nil
-	} else if f.isNotExist(err) {
+	} else if os.IsNotExist(err) {
 		return false, nil
 	}
 	return false, err
@@ -43,7 +46,7 @@ func (f *FileManager) IsFile(filePath string) (bool, error) {
 
 // IsDirectory returns true if the path points to a directory.
 func (f *FileManager) IsDirectory(filePath string) (bool, error) {
-	info, err := f.fileStat(filePath)
+	info, err := os.Stat(filePath)
 	if err != nil {
 		return false, fmt.Errorf("stating file: %w", err)
 	}

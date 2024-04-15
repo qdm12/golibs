@@ -3,6 +3,7 @@ package files
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"syscall"
 )
 
@@ -41,7 +42,7 @@ func (f *FileManager) IsExecutable(filePath string, uid, gid int) (bool, error) 
 
 func (f *FileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (
 	ok bool, err error) {
-	info, err := f.fileStat(filePath)
+	info, err := os.Stat(filePath)
 	if err != nil {
 		return false, err
 	}

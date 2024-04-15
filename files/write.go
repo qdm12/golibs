@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -47,13 +48,13 @@ func (f *FileManager) CreateDir(filePath string, setters ...WriteOptionSetter) e
 			return fmt.Errorf("setting file permissions: %w", err)
 		}
 	} else {
-		err = f.mkdirAll(filePath, options.permissions)
+		err = os.MkdirAll(filePath, options.permissions)
 		if err != nil {
 			return fmt.Errorf("creating directory: %w", err)
 		}
 	}
 	if options.ownership != nil {
-		err = f.chown(filePath, options.ownership.UID, options.ownership.GID)
+		err = os.Chown(filePath, options.ownership.UID, options.ownership.GID)
 		if err != nil {
 			return fmt.Errorf("setting file permissions: %w", err)
 		}
@@ -85,20 +86,20 @@ func (f *FileManager) WriteToFile(filePath string, data []byte,
 			return fmt.Errorf("%w: %s", ErrIsDirectory, filePath)
 		}
 	} else {
-		parentDir := f.filepathDir(filePath)
-		err = f.mkdirAll(parentDir, 0700)
+		parentDir := filepath.Dir(filePath)
+		err = os.MkdirAll(parentDir, 0700)
 		if err != nil {
 			return fmt.Errorf("creating parent directory: %w", err)
 		}
 	}
 
-	err = f.writeFile(filePath, data, options.permissions)
+	err = os.WriteFile(filePath, data, options.permissions)
 	if err != nil {
 		return fmt.Errorf("writing file: %w", err)
 	}
 
 	if options.ownership != nil {
-		err = f.chown(filePath, options.ownership.UID, options.ownership.GID)
+		err = os.Chown(filePath, options.ownership.UID, options.ownership.GID)
 		if err != nil {
 			return fmt.Errorf("changing ownership of %s to %d:%d: %w",
 				filePath, options.ownership.UID, options.ownership.GID, err)

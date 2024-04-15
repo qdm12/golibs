@@ -8,7 +8,7 @@ import (
 
 // GetUserPermissions obtains the permissions of the user owning the file.
 func (f *FileManager) GetUserPermissions(filePath string) (read, write, execute bool, err error) {
-	info, err := f.fileStat(filePath)
+	info, err := os.Stat(filePath)
 	if err != nil {
 		return false, false, false, err
 	}
@@ -19,7 +19,7 @@ func (f *FileManager) GetUserPermissions(filePath string) (read, write, execute 
 
 // GetGroupPermissions obtains the permissions of the group owning the file path.
 func (f *FileManager) GetGroupPermissions(filePath string) (read, write, execute bool, err error) {
-	info, err := f.fileStat(filePath)
+	info, err := os.Stat(filePath)
 	if err != nil {
 		return false, false, false, err
 	}
@@ -30,7 +30,7 @@ func (f *FileManager) GetGroupPermissions(filePath string) (read, write, execute
 
 // GetOthersPermissions obtains the permissions for users and groups not owning the file path.
 func (f *FileManager) GetOthersPermissions(filePath string) (read, write, execute bool, err error) {
-	info, err := f.fileStat(filePath)
+	info, err := os.Stat(filePath)
 	if err != nil {
 		return false, false, false, err
 	}
@@ -46,5 +46,5 @@ func (f *FileManager) SetUserPermissions(filepath string, mod os.FileMode) error
 	} else if !exists {
 		return fmt.Errorf("%w: %s", fs.ErrNotExist, filepath)
 	}
-	return f.chmod(filepath, mod)
+	return os.Chmod(filepath, mod)
 }
