@@ -28,19 +28,19 @@ func (a accessible) toBitMode() (bit fs.FileMode) {
 	}
 }
 
-func (f *FileManager) IsReadable(filePath string, uid, gid int) (bool, error) {
-	return f.isAccessible(filePath, uid, gid, readable)
+func IsReadable(filePath string, uid, gid int) (bool, error) {
+	return isAccessible(filePath, uid, gid, readable)
 }
 
-func (f *FileManager) IsWritable(filePath string, uid, gid int) (bool, error) {
-	return f.isAccessible(filePath, uid, gid, writable)
+func IsWritable(filePath string, uid, gid int) (bool, error) {
+	return isAccessible(filePath, uid, gid, writable)
 }
 
-func (f *FileManager) IsExecutable(filePath string, uid, gid int) (bool, error) {
-	return f.isAccessible(filePath, uid, gid, executable)
+func IsExecutable(filePath string, uid, gid int) (bool, error) {
+	return isAccessible(filePath, uid, gid, executable)
 }
 
-func (f *FileManager) isAccessible(filePath string, uid, gid int, accessibility accessible) (
+func isAccessible(filePath string, uid, gid int, accessibility accessible) (
 	ok bool, err error) {
 	info, err := os.Stat(filePath)
 	if err != nil {

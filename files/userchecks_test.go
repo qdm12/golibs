@@ -58,9 +58,7 @@ func Test_FileManager_isAccessible(t *testing.T) {
 			err = os.Chmod(file.Name(), testCase.perms)
 			require.NoError(t, err)
 
-			manager := NewFileManager()
-
-			ok, err := manager.isAccessible(file.Name(),
+			ok, err := isAccessible(file.Name(),
 				testCase.uid, testCase.gid, testCase.accessibility)
 
 			if testCase.errMessage != "" {

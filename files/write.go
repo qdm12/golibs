@@ -11,33 +11,33 @@ import (
 
 // WriteLinesToFile writes a slice of strings as lines to a file.
 // It creates any directory not existing in the file path if necessary.
-func (f *FileManager) WriteLinesToFile(filePath string, lines []string, options ...WriteOptionSetter) error {
+func WriteLinesToFile(filePath string, lines []string, options ...WriteOptionSetter) error {
 	var data []byte
 	if len(lines) > 0 && (len(lines) != 1 || len(lines[0]) > 0) {
 		data = []byte(strings.Join(lines, "\n"))
 	}
-	return f.WriteToFile(filePath, data, options...)
+	return WriteToFile(filePath, data, options...)
 }
 
 // Touch creates an empty file at the file path given.
 // It creates any directory not existing in the file path if necessary.
-func (f *FileManager) Touch(filePath string, options ...WriteOptionSetter) error {
-	return f.WriteToFile(filePath, nil, options...)
+func Touch(filePath string, options ...WriteOptionSetter) error {
+	return WriteToFile(filePath, nil, options...)
 }
 
-func (f *FileManager) CreateDir(filePath string, setters ...WriteOptionSetter) error {
+func CreateDir(filePath string, setters ...WriteOptionSetter) error {
 	const defaultPermissions os.FileMode = 0700
 	options := newWriteOptions(defaultPermissions)
 	for _, setter := range setters {
 		setter(&options)
 	}
 
-	exists, err := f.FilepathExists(filePath)
+	exists, err := FilepathExists(filePath)
 	if err != nil {
 		return err
 	}
 	if exists { //nolint:nestif
-		isFile, err := f.IsFile(filePath)
+		isFile, err := IsFile(filePath)
 		if err != nil {
 			return err
 		} else if isFile {
@@ -66,20 +66,20 @@ var ErrIsDirectory = errors.New("path is a directory")
 
 // WriteToFile writes data bytes to a file, and creates any
 // directory not existing in the file path if necessary.
-func (f *FileManager) WriteToFile(filePath string, data []byte,
+func WriteToFile(filePath string, data []byte,
 	setters ...WriteOptionSetter) (err error) {
 	const defaultPermissions os.FileMode = 0600
 	options := newWriteOptions(defaultPermissions)
 	for _, setter := range setters {
 		setter(&options)
 	}
-	exists, err := f.FileExists(filePath)
+	exists, err := FileExists(filePath)
 	if err != nil {
 		return fmt.Errorf("checking if file exists: %w", err)
 	}
 
 	if exists {
-		isDir, err := f.IsDirectory(filePath)
+		isDir, err := IsDirectory(filePath)
 		if err != nil {
 			return fmt.Errorf("checking if path is a directory: %w", err)
 		} else if isDir {
@@ -87,7 +87,7 @@ func (f *FileManager) WriteToFile(filePath string, data []byte,
 		}
 	} else {
 		parentDir := filepath.Dir(filePath)
-		err = f.CreateDir(parentDir)
+		err = CreateDir(parentDir)
 		if err != nil {
 			return fmt.Errorf("creating parent directory: %w", err)
 		}

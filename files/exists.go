@@ -5,7 +5,7 @@ import (
 )
 
 // FilepathExists returns true if a file path exists.
-func (f *FileManager) FilepathExists(filePath string) (exists bool, err error) {
+func FilepathExists(filePath string) (exists bool, err error) {
 	_, err = os.Stat(filePath)
 	if err == nil {
 		return true, nil
@@ -17,7 +17,7 @@ func (f *FileManager) FilepathExists(filePath string) (exists bool, err error) {
 
 // FileExists returns true if a file exists at the path given.
 // If a directory is at the path, it returns false.
-func (f *FileManager) FileExists(filePath string) (exists bool, err error) {
+func FileExists(filePath string) (exists bool, err error) {
 	info, err := os.Stat(filePath)
 	switch {
 	case os.IsNotExist(err):
@@ -30,7 +30,7 @@ func (f *FileManager) FileExists(filePath string) (exists bool, err error) {
 }
 
 // DirectoryExists returns true if a directory exists.
-func (f *FileManager) DirectoryExists(filePath string) (exists bool, err error) {
+func DirectoryExists(filePath string) (exists bool, err error) {
 	info, err := os.Stat(filePath)
 	switch {
 	case os.IsNotExist(err):
@@ -43,13 +43,13 @@ func (f *FileManager) DirectoryExists(filePath string) (exists bool, err error) 
 }
 
 // IsFile returns true if the path points to a file.
-func (f *FileManager) IsFile(filePath string) (bool, error) {
-	isDir, err := f.IsDirectory(filePath)
+func IsFile(filePath string) (bool, error) {
+	isDir, err := IsDirectory(filePath)
 	return !isDir, err
 }
 
 // IsDirectory returns true if the path points to a directory.
-func (f *FileManager) IsDirectory(filePath string) (bool, error) {
+func IsDirectory(filePath string) (bool, error) {
 	info, err := os.Stat(filePath)
 	if err != nil {
 		return false, err

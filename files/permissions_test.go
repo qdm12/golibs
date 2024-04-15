@@ -57,9 +57,7 @@ func Test_FileManager_GetUserPermissions(t *testing.T) {
 			err = os.Chmod(file.Name(), testCase.perms)
 			require.NoError(t, err)
 
-			manager := NewFileManager()
-
-			read, write, execute, err := manager.GetUserPermissions(file.Name())
+			read, write, execute, err := GetUserPermissions(file.Name())
 
 			require.NoError(t, err)
 			assert.Equal(t, testCase.read, read)
@@ -114,9 +112,7 @@ func Test_FileManager_GetGroupPermissions(t *testing.T) {
 			err = os.Chmod(file.Name(), testCase.perms)
 			require.NoError(t, err)
 
-			manager := NewFileManager()
-
-			read, write, execute, err := manager.GetGroupPermissions(file.Name())
+			read, write, execute, err := GetGroupPermissions(file.Name())
 
 			require.NoError(t, err)
 			assert.Equal(t, testCase.read, read)
@@ -171,9 +167,7 @@ func Test_FileManager_GetOthersPermissions(t *testing.T) {
 			err = os.Chmod(file.Name(), testCase.perms)
 			require.NoError(t, err)
 
-			manager := NewFileManager()
-
-			read, write, execute, err := manager.GetOthersPermissions(file.Name())
+			read, write, execute, err := GetOthersPermissions(file.Name())
 
 			require.NoError(t, err)
 			assert.Equal(t, testCase.read, read)
