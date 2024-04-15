@@ -43,7 +43,8 @@ func (c *MixedChecker) Check(ctx context.Context, url string) (err error) {
 
 	errStrings := make([]string, 0, len(c.checkers))
 	for range c.checkers {
-		if err := <-errorsCh; err != nil {
+		err = <-errorsCh
+		if err != nil {
 			errStrings = append(errStrings, err.Error())
 		}
 	}

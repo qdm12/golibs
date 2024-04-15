@@ -36,21 +36,26 @@ func (f *FileManager) CreateDir(filePath string, setters ...WriteOptionSetter) e
 	if err != nil {
 		return err
 	}
-	if exists {
+	if exists { //nolint:nestif
 		isFile, err := f.IsFile(filePath)
 		if err != nil {
 			return err
 		} else if isFile {
 			return ErrFileExistsAtPath
 		}
-		if err := f.SetUserPermissions(filePath, options.permissions); err != nil {
+		err = f.SetUserPermissions(filePath, options.permissions)
+		if err != nil {
 			return err
 		}
-	} else if err := f.mkdirAll(filePath, options.permissions); err != nil {
-		return err
+	} else {
+		err = f.mkdirAll(filePath, options.permissions)
+		if err != nil {
+			return err
+		}
 	}
 	if options.ownership != nil {
-		if err := f.chown(filePath, options.ownership.UID, options.ownership.GID); err != nil {
+		err = f.chown(filePath, options.ownership.UID, options.ownership.GID)
+		if err != nil {
 			return err
 		}
 	}

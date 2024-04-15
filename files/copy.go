@@ -113,7 +113,8 @@ func (f *FileManager) CopyFile(fromPath, toPath string) (err error) {
 		}
 	}()
 
-	if _, err := io.Copy(out, in); err != nil {
+	_, err = io.Copy(out, in)
+	if err != nil {
 		return fmt.Errorf("%w: %w", ErrCopyData, err)
 	}
 
@@ -132,7 +133,8 @@ func (f *FileManager) CopySymLink(fromPath, toPath string) error {
 		return fmt.Errorf("%w: at path %s: %w", ErrReadSymlink, fromPath, err)
 	}
 
-	if err := f.symlink(link, toPath); err != nil {
+	err = f.symlink(link, toPath)
+	if err != nil {
 		return fmt.Errorf("%w: at path %s: %w", ErrReadSymlink, toPath, err)
 	}
 

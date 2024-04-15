@@ -38,7 +38,8 @@ func (c *Cmder) Start(cmd ExecCmd) (
 	stderrLines = make(chan string)
 	go streamToChannel(done, wg, stderr, stderrLines)
 
-	if err := cmd.Start(); err != nil {
+	err = cmd.Start()
+	if err != nil {
 		close(done)
 		_ = stdout.Close()
 		close(stdoutLines)

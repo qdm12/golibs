@@ -45,9 +45,10 @@ func randReader(b []byte) error {
 }
 
 // GenerateRandomBytes generates n random bytes.
-func (r *Random) GenerateRandomBytes(n int) ([]byte, error) {
-	b := make([]byte, n)
-	if err := r.randReader(b); err != nil {
+func (r *Random) GenerateRandomBytes(n int) (b []byte, err error) {
+	b = make([]byte, n)
+	err = r.randReader(b)
+	if err != nil {
 		return nil, err
 	}
 	return b, nil
@@ -91,7 +92,8 @@ func (r *Random) GenerateRandomAlphaNum(length uint64) string {
 		if remain == 0 {
 			cache, remain = r.GenerateRandomInt63(), letterIdxMax
 		}
-		if idx := int(cache & letterIdxMask); idx < len(alphaNum) {
+		idx := int(cache & letterIdxMask)
+		if idx < len(alphaNum) {
 			b[i] = alphaNum[idx]
 			i--
 		}
