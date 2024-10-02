@@ -3,70 +3,79 @@ package command
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"os"
-	"sync"
+	"os/exec"
 )
 
 // Start launches a command and streams stdout and stderr to channels.
-// All the channels returned should be closed when an error,
-// nil or not, is received in the waitError channel.
-// The channels should NOT be closed if an error is returned directly
-// with err, as they will already be closed internally by the function.
-func (c *Cmder) Start(cmd ExecCmd) (
-	stdoutLines, stderrLines chan string, waitError chan error, err error) {
-	wg := &sync.WaitGroup{}
+// All the channels returned are ready only and won't be closed
+// if the command fails later.
+func (c *Cmder) Start(cmd *exec.Cmd) (
+	stdoutLines, stderrLines <-chan string,
+	waitError <-chan error, startErr error) {
+	return start(cmd)
+}
 
-	done := make(chan struct{})
+func start(cmd execCmd) (stdoutLines, stderrLines <-chan string,
+	waitError <-chan error, startErr error) {
+	stop := make(chan struct{})
+	stdoutReady := make(chan struct{})
+	stdoutLinesCh := make(chan string)
+	stdoutDone := make(chan struct{})
+	stderrReady := make(chan struct{})
+	stderrLinesCh := make(chan string)
+	stderrDone := make(chan struct{})
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("creating stdout pipe: %w", err)
+		return nil, nil, nil, err
 	}
-	wg.Add(1)
-	stdoutLines = make(chan string)
-	go streamToChannel(done, wg, stdout, stdoutLines)
+	go streamToChannel(stdoutReady, stop, stdoutDone, stdout, stdoutLinesCh)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		_ = stdout.Close()
-		close(stdoutLines)
-		wg.Wait()
-		return nil, nil, nil, fmt.Errorf("creating stderr pipe: %w", err)
+		close(stop)
+		<-stdoutDone
+		return nil, nil, nil, err
 	}
-	wg.Add(1)
-	stderrLines = make(chan string)
-	go streamToChannel(done, wg, stderr, stderrLines)
+	go streamToChannel(stderrReady, stop, stderrDone, stderr, stderrLinesCh)
 
 	err = cmd.Start()
 	if err != nil {
-		close(done)
 		_ = stdout.Close()
-		close(stdoutLines)
 		_ = stderr.Close()
-		close(stderrLines)
-		wg.Wait()
+		close(stop)
+		<-stdoutDone
+		<-stderrDone
 		return nil, nil, nil, err
 	}
 
-	waitError = make(chan error)
+	waitErrorCh := make(chan error)
 	go func() {
 		err := cmd.Wait()
-		close(done)
 		_ = stdout.Close()
 		_ = stderr.Close()
-		wg.Wait()
-		waitError <- err
+		close(stop)
+		<-stdoutDone
+		<-stderrDone
+		waitErrorCh <- err
 	}()
 
-	return stdoutLines, stderrLines, waitError, nil
+	return stdoutLinesCh, stderrLinesCh, waitErrorCh, nil
 }
 
-func streamToChannel(done <-chan struct{}, wg *sync.WaitGroup,
+func streamToChannel(ready chan<- struct{},
+	stop <-chan struct{}, done chan<- struct{},
 	stream io.Reader, lines chan<- string) {
-	defer wg.Done()
+	defer close(done)
+	close(ready)
 	scanner := bufio.NewScanner(stream)
+	lineBuffer := make([]byte, bufio.MaxScanTokenSize) // 64KB
+	const maxCapacity = 1 * 1024 * 1024                // 1MB
+	scanner.Buffer(lineBuffer, maxCapacity)
+
 	for scanner.Scan() {
 		// scanner is closed if the context is canceled
 		// or if the command failed starting because the
@@ -74,18 +83,15 @@ func streamToChannel(done <-chan struct{}, wg *sync.WaitGroup,
 		lines <- scanner.Text()
 	}
 	err := scanner.Err()
-	if err == nil {
+	if err == nil || errors.Is(err, os.ErrClosed) {
 		return
 	}
 
-	// ignore the error if we are done
+	// ignore the error if it is stopped.
 	select {
-	case <-done:
+	case <-stop:
 		return
 	default:
-	}
-
-	if !errors.Is(err, os.ErrClosed) {
 		lines <- "stream error: " + err.Error()
 	}
 }

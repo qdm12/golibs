@@ -17,80 +17,38 @@ func linesToReadCloser(lines []string) io.ReadCloser {
 	return io.NopCloser(bytes.NewBufferString(s))
 }
 
-func Test_commander_Start(t *testing.T) {
+func Test_start(t *testing.T) { //nolint:cyclop
 	t.Parallel()
 
 	errDummy := errors.New("dummy")
 
 	testCases := map[string]struct {
-		makeExecCmd func(ctrl *gomock.Controller) *MockExecCmd
-		stdout      []string
-		stderr      []string
-		startErr    error
-		waitErr     error
-		err         error
+		stdout        []string
+		stdoutPipeErr error
+		stderr        []string
+		stderrPipeErr error
+		startErr      error
+		waitErr       error
+		err           error
 	}{
-		"no_output": {
-			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
-				cmd := NewMockExecCmd(ctrl)
-				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().StderrPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().Start().Return(nil)
-				cmd.EXPECT().Wait().Return(nil)
-				return cmd
-			},
-		},
+		"no output": {},
 		"success": {
-			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
-				cmd := NewMockExecCmd(ctrl)
-				cmd.EXPECT().StdoutPipe().
-					Return(linesToReadCloser([]string{"hello", "world"}), nil)
-				cmd.EXPECT().StderrPipe().
-					Return(linesToReadCloser([]string{"some", "error"}), nil)
-				cmd.EXPECT().Start().Return(nil)
-				cmd.EXPECT().Wait().Return(nil)
-				return cmd
-			},
 			stdout: []string{"hello", "world"},
 			stderr: []string{"some", "error"},
 		},
-		"stdout_pipe_error": {
-			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
-				cmd := NewMockExecCmd(ctrl)
-				cmd.EXPECT().StdoutPipe().Return(nil, errDummy)
-				return cmd
-			},
-			err: errDummy,
+		"stdout pipe error": {
+			stdoutPipeErr: errDummy,
+			err:           errDummy,
 		},
-		"stderr_pipe_error": {
-			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
-				cmd := NewMockExecCmd(ctrl)
-				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().StderrPipe().Return(nil, errDummy)
-				return cmd
-			},
-			err: errDummy,
+		"stderr pipe error": {
+			stderrPipeErr: errDummy,
+			err:           errDummy,
 		},
 		"start error": {
-			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
-				cmd := NewMockExecCmd(ctrl)
-				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().StderrPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().Start().Return(errDummy)
-				return cmd
-			},
 			startErr: errDummy,
 			err:      errDummy,
 		},
 		"wait error": {
-			makeExecCmd: func(ctrl *gomock.Controller) *MockExecCmd {
-				cmd := NewMockExecCmd(ctrl)
-				cmd.EXPECT().StdoutPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().StderrPipe().Return(linesToReadCloser(nil), nil)
-				cmd.EXPECT().Start().Return(nil)
-				cmd.EXPECT().Wait().Return(errDummy)
-				return cmd
-			},
 			waitErr: errDummy,
 		},
 	}
@@ -99,15 +57,31 @@ func Test_commander_Start(t *testing.T) {
 		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			ctrl := gomock.NewController(t)
 
-			cmder := &Cmder{}
-			mockCmd := testCase.makeExecCmd(ctrl)
+			stdout := linesToReadCloser(testCase.stdout)
+			stderr := linesToReadCloser(testCase.stderr)
 
-			stdoutLines, stderrLines, waitError, err := cmder.Start(mockCmd)
+			mockCmd := NewMockexecCmd(ctrl)
 
-			assert.ErrorIs(t, err, testCase.err)
+			mockCmd.EXPECT().StdoutPipe().
+				Return(stdout, testCase.stdoutPipeErr)
+			if testCase.stdoutPipeErr == nil {
+				mockCmd.EXPECT().StderrPipe().Return(stderr, testCase.stderrPipeErr)
+				if testCase.stderrPipeErr == nil {
+					mockCmd.EXPECT().Start().Return(testCase.startErr)
+					if testCase.startErr == nil {
+						mockCmd.EXPECT().Wait().Return(testCase.waitErr)
+					}
+				}
+			}
+
+			stdoutLines, stderrLines, waitError, err := start(mockCmd)
+
 			if testCase.err != nil {
+				require.Error(t, err)
+				assert.Equal(t, testCase.err.Error(), err.Error())
 				assert.Nil(t, stdoutLines)
 				assert.Nil(t, stderrLines)
 				assert.Nil(t, waitError)
@@ -117,6 +91,7 @@ func Test_commander_Start(t *testing.T) {
 			require.NoError(t, err)
 
 			var stdoutIndex, stderrIndex int
+
 			done := false
 			for !done {
 				select {
@@ -127,7 +102,12 @@ func Test_commander_Start(t *testing.T) {
 					assert.Equal(t, testCase.stderr[stderrIndex], line)
 					stderrIndex++
 				case err := <-waitError:
-					assert.ErrorIs(t, err, testCase.waitErr)
+					if testCase.waitErr != nil {
+						require.Error(t, err)
+						assert.Equal(t, testCase.waitErr.Error(), err.Error())
+					} else {
+						assert.NoError(t, err)
+					}
 					done = true
 				}
 			}
