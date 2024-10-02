@@ -5,7 +5,7 @@ ARG GOLANGCI_LINT_VERSION=v1.56.2
 FROM --platform=${BUILDPLATFORM} qmcgaw/binpot:golangci-lint-${GOLANGCI_LINT_VERSION} AS golangci-lint
 
 FROM --platform=${BUILDPLATFORM} golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-RUN apk --update --no-cache add git g++
+RUN apk --update --no-cache add git g++ findutils
 ENV CGO_ENABLED=0
 WORKDIR /tmp/gobuild
 COPY --from=golangci-lint /bin /go/bin/golangci-lint
