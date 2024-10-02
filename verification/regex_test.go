@@ -8,7 +8,7 @@ import (
 
 func Test_SearchIPv4(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		finds []string
@@ -24,7 +24,7 @@ func Test_SearchIPv4(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.SearchIPv4(tc.s)
+			out := SearchIPv4(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
 	}
@@ -32,7 +32,7 @@ func Test_SearchIPv4(t *testing.T) {
 
 func Test_SearchIPv6(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		finds []string
@@ -57,7 +57,7 @@ func Test_SearchIPv6(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.SearchIPv6(tc.s)
+			out := SearchIPv6(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
 	}
@@ -65,7 +65,7 @@ func Test_SearchIPv6(t *testing.T) {
 
 func Test_SearchEmail(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		finds []string
@@ -86,7 +86,7 @@ func Test_SearchEmail(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.SearchEmail(tc.s)
+			out := SearchEmail(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
 	}
@@ -94,7 +94,7 @@ func Test_SearchEmail(t *testing.T) {
 
 func Test_SearchPhone(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		finds []string
@@ -128,7 +128,7 @@ func Test_SearchPhone(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.SearchPhone(tc.s)
+			out := SearchPhone(tc.s)
 			assert.ElementsMatch(t, tc.finds, out)
 		})
 	}
@@ -136,7 +136,7 @@ func Test_SearchPhone(t *testing.T) {
 
 func Test_MatchEmail(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		match bool
@@ -156,7 +156,7 @@ func Test_MatchEmail(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.MatchEmail(tc.s)
+			out := MatchEmail(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
 	}
@@ -164,7 +164,7 @@ func Test_MatchEmail(t *testing.T) {
 
 func Test_MatchPhoneIntl(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		match bool
@@ -180,7 +180,7 @@ func Test_MatchPhoneIntl(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.MatchPhoneIntl(tc.s)
+			out := MatchPhoneIntl(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
 	}
@@ -188,7 +188,7 @@ func Test_MatchPhoneIntl(t *testing.T) {
 
 func Test_MatchPhoneLocal(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		match bool
@@ -207,7 +207,7 @@ func Test_MatchPhoneLocal(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.MatchPhoneLocal(tc.s)
+			out := MatchPhoneLocal(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
 	}
@@ -215,7 +215,7 @@ func Test_MatchPhoneLocal(t *testing.T) {
 
 func Test_MatchDomain(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		match bool
@@ -234,7 +234,7 @@ func Test_MatchDomain(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.MatchDomain(tc.s)
+			out := MatchDomain(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
 	}
@@ -242,7 +242,7 @@ func Test_MatchDomain(t *testing.T) {
 
 func Test_MatchHostname(t *testing.T) {
 	t.Parallel()
-	v := NewVerifier()
+
 	tests := map[string]struct {
 		s     string
 		match bool
@@ -261,7 +261,7 @@ func Test_MatchHostname(t *testing.T) {
 		tc := tc
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			out := v.MatchHostname(tc.s)
+			out := MatchHostname(tc.s)
 			assert.Equal(t, tc.match, out)
 		})
 	}

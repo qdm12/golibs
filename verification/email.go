@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 )
 
@@ -13,14 +12,10 @@ var (
 	ErrEmailHostUnreachable = errors.New("email host is not reachable")
 )
 
-var (
-	regexEmailMatch = regexp.MustCompile("^" + regexEmail + "$")
-)
-
 // ValidateEmail verifies the format and the existence of an email address with a MX lookup.
 func ValidateEmail(ctx context.Context, email string,
 	mxLookuper MXLookuper) error {
-	if !regexEmailMatch.MatchString(email) {
+	if !MatchEmail(email) {
 		return fmt.Errorf("%w: %s", ErrEmailFormatNotValid, email)
 	}
 
