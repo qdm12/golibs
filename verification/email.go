@@ -1,8 +1,10 @@
 package verification
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -11,17 +13,29 @@ var (
 	ErrEmailHostUnreachable = errors.New("email host is not reachable")
 )
 
+var (
+	regexEmailMatch = regexp.MustCompile("^" + regexEmail + "$")
+)
+
 // ValidateEmail verifies the format and the existence of an email address with a MX lookup.
-func (v *Verifier) ValidateEmail(email string) error {
-	if !v.Regex.MatchEmail(email) {
+func ValidateEmail(ctx context.Context, email string,
+	mxLookuper MXLookuper) error {
+	if !regexEmailMatch.MatchString(email) {
 		return fmt.Errorf("%w: %s", ErrEmailFormatNotValid, email)
 	}
+
 	i := strings.LastIndexByte(email, '@')
 	host := email[i+1:]
-	_, err := v.mxLookup(host)
-	if err != nil {
+	records, err := mxLookuper.LookupMX(ctx, host)
+
+	switch {
+	case err != nil:
 		return fmt.Errorf("%w: for host %s: %w",
 			ErrEmailHostUnreachable, host, err)
+	case len(records) == 0:
+		return fmt.Errorf("%w: for host %s: no MX record found",
+			ErrEmailHostUnreachable, host)
+	default:
+		return nil
 	}
-	return nil
 }
